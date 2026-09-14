@@ -51,12 +51,15 @@ public class NightwatchSparkParticle extends SpriteBillboardParticle {
         this.centerZ = effect.centerZ();
         this.converging = effect.converging();
 
-        // 萤火虫大小：比枝叶的搏动粒子小一半还多
+        // 萤火虫大小：比枝叶的搏动粒子小一半还多，只在眼角余光里闪一下
         this.scale = 0.050F + this.random.nextFloat() * 0.045F;
+        // 收拢的那批路程短、很快到；飞散的那批要飘出去，所以给长一点的寿命
         this.maxAge = this.converging ? 22 + this.random.nextInt(7) : 24 + this.random.nextInt(9);
+        // 不受重力、也不被方块挡住：否则光点会往下掉或贴在墙上，就不像"光"了
         this.collidesWithWorld = false;
         this.gravityStrength = 0.0F;
 
+        // 深蓝为主，掺少量发光的亮蓝点——全是深蓝会显得死，全靠亮蓝又会太抢眼
         if (this.random.nextFloat() < DEEP_BLUE_CHANCE) {
             this.setColor(0.16F, 0.30F, 0.78F);
         } else {
@@ -64,7 +67,7 @@ public class NightwatchSparkParticle extends SpriteBillboardParticle {
         }
 
         if (!this.converging) {
-            // 飞散：给一个随机方向的初速度，略微向上偏
+            // 飞散：给一个随机方向的初速度；俯仰上略微偏上，看着像是从眼眶里"冒"出来
             double angle = this.random.nextDouble() * Math.PI * 2.0D;
             double rise = (this.random.nextDouble() - 0.30D) * 0.6D;
             double speed = 0.055D + this.random.nextDouble() * 0.050D;

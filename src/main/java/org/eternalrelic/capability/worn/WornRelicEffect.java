@@ -192,15 +192,20 @@ public final class WornRelicEffect {
         Random random = player.getRandom();
 
         for (int i = 0; i < INSTALL_SPARK_COUNT; i++) {
+            // 在球面上取一个均匀分布的方向：方位角（theta）随便取即可；
+            // 俯仰角（phi）必须按 cos 均匀取值，否则光点会往两极堆，
+            // 看上去就变成"上下各一串"，而不是从四面八方收拢
             double theta = random.nextDouble() * Math.PI * 2.0D;
             double cosPhi = random.nextDouble() * 2.0D - 1.0D;
             double sinPhi = Math.sqrt(Math.max(0.0D, 1.0D - cosPhi * cosPhi));
             double distance = SPARK_SPAWN_MIN_DISTANCE + random.nextDouble() * SPARK_SPAWN_DISTANCE_SPREAD;
 
+            // 竖直方向压扁一些：人的头部前后左右比上下宽，用正球体会显得上下拉得太开
             double x = headX + sinPhi * Math.cos(theta) * distance;
             double y = headY + cosPhi * distance * 0.75D;
             double z = headZ + sinPhi * Math.sin(theta) * distance;
 
+            // 一次只生成一颗：每颗的出生点都不同，没法合并成一次批量生成
             world.spawnParticles(
                     new NightwatchParticleEffect(headX, headY, headZ, true),
                     x, y, z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
@@ -223,6 +228,8 @@ public final class WornRelicEffect {
         double headY = player.getEyeY();
         double headZ = player.getZ();
 
+        // 这批光点的出生点都挤在头部附近，因此可以一次批量生成：
+        // 后三个偏移量让它们散落在一小块范围内；具体各自往哪飞，由客户端逐颗随机决定
         world.spawnParticles(
                 new NightwatchParticleEffect(headX, headY, headZ, false),
                 headX, headY, headZ,

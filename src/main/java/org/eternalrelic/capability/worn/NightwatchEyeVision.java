@@ -97,13 +97,17 @@ public final class NightwatchEyeVision {
      * @param refreshNightVision 本轮是否轮到给夜视续期
      */
     private static void applyFor(ServerPlayerEntity player, boolean refreshNightVision) {
-        if (WornRelicEffect.isWorn(player, NightwatchEye.LEFT) && isInDark(player)) {
+        // 亮度这一轮只查一次：两只眼共用同一个"这里够不够暗"的判断
+        boolean inDark = isInDark(player);
+
+        if (inDark && WornRelicEffect.isWorn(player, NightwatchEye.LEFT)) {
             keepNightVision(player, refreshNightVision);
         } else {
+            // 不在暗处、或已经没戴左眼：把夜视收回来
             dropNightVision(player);
         }
 
-        if (isInDark(player) && WornRelicEffect.isWorn(player, NightwatchEye.RIGHT)) {
+        if (inDark && WornRelicEffect.isWorn(player, NightwatchEye.RIGHT)) {
             outlineVisibleCreatures(player);
         }
     }
