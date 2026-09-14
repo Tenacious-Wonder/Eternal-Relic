@@ -4,12 +4,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import org.eternalrelic.registry.ModItems;
 import org.eternalrelic.relic.NightwatchEye;
 
 /**
@@ -26,17 +32,31 @@ import org.eternalrelic.relic.NightwatchEye;
  * 退出再进时，玩家的属性会被游戏自己存进存档，状态因此自动延续；只有死亡重生与穿越维度时
  * 玩家会被换成一个新的个体、属性不跟着走，才需要 {@link ServerPlayerEvents#COPY_FROM}
  * 把这条扣减重新挂上去。</p>
+ *
+ * <h2>怎么取下来</h2>
+ * <p>装入是拿生命上限换视野，取下来则要付出另一份代价：吃下金苹果、附魔金苹果，或获得恢复二
+ * 及以上的效果。满足条件时 {@link #releaseAll 取下全部已装入的眼睛}——生命上限还给玩家，
+ * 眼睛则以<b>能量耗尽</b>的形态落到脚下，需要与附魔之瓶合成才能重新装上。</p>
+ *
+ * <p>金苹果与附魔金苹果由 {@code PlayerEntityMixin} 在玩家进食时通知；恢复效果则在
+ * {@link #register() 这里}逐刻核对。两条来源合起来正是需求里写的三种恢复方式。</p>
  */
 public final class WornRelicEffect {
 
     /** 装入一只眼要付出的代价：一颗心（游戏里 2 点生命）。 */
     private static final double HEALTH_COST = 2.0D;
 
+    /** 每隔多少刻核对一次玩家身上的恢复效果。10 刻约为 0.5 秒。 */
+    private static final int CHECK_INTERVAL_TICKS = 10;
+
+    /** 能把眼睛取下来的恢复等级下限：恢复二，也就是等级编号 1（编号从 0 起算）。 */
+    private static final int RESTORING_REGENERATION_AMPLIFIER = 1;
+
     private WornRelicEffect() {
     }
 
     /**
-     * 由 {@link org.eternalrelic.EternalRelic#onInitialize()} 调用，挂上重生与穿越维度时的搬运回调。
+     * 由 {@link org.eternalrelic.EternalRelic#onInitialize()} 调用，挂上重生搬运与恢复核对的回调。
      *
      * <p>游戏把玩家换成一个新个体时，只搬运背包、血量这类数据，属性不跟着走。
      * 这里把旧玩家身上的眼睛重新装到新玩家身上，避免「眼睛还装着、血量却白白还回来」。</p>
@@ -46,6 +66,18 @@ public final class WornRelicEffect {
             for (NightwatchEye eye : NightwatchEye.values()) {
                 if (isWorn(oldPlayer, eye)) {
                     apply(newPlayer, eye);
+                }
+            }
+        });
+
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            if (server.getTicks() % CHECK_INTERVAL_TICKS != 0) {
+                return;
+            }
+
+            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                if (hasRestoringRegeneration(player)) {
+                    releaseAll(player);
                 }
             }
         });
@@ -75,6 +107,67 @@ public final class WornRelicEffect {
     public static boolean isWorn(PlayerEntity player, NightwatchEye eye) {
         EntityAttributeInstance maxHealth = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
         return maxHealth != null && maxHealth.getModifier(modifierIdOf(eye)) != null;
+    }
+
+    /**
+     * 取下玩家身上已经装入的全部眼睛：生命上限还给玩家，眼睛以能量耗尽的形态落到脚下。
+     *
+     * <p>只处理真正装着的那几只。玩家背包里还没装入的眼睛不受影响——需求里明确过，
+     * 没戴上的眼睛不该被牵连。</p>
+     *
+     * @param player 目标玩家
+     * @return 是否至少取下了一只
+     */
+    public static boolean releaseAll(PlayerEntity player) {
+        boolean released = false;
+
+        for (NightwatchEye eye : NightwatchEye.values()) {
+            if (release(player, eye)) {
+                released = true;
+            }
+        }
+
+        return released;
+    }
+
+    /**
+     * 取下其中一只眼。
+     *
+     * @param player 目标玩家
+     * @param eye    要取下的眼
+     * @return 是否确实取下了；原本就没装着时返回 {@code false}
+     */
+    private static boolean release(PlayerEntity player, NightwatchEye eye) {
+        EntityAttributeInstance maxHealth = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+        if (maxHealth == null || maxHealth.getModifier(modifierIdOf(eye)) == null) {
+            return false;
+        }
+
+        maxHealth.removeModifier(modifierIdOf(eye));
+
+        // 取下的眼睛不是直接消失，而是耗尽能量后落到脚下，等玩家用附魔之瓶重新充能
+        player.dropItem(new ItemStack(drainedItemOf(eye)), false);
+        return true;
+    }
+
+    /**
+     * @param player 待检查的玩家
+     * @return 该玩家是否带着能把眼睛取下来的恢复效果（恢复二及以上）
+     */
+    private static boolean hasRestoringRegeneration(PlayerEntity player) {
+        StatusEffectInstance regeneration = player.getStatusEffect(StatusEffects.REGENERATION);
+        return regeneration != null && regeneration.getAmplifier() >= RESTORING_REGENERATION_AMPLIFIER;
+    }
+
+    /**
+     * @param eye 守夜之瞳的某一只眼
+     * @return 该只眼能量耗尽后的物品形态
+     */
+    private static Item drainedItemOf(NightwatchEye eye) {
+        return switch (eye) {
+            case LEFT -> ModItems.NIGHTWATCH_EYE_LEFT_DRAINED;
+            case RIGHT -> ModItems.NIGHTWATCH_EYE_RIGHT_DRAINED;
+        };
     }
 
     /**
