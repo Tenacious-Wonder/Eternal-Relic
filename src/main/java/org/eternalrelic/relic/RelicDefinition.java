@@ -2,7 +2,6 @@ package org.eternalrelic.relic;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
-import net.minecraft.text.Text;
 
 /**
  * 一件遗物的身份信息，也就是「遗物表」里的一行。

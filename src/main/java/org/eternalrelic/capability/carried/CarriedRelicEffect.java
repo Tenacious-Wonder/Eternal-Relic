@@ -16,7 +16,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 
-import org.eternalrelic.registry.ModParticleTypes;
 import org.eternalrelic.registry.ModRelics;
 import org.eternalrelic.registry.ModSounds;
 import org.eternalrelic.relic.AotaPulseParticleEffect;
@@ -42,11 +41,11 @@ public final class CarriedRelicEffect {
     /** 记录每位玩家当前已生效的携带件数：玩家编号 → （遗物编号 → 件数）。 */
     private static final Map<UUID, Map<UUID, Integer>> APPLIED_COUNTS = new HashMap<>();
 
-    /** 携带一件遗物时搏动声的音量。 */
-    private static final float HEARTBEAT_MIN_VOLUME = 0.6F;
+    /** 携带一件遗物时搏动声的音量（与音效「奥塔的搏动」对应）。 */
+    private static final float PULSE_MIN_VOLUME = 0.6F;
 
     /** 携带足够多遗物时搏动声的音量上限。 */
-    private static final float HEARTBEAT_MAX_VOLUME = 1.0F;
+    private static final float PULSE_MAX_VOLUME = 1.0F;
 
     private CarriedRelicEffect() {
     }
