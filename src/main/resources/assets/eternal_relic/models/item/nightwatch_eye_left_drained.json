@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "eternal_relic:item/nightwatch_eye_left_drained"
+  }
+}

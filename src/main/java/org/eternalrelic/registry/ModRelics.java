@@ -41,6 +41,28 @@ public final class ModRelics {
             MaterialRarity.TREASURE,
             new RelicEffect(RelicAttribute.MAX_HEALTH, 0.12D, 0.02D, 20));
 
+    /**
+     * 守夜之瞳·左眼 —— 装入左眼后，在低光环境下看清周围。
+     *
+     * <p>它不靠「放在背包里」生效，而是由玩家右键装入，因此这里没有携带属性加成；
+     * 装入过程与它索取的代价由
+     * {@link org.eternalrelic.capability.worn.WornRelicEffect} 负责。</p>
+     */
+    public static final RelicDefinition NIGHTWATCH_EYE_LEFT = define(
+            ModItems.NIGHTWATCH_EYE_LEFT,
+            MaterialRarity.ESSENCE,
+            null);
+
+    /**
+     * 守夜之瞳·右眼 —— 装入右眼后，在低光环境下照见附近的活物。
+     *
+     * <p>与左眼一样属于装入型遗物，没有携带属性加成。</p>
+     */
+    public static final RelicDefinition NIGHTWATCH_EYE_RIGHT = define(
+            ModItems.NIGHTWATCH_EYE_RIGHT,
+            MaterialRarity.ESSENCE,
+            null);
+
     private ModRelics() {
     }
 

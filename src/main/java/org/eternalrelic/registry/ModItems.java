@@ -14,6 +14,8 @@ import net.minecraft.util.Identifier;
 
 import org.eternalrelic.EternalRelic;
 import org.eternalrelic.item.AotaBranchItem;
+import org.eternalrelic.item.NightwatchEyeItem;
+import org.eternalrelic.relic.NightwatchEye;
 
 /**
  * 本模组的物品注册入口。
@@ -35,6 +37,30 @@ public final class ModItems {
     public static final Item AOTA_BRANCH = register("aota_branch",
             new AotaBranchItem(new Item.Settings().maxCount(1)));
 
+    /**
+     * 守夜之瞳·左眼 —— 右键装入左眼，在低光环境下看清周围。
+     */
+    public static final Item NIGHTWATCH_EYE_LEFT = register("nightwatch_eye_left",
+            new NightwatchEyeItem(new Item.Settings().maxCount(1), NightwatchEye.LEFT, false));
+
+    /**
+     * 守夜之瞳·右眼 —— 右键装入右眼，在低光环境下照见附近的活物。
+     */
+    public static final Item NIGHTWATCH_EYE_RIGHT = register("nightwatch_eye_right",
+            new NightwatchEyeItem(new Item.Settings().maxCount(1), NightwatchEye.RIGHT, false));
+
+    /**
+     * 守夜之瞳·左眼（耗尽）—— 被取下后能量耗尽，需与附魔之瓶合成才能恢复原样。
+     */
+    public static final Item NIGHTWATCH_EYE_LEFT_DRAINED = register("nightwatch_eye_left_drained",
+            new NightwatchEyeItem(new Item.Settings().maxCount(1), NightwatchEye.LEFT, true));
+
+    /**
+     * 守夜之瞳·右眼（耗尽）—— 被取下后能量耗尽，需与附魔之瓶合成才能恢复原样。
+     */
+    public static final Item NIGHTWATCH_EYE_RIGHT_DRAINED = register("nightwatch_eye_right_drained",
+            new NightwatchEyeItem(new Item.Settings().maxCount(1), NightwatchEye.RIGHT, true));
+
     private ModItems() {
     }
 
@@ -51,7 +77,13 @@ public final class ModItems {
                 .displayName(Text.translatable("itemGroup.eternal_relic.relic_group"))
                 .build());
 
-        ItemGroupEvents.modifyEntriesEvent(RELIC_GROUP_KEY).register(entries -> entries.add(AOTA_BRANCH));
+        ItemGroupEvents.modifyEntriesEvent(RELIC_GROUP_KEY).register(entries -> {
+            entries.add(AOTA_BRANCH);
+            entries.add(NIGHTWATCH_EYE_LEFT);
+            entries.add(NIGHTWATCH_EYE_RIGHT);
+            entries.add(NIGHTWATCH_EYE_LEFT_DRAINED);
+            entries.add(NIGHTWATCH_EYE_RIGHT_DRAINED);
+        });
     }
 
     private static Item register(String name, Item item) {
