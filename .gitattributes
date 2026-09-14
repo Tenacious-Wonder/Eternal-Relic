@@ -1,0 +1,7 @@
+# 一律按 LF 存入仓库，检出时保持原样
+* text=auto eol=lf
+
+# 二进制文件不做行尾转换
+*.jar binary
+*.ogg binary
+*.png binary
