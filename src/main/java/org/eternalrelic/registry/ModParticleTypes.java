@@ -8,6 +8,7 @@ import net.minecraft.util.Identifier;
 
 import org.eternalrelic.EternalRelic;
 import org.eternalrelic.relic.AotaPulseParticleEffect;
+import org.eternalrelic.relic.NightwatchParticleEffect;
 
 /**
  * 本模组的粒子注册入口。
@@ -19,6 +20,10 @@ public final class ModParticleTypes {
     /** 奥塔的搏动粒子 —— 以玩家胸口为中心涨落的绿色光点。 */
     private static final ParticleType<AotaPulseParticleEffect> AOTA_PULSE =
             register("aota_pulse", FabricParticleTypes.complex(new AotaPulseParticleEffect.Factory()));
+
+    /** 守夜之瞳装取时的微光点 —— 装入时从四周收拢，取下时向四周飞散。 */
+    private static final ParticleType<NightwatchParticleEffect> NIGHTWATCH_SPARK =
+            register("nightwatch_spark", FabricParticleTypes.complex(new NightwatchParticleEffect.Factory()));
 
     private ModParticleTypes() {
     }
@@ -34,6 +39,13 @@ public final class ModParticleTypes {
      */
     public static ParticleType<AotaPulseParticleEffect> aotaPulse() {
         return AOTA_PULSE;
+    }
+
+    /**
+     * @return 守夜之瞳装取时的微光点类型
+     */
+    public static ParticleType<NightwatchParticleEffect> nightwatchSpark() {
+        return NIGHTWATCH_SPARK;
     }
 
     private static <T extends net.minecraft.particle.ParticleEffect> ParticleType<T> register(

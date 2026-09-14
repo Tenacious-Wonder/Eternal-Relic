@@ -37,3 +37,4 @@ replay_*.log
 
 # 设计稿与设计文档（团队规定：不入库）
 design-docs/
+.tmp-mcsrc/

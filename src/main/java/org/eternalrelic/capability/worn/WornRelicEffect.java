@@ -14,19 +14,23 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import org.eternalrelic.registry.ModItems;
 import org.eternalrelic.registry.ModSounds;
 import org.eternalrelic.relic.NightwatchEye;
+import org.eternalrelic.relic.NightwatchParticleEffect;
 
 /**
  * 「装入生效」能力：把守夜之瞳装进玩家的眼窝，并让代价一直挂在玩家身上。
  *
  * <p>目前这一层承载的是守夜之瞳这一族遗物：装入一只眼，就从生命上限里扣掉一颗心，
- * 同时响起一记机械声，并叠上玩家受击声——让"拿血换视野"这件事在听觉上说得通。</p>
+ * 同时响起一记机械声、叠上玩家受击声，并散出几颗极小的深蓝光点——
+ * 让「拿血换视野」这件事在听觉与视觉上都说得通。</p>
  *
  * <p><b>扣减用「加法」而不是「按比例」</b>：加法在属性结算顺序里排在最前，先于一切按百分比
  * 放大的加成（例如奥塔的枝叶的 +12%）。因此玩家失去的是实打实的底数，枝叶也放大不了这份损失，
@@ -71,6 +75,18 @@ public final class WornRelicEffect {
 
     /** 物品落地声的音调。压低一档，听着像东西落在脚边，而不是被拾起。 */
     private static final float PICKUP_PITCH = 0.7F;
+
+    /** 装入时收拢光点的颗数。刻意很少，只在那一刻闪一下。 */
+    private static final int INSTALL_SPARK_COUNT = 6;
+
+    /** 取下时飞散光点的颗数。比装入略多，好让"散开"这个走向看得出来。 */
+    private static final int RELEASE_SPARK_COUNT = 8;
+
+    /** 收拢光点出生的距离区间（米）：从头部多远处开始往回收。 */
+    private static final double SPARK_SPAWN_MIN_DISTANCE = 1.3D;
+
+    /** 收拢光点出生的距离区间上浮量。 */
+    private static final double SPARK_SPAWN_DISTANCE_SPREAD = 0.9D;
 
     private WornRelicEffect() {
     }
@@ -117,6 +133,7 @@ public final class WornRelicEffect {
 
         apply(player, eye);
         playInstallSound(player);
+        spawnInstallSparks(player);
         return true;
     }
 
@@ -150,9 +167,66 @@ public final class WornRelicEffect {
 
         if (released) {
             playReleaseSound(player);
+            spawnReleaseSparks(player);
         }
 
         return released;
+    }
+
+    /**
+     * 在头部四周撒出几颗向头部收拢的微光点。
+     *
+     * <p>出生点取在头部外围的一层球面上：方向随机、距离略有浮动，因此几颗光点是从不同方向
+     * 一起"收"进眼眶的，而不是从同一个方向排着队飞。颗数刻意压得很低。</p>
+     *
+     * @param player 刚装入义眼的玩家
+     */
+    private static void spawnInstallSparks(PlayerEntity player) {
+        if (!(player.getWorld() instanceof ServerWorld world)) {
+            return;
+        }
+
+        double headX = player.getX();
+        double headY = player.getEyeY();
+        double headZ = player.getZ();
+        Random random = player.getRandom();
+
+        for (int i = 0; i < INSTALL_SPARK_COUNT; i++) {
+            double theta = random.nextDouble() * Math.PI * 2.0D;
+            double cosPhi = random.nextDouble() * 2.0D - 1.0D;
+            double sinPhi = Math.sqrt(Math.max(0.0D, 1.0D - cosPhi * cosPhi));
+            double distance = SPARK_SPAWN_MIN_DISTANCE + random.nextDouble() * SPARK_SPAWN_DISTANCE_SPREAD;
+
+            double x = headX + sinPhi * Math.cos(theta) * distance;
+            double y = headY + cosPhi * distance * 0.75D;
+            double z = headZ + sinPhi * Math.sin(theta) * distance;
+
+            world.spawnParticles(
+                    new NightwatchParticleEffect(headX, headY, headZ, true),
+                    x, y, z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+        }
+    }
+
+    /**
+     * 在头部撒出几颗向四周飞散的微光点。
+     *
+     * <p>与装入的方向正好相反：这一次是从眼眶往外飘。颗数同样很少。</p>
+     *
+     * @param player 刚取下义眼的玩家
+     */
+    private static void spawnReleaseSparks(PlayerEntity player) {
+        if (!(player.getWorld() instanceof ServerWorld world)) {
+            return;
+        }
+
+        double headX = player.getX();
+        double headY = player.getEyeY();
+        double headZ = player.getZ();
+
+        world.spawnParticles(
+                new NightwatchParticleEffect(headX, headY, headZ, false),
+                headX, headY, headZ,
+                RELEASE_SPARK_COUNT, 0.12D, 0.10D, 0.12D, 0.0D);
     }
 
     /**

@@ -21,7 +21,8 @@ public final class ModParticleFactories {
         // 先唤醒注册类，确保粒子类型已完成登记
         ModParticleTypes.register();
 
-        ParticleFactoryRegistry.getInstance()
-                .register(ModParticleTypes.aotaPulse(), AotaPulseParticle.Factory::new);
+        ParticleFactoryRegistry registry = ParticleFactoryRegistry.getInstance();
+        registry.register(ModParticleTypes.aotaPulse(), AotaPulseParticle.Factory::new);
+        registry.register(ModParticleTypes.nightwatchSpark(), NightwatchSparkParticle.Factory::new);
     }
 }
