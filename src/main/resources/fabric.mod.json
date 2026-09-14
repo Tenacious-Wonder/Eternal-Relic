@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "eternal_relic",
+  "version": "${version}",
+  "name": "Eternal Relic",
+  "description": "探索世界，收集散落各处的永恒遗物，让每一件遗物都赋予你独特的能力。",
+  "authors": [
+    "Tenacious Wonder"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/organization/tenacious-wonder"
+  },
+  "license": "MIT",
+  "icon": "assets/eternal_relic/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "org.eternalrelic.client.EternalRelicDataGenerator"
+    ],
+    "client": [
+      "org.eternalrelic.client.EternalRelicClient"
+    ],
+    "main": [
+      "org.eternalrelic.EternalRelic"
+    ]
+  },
+  "mixins": [
+    "eternalrelic.mixins.json",
+    {
+      "config": "eternalrelic.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

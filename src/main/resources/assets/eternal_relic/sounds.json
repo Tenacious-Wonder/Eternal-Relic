@@ -1,0 +1,10 @@
+{
+  "aota_pulse": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/aota_pulse",
+        "volume": 0.7
+      }
+    ]
+  }
+}

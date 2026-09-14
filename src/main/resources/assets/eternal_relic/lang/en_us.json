@@ -1,0 +1,11 @@
+{
+  "modmenu.nameTranslation.eternal_relic": "TW's Eternal Relic",
+  "modmenu.descriptionTranslation.eternal_relic": "Explore the world and collect the Eternal Relics scattered across it — each one grants you a unique power.",
+  "item.eternal_relic.aota_branch": "Aota's Branch",
+  "item.eternal_relic.aota_branch.desc": "While carried in your inventory: +12% max health, plus +2% for each additional branch.",
+  "itemGroup.eternal_relic.relic_group": "TW's Eternal Relics",
+  "subtitles.eternal_relic.aota_pulse": "Aota's pulse",
+  "rarity.eternal_relic.material": "Material grade: %s",
+  "rarity.eternal_relic.grade": "Equipment grade: %s",
+  "rarity.eternal_relic.relic": "Relic rarity: %s"
+}

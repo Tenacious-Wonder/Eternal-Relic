@@ -1,0 +1,11 @@
+{
+  "modmenu.nameTranslation.eternal_relic": "TW's Eternal Relic",
+  "modmenu.descriptionTranslation.eternal_relic": "探索世界，收集散落各处的永恒遗物，让每一件遗物都赋予你独特的能力。",
+  "item.eternal_relic.aota_branch": "奥塔的枝叶",
+  "item.eternal_relic.aota_branch.desc": "携带于背包时，生命上限 +12%；每多携带一份，额外 +2%。",
+  "itemGroup.eternal_relic.relic_group": "TW 的永恒遗物",
+  "subtitles.eternal_relic.aota_pulse": "奥塔的搏动",
+  "rarity.eternal_relic.material": "成色：%s",
+  "rarity.eternal_relic.grade": "品阶：%s",
+  "rarity.eternal_relic.relic": "遗物稀有度：%s"
+}
