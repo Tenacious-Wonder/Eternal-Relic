@@ -6,5 +6,21 @@
         "volume": 0.7
       }
     ]
+  },
+  "nightwatch_install": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/nightwatch_install",
+        "volume": 1.0
+      }
+    ]
+  },
+  "nightwatch_release": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/nightwatch_release",
+        "volume": 1.0
+      }
+    ]
   }
 }

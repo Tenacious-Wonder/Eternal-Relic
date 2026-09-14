@@ -13,6 +13,8 @@
   "item.eternal_relic.nightwatch_eye_right_drained.desc": "能量已耗尽，无法装入。与附魔之瓶合成可恢复原样。",
   "itemGroup.eternal_relic.relic_group": "TW 的永恒遗物",
   "subtitles.eternal_relic.aota_pulse": "奥塔的搏动",
+  "subtitles.eternal_relic.nightwatch_install": "义眼归位",
+  "subtitles.eternal_relic.nightwatch_release": "义眼脱落",
   "rarity.eternal_relic.material": "成色：%s",
   "rarity.eternal_relic.grade": "品阶：%s",
   "rarity.eternal_relic.relic": "遗物稀有度：%s"

@@ -13,6 +13,8 @@
   "item.eternal_relic.nightwatch_eye_right_drained.desc": "Its energy is spent, so it cannot be set in. Craft it with a Bottle o' Enchanting to restore it.",
   "itemGroup.eternal_relic.relic_group": "TW's Eternal Relics",
   "subtitles.eternal_relic.aota_pulse": "Aota's pulse",
+  "subtitles.eternal_relic.nightwatch_install": "Nightwatch Eye clicks into place",
+  "subtitles.eternal_relic.nightwatch_release": "Nightwatch Eye comes loose",
   "rarity.eternal_relic.material": "Material grade: %s",
   "rarity.eternal_relic.grade": "Equipment grade: %s",
   "rarity.eternal_relic.relic": "Relic rarity: %s"

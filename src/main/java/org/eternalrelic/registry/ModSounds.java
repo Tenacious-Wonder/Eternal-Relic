@@ -18,6 +18,12 @@ public final class ModSounds {
     /** 奥塔的搏动声 —— 奥塔的枝叶开始生效时响起的心跳声。 */
     public static final SoundEvent AOTA_PULSE = register("aota_pulse");
 
+    /** 守夜之瞳归位声 —— 义眼装入眼眶时的一记机械声。 */
+    public static final SoundEvent NIGHTWATCH_INSTALL = register("nightwatch_install");
+
+    /** 守夜之瞳脱落声 —— 义眼从眼眶里松开、掉到脚下时的声响。 */
+    public static final SoundEvent NIGHTWATCH_RELEASE = register("nightwatch_release");
+
     private ModSounds() {
     }
 
