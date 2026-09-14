@@ -3,6 +3,7 @@ package org.eternalrelic;
 import net.fabricmc.api.ModInitializer;
 
 import org.eternalrelic.capability.carried.CarriedRelicEffect;
+import org.eternalrelic.capability.worn.NightwatchEyeVision;
 import org.eternalrelic.capability.worn.WornRelicEffect;
 import org.eternalrelic.registry.ModItems;
 import org.eternalrelic.registry.ModParticleTypes;
@@ -23,11 +24,12 @@ import org.eternalrelic.registry.ModSounds;
  *   <li>{@link ModSounds}、{@link ModParticleTypes} —— 遗物生效时的听觉与视觉表现。</li>
  *   <li>{@link CarriedRelicEffect} —— 「携带生效」能力：核对背包、挂属性、播放表现。</li>
  *   <li>{@link WornRelicEffect} —— 「装入生效」能力：把守夜之瞳装进眼中，并让代价跟随玩家。</li>
+ *   <li>{@link NightwatchEyeVision} —— 守夜之瞳的视觉：在暗处看清周围、照见活物。</li>
  * </ul>
  *
  * <h2>加载顺序</h2>
  * <p>游戏启动时按顺序唤醒上述注册表：物品先登记，遗物表才有物品可引用；音效与粒子随后登记，
- * 最后挂上核对背包与搬运装入状态的回调。</p>
+ * 最后挂上核对背包、搬运装入状态与逐刻核对视觉的回调。</p>
  */
 public class EternalRelic implements ModInitializer {
 
@@ -44,5 +46,6 @@ public class EternalRelic implements ModInitializer {
         ModParticleTypes.register();
         CarriedRelicEffect.register();
         WornRelicEffect.register();
+        NightwatchEyeVision.register();
     }
 }
