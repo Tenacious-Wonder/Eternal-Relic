@@ -8,6 +8,7 @@ import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 
 import org.eternalrelic.relic.NightwatchParticleEffect;
@@ -15,8 +16,9 @@ import org.eternalrelic.relic.NightwatchParticleEffect;
 /**
  * 守夜之瞳装取时的一颗微小光点 —— 萤火虫大小，深蓝为主，少数是发光的亮蓝点。
  *
- * <p>两种走法：<b>收拢</b>时朝汇聚点加速收束，抵达即消失；<b>飞散</b>时带着随机初速度向外飘，
- * 一路减速直到寿命耗尽。两者都刻意做得又小又少，只在那一瞬闪一下，不喧宾夺主。</p>
+ * <p>两种走法：<b>收拢</b>时朝玩家的头部加速收束，且目标每刻重新对准，因此边走边装也能一直
+ * 追着人飞；<b>飞散</b>时带着随机初速度向外飘，一路减速直到寿命耗尽。两者都刻意做得又小又少，
+ * 只在那一瞬闪一下，不喧宾夺主。</p>
  */
 @Environment(EnvType.CLIENT)
 public class NightwatchSparkParticle extends SpriteBillboardParticle {
@@ -33,10 +35,15 @@ public class NightwatchSparkParticle extends SpriteBillboardParticle {
     /** 离汇聚点多近就算抵达（距离的平方）。 */
     private static final double ARRIVE_DISTANCE_SQUARED = 0.09D;
 
-    /** 汇聚点（装取那一刻的头部位置）。 */
-    private final double centerX;
-    private final double centerY;
-    private final double centerZ;
+    /** 供收拢时定位玩家：目标要跟着人走，不固定在装入那一刻的位置。 */
+    private final ClientWorld clientWorld;
+
+    /**
+     * 当前的汇聚点。收拢过程中每刻都会被刷新成玩家此刻的头部位置，因此这里不是 final。
+     */
+    private double centerX;
+    private double centerY;
+    private double centerZ;
 
     /** 是否朝汇聚点收拢。 */
     private final boolean converging;
@@ -46,6 +53,7 @@ public class NightwatchSparkParticle extends SpriteBillboardParticle {
         super(world, x, y, z, 0.0D, 0.0D, 0.0D);
         this.setSprite(spriteProvider.getSprite(this.random));
 
+        this.clientWorld = world;
         this.centerX = effect.centerX();
         this.centerY = effect.centerY();
         this.centerZ = effect.centerZ();
@@ -87,6 +95,10 @@ public class NightwatchSparkParticle extends SpriteBillboardParticle {
         super.tick();
 
         if (this.converging) {
+            // 每刻重新对准玩家：装入时人常常在走动，目标若停在装入那一刻的旧位置，
+            // 光点就会朝着身后的残影飞过去
+            updateCenter();
+
             double progress = (double) this.age / (double) this.maxAge;
             double pull = CONVERGE_PULL * (0.4D + progress);
             this.velocityX += (this.centerX - this.x) * pull;
@@ -128,6 +140,43 @@ public class NightwatchSparkParticle extends SpriteBillboardParticle {
     @Override
     public ParticleTextureSheet getType() {
         return ParticleTextureSheet.PARTICLE_SHEET_LIT;
+    }
+
+    /**
+     * 把汇聚点挪到玩家此刻的头部。
+     *
+     * <p>找不到玩家时保持原目标不动，总比让光点失去方向好。</p>
+     */
+    private void updateCenter() {
+        PlayerEntity target = nearestPlayer();
+        if (target == null) {
+            return;
+        }
+
+        this.centerX = target.getX();
+        this.centerY = target.getEyeY();
+        this.centerZ = target.getZ();
+    }
+
+    /**
+     * @return 离汇聚点最近的玩家，也就是装入义眼的那位
+     */
+    private PlayerEntity nearestPlayer() {
+        PlayerEntity closest = null;
+        double best = Double.MAX_VALUE;
+
+        for (PlayerEntity candidate : this.clientWorld.getPlayers()) {
+            double dx = candidate.getX() - this.centerX;
+            double dy = candidate.getY() - this.centerY;
+            double dz = candidate.getZ() - this.centerZ;
+            double distance = dx * dx + dy * dy + dz * dz;
+            if (distance < best) {
+                best = distance;
+                closest = candidate;
+            }
+        }
+
+        return closest;
     }
 
     /**
