@@ -19,7 +19,6 @@ import net.minecraft.sound.SoundCategory;
 import org.eternalrelic.registry.ModRelics;
 import org.eternalrelic.registry.ModSounds;
 import org.eternalrelic.relic.AotaPulseParticleEffect;
-import org.eternalrelic.registry.ModSounds;
 import org.eternalrelic.relic.RelicDefinition;
 import org.eternalrelic.relic.RelicEffect;
 
@@ -41,11 +40,14 @@ public final class CarriedRelicEffect {
     /** 记录每位玩家当前已生效的携带件数：玩家编号 → （遗物编号 → 件数）。 */
     private static final Map<UUID, Map<UUID, Integer>> APPLIED_COUNTS = new HashMap<>();
 
-    /** 携带一件遗物时搏动声的音量（与音效「奥塔的搏动」对应）。 */
-    private static final float PULSE_MIN_VOLUME = 0.6F;
+    /** 只带一件遗物时，搏动声的音量。 */
+    private static final float PULSE_MIN_VOLUME = 1.0F;
 
-    /** 携带足够多遗物时搏动声的音量上限。 */
-    private static final float PULSE_MAX_VOLUME = 1.0F;
+    /** 携带量达到 {@link #PULSE_FULL_COUNT} 件时，搏动声的音量。 */
+    private static final float PULSE_MAX_VOLUME = 1.4F;
+
+    /** 携带到这么多件时搏动声最响；再多也不再变响，免得一堆遗物叠出一声炸响。 */
+    private static final float PULSE_FULL_COUNT = 5.0F;
 
     private CarriedRelicEffect() {
     }
@@ -236,10 +238,11 @@ public final class CarriedRelicEffect {
      * 因此附近的玩家既能听到、也能看到。</p>
      *
      * @param player 刚开始携带遗物的玩家
-     * @param count  当前携带件数，携带得越多声音略响、粒子略多
+     * @param count  当前携带件数。只影响声音大小：带得越多略响一些，粒子数不随它变化
      */
     private static void playBirthEffect(ServerPlayerEntity player, int count) {
-        float volume = 1.0F + Math.min(1.0F, count / 5.0F) * 0.4F;
+        float volume = PULSE_MIN_VOLUME
+                + Math.min(1.0F, count / PULSE_FULL_COUNT) * (PULSE_MAX_VOLUME - PULSE_MIN_VOLUME);
         ServerWorld world = player.getServerWorld();
 
         // 由服务端广播：玩家自己与附近玩家都能听到（实测这条路径可靠）

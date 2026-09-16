@@ -23,9 +23,6 @@ import org.eternalrelic.registry.ModParticleTypes;
 public record AotaPulseParticleEffect(double centerX, double centerY, double centerZ,
                                       float sphereRadius, float cycleSpeed) implements ParticleEffect {
 
-    /**
-     * @return 本参数集所属的粒子类型
-     */
     @Override
     public ParticleType<?> getType() {
         return ModParticleTypes.aotaPulse();

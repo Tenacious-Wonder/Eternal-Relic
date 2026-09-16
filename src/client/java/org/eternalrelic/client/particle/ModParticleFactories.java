@@ -24,5 +24,9 @@ public final class ModParticleFactories {
         ParticleFactoryRegistry registry = ParticleFactoryRegistry.getInstance();
         registry.register(ModParticleTypes.aotaPulse(), AotaPulseParticle.Factory::new);
         registry.register(ModParticleTypes.nightwatchSpark(), NightwatchSparkParticle.Factory::new);
+        registry.register(ModParticleTypes.echoRingShard(), EchoRingShardParticle.Factory::new);
+        registry.register(ModParticleTypes.soulWisp(), SoulWispParticle.Factory::new);
+        registry.register(ModParticleTypes.soulBurst(), SoulBurstParticle.Factory::new);
+        registry.register(ModParticleTypes.soulRise(), SoulRiseParticle.Factory::new);
     }
 }

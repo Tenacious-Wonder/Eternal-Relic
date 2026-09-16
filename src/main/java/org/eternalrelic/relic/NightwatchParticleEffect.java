@@ -28,9 +28,6 @@ import org.eternalrelic.registry.ModParticleTypes;
 public record NightwatchParticleEffect(double centerX, double centerY, double centerZ,
                                        boolean converging) implements ParticleEffect {
 
-    /**
-     * @return 本参数集所属的粒子类型
-     */
     @Override
     public ParticleType<?> getType() {
         return ModParticleTypes.nightwatchSpark();

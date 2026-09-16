@@ -2,7 +2,9 @@ package org.eternalrelic.client;
 
 import net.fabricmc.api.ClientModInitializer;
 
+import org.eternalrelic.client.network.SoulFlameClientNetwork;
 import org.eternalrelic.client.particle.ModParticleFactories;
+import org.eternalrelic.client.screen.RelicScreenOpener;
 
 /**
  * 客户端入口：只处理画面相关的内容。
@@ -15,6 +17,9 @@ public class EternalRelicClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ModParticleFactories.register();
+        RelicScreenOpener.register();
+        SoulLanternKey.register();
+        SoulFlameClientNetwork.register();
         MaterialTooltip.register();
     }
 }

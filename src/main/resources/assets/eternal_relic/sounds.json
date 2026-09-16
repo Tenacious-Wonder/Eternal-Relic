@@ -22,5 +22,65 @@
         "volume": 1.0
       }
     ]
+  },
+  "soul_flame": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/soul_flame",
+        "volume": 1.0
+      }
+    ]
+  },
+  "soul_cast": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/soul_cast",
+        "volume": 1.0
+      }
+    ]
+  },
+  "soul_burst": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/soul_burst",
+        "volume": 1.0
+      }
+    ]
+  },
+  "soul_wisp": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/soul_wisp",
+        "volume": 1.0
+      }
+    ]
+  },
+  "soul_moan": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/soul_moan_1",
+        "volume": 1.0
+      },
+      {
+        "name": "eternal_relic:relic/soul_moan_2",
+        "volume": 1.0
+      },
+      {
+        "name": "eternal_relic:relic/soul_moan_3",
+        "volume": 1.0
+      }
+    ]
+  },
+  "echo_ring_ward": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/echo_ring_ward_1",
+        "volume": 1.0
+      },
+      {
+        "name": "eternal_relic:relic/echo_ring_ward_2",
+        "volume": 1.0
+      }
+    ]
   }
 }

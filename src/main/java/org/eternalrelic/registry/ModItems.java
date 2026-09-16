@@ -14,7 +14,10 @@ import net.minecraft.util.Identifier;
 
 import org.eternalrelic.EternalRelic;
 import org.eternalrelic.item.AotaBranchItem;
+import org.eternalrelic.item.EchoRingItem;
 import org.eternalrelic.item.NightwatchEyeItem;
+import org.eternalrelic.item.RelicItem;
+import org.eternalrelic.item.SoulLanternItem;
 import org.eternalrelic.relic.NightwatchEye;
 
 /**
@@ -36,6 +39,59 @@ public final class ModItems {
      */
     public static final Item AOTA_BRANCH = register("aota_branch",
             new AotaBranchItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 回响之环 —— 携带在背包中时，替玩家挡下攻击的遗物。
+     */
+    public static final Item ECHO_RING = register("echo_ring",
+            new EchoRingItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 回响之环（碎裂）—— 替玩家挡下攻击后碎成的形态，冷却走完自行恢复原样。
+     */
+    public static final Item ECHO_RING_DRAINED = register("echo_ring_drained",
+            new EchoRingItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 引魂之灯 —— 携带时收集击杀所得的魂火，按 G 键一次倾泻出去的遗物。
+     */
+    public static final Item SOUL_LANTERN = register("soul_lantern",
+            new SoulLanternItem(new Item.Settings().maxCount(1)));
+
+    // ==================== 品阶样本（测试用） ====================
+
+    /**
+     * 品阶样本 —— 七件没有任何效果的测试遗物，各自对应一个材料档位。
+     *
+     * <p>它们只用来检查遗物界面在七个档位下的表现（面板样式与品质配色），不具备任何实际功能，
+     * 正式发布前应连同贴图、模型与语言条目一并移除。</p>
+     */
+    public static final Item RELIC_SAMPLE_DEBRIS = register("relic_sample_debris",
+            new RelicItem(new Item.Settings()));
+
+    /** 品阶样本·粗石。 */
+    public static final Item RELIC_SAMPLE_ROUGH = register("relic_sample_rough",
+            new RelicItem(new Item.Settings()));
+
+    /** 品阶样本·成材。 */
+    public static final Item RELIC_SAMPLE_LUMBER = register("relic_sample_lumber",
+            new RelicItem(new Item.Settings()));
+
+    /** 品阶样本·精萃。 */
+    public static final Item RELIC_SAMPLE_ESSENCE = register("relic_sample_essence",
+            new RelicItem(new Item.Settings()));
+
+    /** 品阶样本·珍品。 */
+    public static final Item RELIC_SAMPLE_TREASURE = register("relic_sample_treasure",
+            new RelicItem(new Item.Settings()));
+
+    /** 品阶样本·至宝。 */
+    public static final Item RELIC_SAMPLE_SUPREME = register("relic_sample_supreme",
+            new RelicItem(new Item.Settings()));
+
+    /** 品阶样本·源质。 */
+    public static final Item RELIC_SAMPLE_SOURCE = register("relic_sample_source",
+            new RelicItem(new Item.Settings()));
 
     /**
      * 守夜之瞳·左眼 —— 右键装入左眼，在低光环境下看清周围。
@@ -79,10 +135,21 @@ public final class ModItems {
 
         ItemGroupEvents.modifyEntriesEvent(RELIC_GROUP_KEY).register(entries -> {
             entries.add(AOTA_BRANCH);
+            entries.add(ECHO_RING);
+            entries.add(ECHO_RING_DRAINED);
+            entries.add(SOUL_LANTERN);
             entries.add(NIGHTWATCH_EYE_LEFT);
             entries.add(NIGHTWATCH_EYE_RIGHT);
             entries.add(NIGHTWATCH_EYE_LEFT_DRAINED);
             entries.add(NIGHTWATCH_EYE_RIGHT_DRAINED);
+
+            entries.add(RELIC_SAMPLE_DEBRIS);
+            entries.add(RELIC_SAMPLE_ROUGH);
+            entries.add(RELIC_SAMPLE_LUMBER);
+            entries.add(RELIC_SAMPLE_ESSENCE);
+            entries.add(RELIC_SAMPLE_TREASURE);
+            entries.add(RELIC_SAMPLE_SUPREME);
+            entries.add(RELIC_SAMPLE_SOURCE);
         });
     }
 
