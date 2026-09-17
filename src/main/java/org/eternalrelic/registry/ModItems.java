@@ -53,7 +53,7 @@ public final class ModItems {
             new EchoRingItem(new Item.Settings().maxCount(1)));
 
     /**
-     * 引魂之灯 —— 携带时收集击杀所得的魂火，按 G 键一次倾泻出去的遗物。
+     * 引魂燃灯 —— 携带时收集击杀所得的魂火，按 G 键一次倾泻出去的遗物。
      */
     public static final Item SOUL_LANTERN = register("soul_lantern",
             new SoulLanternItem(new Item.Settings().maxCount(1)));

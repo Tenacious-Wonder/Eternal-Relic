@@ -12,10 +12,10 @@ import net.minecraft.world.World;
 import org.eternalrelic.capability.carried.SoulLanternEffect;
 
 /**
- * 引魂之灯 —— 携带时收集击杀所得的魂火，按 G 键一次倾泻出去的遗物。
+ * 引魂燃灯 —— 携带时收集击杀所得的魂火，按 G 键一次倾泻出去的遗物。
  *
- * <p>它本身只负责门面：名称、说明文字，以及把「攒了多少魂火、是否在冷却」写在提示框里——
- * 玩家不必打开箱子的界面就能知道这盏灯现在能不能放。</p>
+ * <p>它本身只负责门面：把「攒了多少魂火、是否在冷却」写在提示框里——
+ * 玩家不必打开箱子的界面就能知道这盏灯现在能不能放。名称与外观描述由语言文件承担。</p>
  *
  * <p>攒魂与释放由 {@link SoulLanternEffect} 负责；灯只需被携带（主背包或副手），
  * 不需要装入身体。</p>
@@ -27,7 +27,10 @@ public class SoulLanternItem extends Item {
     }
 
     /**
-     * 在物品提示框中补上说明、魂火数与冷却状态。
+     * 在物品提示框中补上魂火数与冷却状态。
+     *
+     * <p>效果说明不在这里——它已经写在遗物界面里了；提示框只留这两行**随时会变的**状态，
+     * 好让玩家在箱子里扫一眼就知道这盏灯现在能不能放。</p>
      *
      * @param stack   正在查看的物品
      * @param world   玩家所在的世界；在部分界面里可能为 {@code null}
@@ -35,8 +38,6 @@ public class SoulLanternItem extends Item {
      */
     @Override
     public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.translatable(this.getTranslationKey() + ".desc").formatted(Formatting.GRAY));
-
         int souls = SoulLanternEffect.soulsOf(stack);
         tooltip.add(Text.translatable("item.eternal_relic.soul_lantern.souls",
                         souls, SoulLanternEffect.MAX_SOULS)

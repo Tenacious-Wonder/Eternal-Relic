@@ -234,7 +234,7 @@ public class SoulWispParticle extends SpriteBillboardParticle {
             double sinPhi = Math.sqrt(Math.max(0.0D, 1.0D - cosPhi * cosPhi));
 
             this.clientWorld.addParticle(
-                    new SoulBurstParticleEffect(chestX, chestY, chestZ, BURST_RADIUS),
+                    new SoulBurstParticleEffect(chestX, chestY, chestZ, BURST_RADIUS, 1.0F),
                     chestX + sinPhi * Math.cos(theta) * 0.05D,
                     chestY + cosPhi * 0.05D,
                     chestZ + sinPhi * Math.sin(theta) * 0.05D,

@@ -9,7 +9,7 @@ import net.minecraft.particle.ParticleType;
 import org.eternalrelic.registry.ModParticleTypes;
 
 /**
- * 引魂之灯收集灵魂时，那颗飞向玩家的魂火的生成参数。
+ * 引魂燃灯收集灵魂时，那颗飞向玩家的魂火的生成参数。
  *
  * <p>只需要带一个「目标是谁」——粒子要靠这个编号在客户端每刻查到玩家此刻的位置，
  * 所以魂火才能一路追着人跑，而不是飞向生成瞬间的旧坐标。位置随粒子自身携带，

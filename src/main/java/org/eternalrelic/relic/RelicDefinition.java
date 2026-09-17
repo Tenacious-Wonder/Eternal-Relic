@@ -45,7 +45,12 @@ public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, R
     }
 
     /**
-     * @return 悬浮说明文字的翻译键，例如 {@code item.eternal_relic.aota_branch.desc}
+     * 效果说明的翻译键，例如 {@code item.eternal_relic.aota_branch.desc}。
+     *
+     * <p>这段文字已经不在物品提示框里显示了——提示框只留一句「按左 Shift 详细查看」，
+     * 正文一律由遗物界面呈现。</p>
+     *
+     * @return 效果说明的翻译键
      */
     public String descriptionKey() {
         return this.item.getTranslationKey() + ".desc";

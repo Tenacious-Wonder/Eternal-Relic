@@ -11,7 +11,7 @@ import org.eternalrelic.network.SoulLanternNetwork;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * 引魂之灯的释放按键。
+ * 引魂燃灯的释放按键。
  *
  * <p>默认 G 键，玩家可以在「选项 → 控制」里改——用原版的按键绑定系统注册，而不是自己读键盘，
  * 这样改键、冲突提示、以及按键分类都由游戏代管。</p>

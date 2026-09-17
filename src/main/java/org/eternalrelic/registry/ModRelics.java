@@ -50,16 +50,16 @@ public final class ModRelics {
      * {@link org.eternalrelic.capability.carried.DamageWardEffect} 在攻击落下前出手。
      * 只有「被谁打的」攻击才算数，药水与状态效果造成的伤害不会触发。</p>
      *
-     * <p>固有稀有度为至宝：这是能在关键时刻改写一次交手结果的东西，本身就该是顶级成色。</p>
+     * <p>固有稀有度为珍品：这是能在关键时刻改写一次交手结果的东西。</p>
      */
     public static final RelicDefinition ECHO_RING = define(
             ModItems.ECHO_RING,
-            MaterialRarity.SUPREME,
+            MaterialRarity.TREASURE,
             null,
             new DamageWard(ModItems.ECHO_RING_DRAINED, 20.0F, 5, 10, 60.0F, 2400));
 
     /**
-     * 引魂之灯 —— 携带时收集击杀所得的魂火，按 G 键一次倾泻出去。
+     * 引魂燃灯 —— 携带时收集击杀所得的魂火，按 G 键一次倾泻出去。
      *
      * <p>它没有持续的属性加成，价值全在「攒」与「放」之间：由
      * {@link org.eternalrelic.capability.carried.SoulLanternEffect} 记录击杀、

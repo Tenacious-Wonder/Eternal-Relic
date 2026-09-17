@@ -47,7 +47,7 @@ public final class ModSounds {
     public static final SoundEvent SOUL_BURST = register("soul_burst");
 
     /**
-     * 引魂之灯的释放声 —— 按 G 倾泻魂火时响起。
+     * 引魂燃灯的释放声 —— 按 G 倾泻魂火时响起。
      */
     public static final SoundEvent SOUL_CAST = register("soul_cast");
 

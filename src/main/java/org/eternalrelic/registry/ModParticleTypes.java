@@ -33,7 +33,7 @@ public final class ModParticleTypes {
     private static final ParticleType<EchoRingShardParticleEffect> ECHO_RING_SHARD =
             register("echo_ring_shard", FabricParticleTypes.complex(new EchoRingShardParticleEffect.Factory()));
 
-    /** 引魂之灯收集灵魂时的青色魂火 —— 从尸体飘向灯的主人，一路歪歪扭扭。 */
+    /** 引魂燃灯收集灵魂时的青色魂火 —— 从尸体飘向灯的主人，一路歪歪扭扭。 */
     private static final ParticleType<SoulWispParticleEffect> SOUL_WISP =
             register("soul_wisp", FabricParticleTypes.complex(new SoulWispParticleEffect.Factory()));
 
@@ -80,7 +80,7 @@ public final class ModParticleTypes {
     }
 
     /**
-     * @return 引魂之灯收集灵魂时的魂火粒子类型
+     * @return 引魂燃灯收集灵魂时的魂火粒子类型
      */
     public static ParticleType<SoulWispParticleEffect> soulWisp() {
         return SOUL_WISP;

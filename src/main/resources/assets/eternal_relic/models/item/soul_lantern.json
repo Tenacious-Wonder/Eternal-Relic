@@ -1,6 +1,4 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "eternal_relic:item/soul_lantern"
-  }
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front"
 }

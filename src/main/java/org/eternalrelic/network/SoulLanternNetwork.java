@@ -8,7 +8,7 @@ import org.eternalrelic.EternalRelic;
 import org.eternalrelic.capability.carried.SoulLanternEffect;
 
 /**
- * 引魂之灯释放时的客户端与服务端通信。
+ * 引魂燃灯释放时的客户端与服务端通信。
  *
  * <p>按键是在客户端按下的，但伤害必须由服务端结算——客户端算出来的结果会被服务器纠正回去，
  * 等于白算。因此客户端只把「我要放灯」这件事告诉服务端，真正扣魂火、造成伤害、留下魂火

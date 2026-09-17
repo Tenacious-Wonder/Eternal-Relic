@@ -1,13 +1,8 @@
 package org.eternalrelic.item;
 
-import java.util.List;
-
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
@@ -24,6 +19,9 @@ import org.eternalrelic.relic.NightwatchEye;
  *
  * <p>能量耗尽的守夜之瞳（装入后被取下、尚未充能的那只）不能再次装入：拿着它右键不会有任何
  * 反应，需要先在工作台里与附魔之瓶合成，恢复成可用的那一只。</p>
+ *
+ * <p>名称、品阶与效果说明由语言文件和遗物界面承担，提示框里只留一句「按左 Shift 详细查看」，
+ * 因此本类只管「右键装入」这一件事。</p>
  */
 public class NightwatchEyeItem extends Item {
 
@@ -68,18 +66,5 @@ public class NightwatchEyeItem extends Item {
 
         stack.decrement(1);
         return TypedActionResult.success(stack);
-    }
-
-    /**
-     * 在物品提示框中补上一行说明（灰色小字）。
-     *
-     * <p>说明文字的翻译键约定：在物品自身的翻译键后追加 {@code ".desc"}，
-     * 因此可用的眼与耗尽的眼各自对应一份文字。</p>
-     *
-     * @param tooltip 待填充的提示框内容
-     */
-    @Override
-    public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.translatable(this.getTranslationKey() + ".desc").formatted(Formatting.GRAY));
     }
 }

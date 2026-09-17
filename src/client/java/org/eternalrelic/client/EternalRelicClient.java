@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 
 import org.eternalrelic.client.network.SoulFlameClientNetwork;
 import org.eternalrelic.client.particle.ModParticleFactories;
+import org.eternalrelic.client.render.SoulLanternItemRenderer;
 import org.eternalrelic.client.screen.RelicScreenOpener;
 
 /**
@@ -19,7 +20,9 @@ public class EternalRelicClient implements ClientModInitializer {
         ModParticleFactories.register();
         RelicScreenOpener.register();
         SoulLanternKey.register();
+        SoulLanternGlow.register();
         SoulFlameClientNetwork.register();
         MaterialTooltip.register();
+        SoulLanternItemRenderer.register();
     }
 }

@@ -51,7 +51,7 @@ public class SoulBurstParticle extends SpriteBillboardParticle {
      * @param dirX           向外扩散的方向 X；方向是工厂算好的单位向量，本类不再自行归一化
      * @param dirY           向外扩散的方向 Y
      * @param dirZ           向外扩散的方向 Z
-     * @param effect         服务端传来的生成参数：球心与扩散距离
+     * @param effect         生成参数：球心、扩散距离与体型倍率
      * @param spriteProvider 供它从中挑一帧贴图
      */
     SoulBurstParticle(ClientWorld world, double x, double y, double z,
@@ -69,8 +69,8 @@ public class SoulBurstParticle extends SpriteBillboardParticle {
         this.centerZ = effect.centerZ();
         this.spreadDistance = effect.spreadRadius();
 
-        // 极小：比飞来的魂火小一圈，只当余韵
-        this.scale = 0.06F + this.random.nextFloat() * 0.05F;
+        // 极小：比飞来的魂火小一圈，只当余韵。再乘上倍率，好让身上的光晕比胸口那圈更细
+        this.scale = (0.06F + this.random.nextFloat() * 0.05F) * effect.scale();
         this.maxAge = (int) Math.ceil(SPREAD_TICKS + HOLD_TICKS);
         // 不受重力、也不被方块挡住：它是贴着人炸开的光点
         this.collidesWithWorld = false;
