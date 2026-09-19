@@ -7,6 +7,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -18,6 +19,7 @@ import org.eternalrelic.registry.VanillaItemGrades;
 import org.eternalrelic.registry.VanillaMaterialRarities;
 import org.eternalrelic.relic.EquipmentGrade;
 import org.eternalrelic.relic.MaterialRarity;
+import org.eternalrelic.relic.RelicAttachment;
 import org.eternalrelic.relic.RelicDefinition;
 
 /**
@@ -79,11 +81,37 @@ public final class MaterialTooltip {
                     .formatted(Formatting.DARK_GRAY));
         }
 
+        appendAttachments(lines, stack);
+
         appendFlavor(lines, stack.getTranslationKey());
 
         if (relic != null) {
             // 效果说明一律搬到遗物界面里看，提示框只留一句指路，免得两处文字各写一遍
             lines.add(Text.translatable("item.eternal_relic.tooltip.hint")
+                    .formatted(Formatting.DARK_GRAY));
+        }
+    }
+
+    /**
+     * 列出这件物品上附着的遗物。
+     *
+     * <p>附着关系本身记在物品的数据里（见 {@link RelicAttachment}），这里只负责把它读出来给玩家看。
+     * 名字按这件遗物自己的稀有度上色，与遗物界面里的写法一致。</p>
+     *
+     * <p>没有附着任何遗物的物品会自动跳过，所以这个方法是给所有物品调的，
+     * 不必先判断它是不是装备。</p>
+     *
+     * @param lines 提示框内容，就地追加
+     * @param stack 正在查看的物品
+     */
+    private static void appendAttachments(List<Text> lines, ItemStack stack) {
+        for (Item relic : RelicAttachment.attachedTo(stack)) {
+            RelicDefinition definition = ModRelics.definitionOf(relic);
+            Text name = definition == null
+                    ? relic.getName()
+                    : colored(relic.getName().getString(), definition.rarity().color());
+
+            lines.add(Text.translatable("tooltip.eternal_relic.attached", name)
                     .formatted(Formatting.DARK_GRAY));
         }
     }

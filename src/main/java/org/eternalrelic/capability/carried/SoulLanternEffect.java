@@ -107,8 +107,8 @@ public final class SoulLanternEffect {
             return;
         }
 
-        ItemStack lantern = carriedLantern(player);
-        if (lantern == null) {
+        ItemStack lantern = CarriedStacks.firstOf(player, ModItems.SOUL_LANTERN);
+        if (lantern.isEmpty()) {
             return;
         }
 
@@ -165,8 +165,8 @@ public final class SoulLanternEffect {
      * @return 是否确实释放了（没携带灯、一缕魂火都没有、或仍在冷却中时返回 {@code false}）
      */
     public static boolean cast(ServerPlayerEntity player) {
-        ItemStack lantern = carriedLantern(player);
-        if (lantern == null) {
+        ItemStack lantern = CarriedStacks.firstOf(player, ModItems.SOUL_LANTERN);
+        if (lantern.isEmpty()) {
             return false;
         }
 
@@ -361,43 +361,7 @@ public final class SoulLanternEffect {
         }
     }
 
-    // ==================== 携带与物品数据 ====================
-
-    /**
-     * 找出玩家携带的引魂燃灯。
-     *
-     * <p>主背包与副手都算——灯拿在手上、放在背包里同样管用。携带多件时取最先遇到的那一件。</p>
-     *
-     * @param player 目标玩家
-     * @return 灯的物品堆；没有携带时返回 {@code null}
-     */
-    private static ItemStack carriedLantern(PlayerEntity player) {
-        for (ItemStack stack : player.getInventory().main) {
-            if (isLantern(stack)) {
-                return stack;
-            }
-        }
-
-        for (ItemStack stack : player.getInventory().offHand) {
-            if (isLantern(stack)) {
-                return stack;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * 判断一件物品是不是引魂燃灯。
-     *
-     * <p>灯是这套能力唯一的触发物，因此这个判定就是攒魂与释放两道流程的入口条件。</p>
-     *
-     * @param stack 待判定的物品堆
-     * @return 是否为引魂燃灯
-     */
-    private static boolean isLantern(ItemStack stack) {
-        return !stack.isEmpty() && stack.isOf(ModItems.SOUL_LANTERN);
-    }
+    // ==================== 物品数据 ====================
 
     /**
      * 读出灯里攒下的魂火数。

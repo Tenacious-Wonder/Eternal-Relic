@@ -1,8 +1,8 @@
 {
-  "aota_pulse": {
+  "relic_arrival": {
     "sounds": [
       {
-        "name": "eternal_relic:relic/aota_pulse",
+        "name": "eternal_relic:relic/relic_arrival",
         "volume": 0.7
       }
     ]
@@ -79,6 +79,22 @@
       },
       {
         "name": "eternal_relic:relic/echo_ring_ward_2",
+        "volume": 1.0
+      }
+    ]
+  },
+  "station_hammer": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/station_anvil_hit",
+        "volume": 1.0
+      },
+      {
+        "name": "eternal_relic:relic/station_forge_rhythm",
+        "volume": 1.0
+      },
+      {
+        "name": "eternal_relic:relic/station_metal_clang",
         "volume": 1.0
       }
     ]

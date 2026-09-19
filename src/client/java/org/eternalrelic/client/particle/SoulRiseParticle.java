@@ -135,8 +135,6 @@ public class SoulRiseParticle extends SpriteBillboardParticle {
     /**
      * 越老越亮：刚渗出来时几乎看不见，升到半空才亮起来，像慢慢"醒"过来。
      *
-     * <p>只提亮方块光照分量，不动天空光，因此白天黑夜都是一个亮法。</p>
-     *
      * @param tint 当前帧的插值进度
      * @return 本帧的光照值
      */
@@ -144,17 +142,7 @@ public class SoulRiseParticle extends SpriteBillboardParticle {
     public int getBrightness(float tint) {
         float progress = MathHelper.clamp((this.age + tint) / this.maxAge, 0.0F, 1.0F);
 
-        int packed = super.getBrightness(tint);
-        int block = packed & 0xFF;
-        int sky = packed >> 16 & 0xFF;
-
-        // 提亮写法与 240 的封顶取自原版 FlameParticle
-        block += (int) (progress * 15.0F * 16.0F);
-        if (block > 240) {
-            block = 240;
-        }
-
-        return block | sky << 16;
+        return ParticleMath.brightenBlockLight(progress, super.getBrightness(tint));
     }
 
     /**

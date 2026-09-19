@@ -13,20 +13,23 @@ import net.minecraft.util.Identifier;
  * <p>这里的稀有度取自<b>材料档位</b> {@link MaterialRarity}，登记一次便固定不变——
  * 遗物的成色由它自身决定，不随谁做出来而改变。</p>
  *
- * <p>两处能力插槽各自独立：{@code effect} 管「一直挂在身上的数值」，
- * {@code ward} 管「每次挨打时出手一次」。一件遗物可以只有其中之一，也可以两样都有，
- * 没有的那一项留 {@code null} 即可——相应的能力类查不到配置就会自动跳过这件遗物。</p>
+ * <p>三处能力插槽各自独立：{@code effect} 管「一直挂在身上的数值」，
+ * {@code ward} 管「每次挨打时出手一次」，{@code arrivalEffect} 管「刚开始携带时要不要亮相」。
+ * 一件遗物可以只有其中任意几项；没有的那一项留 {@code null}（开关留 {@code false}）即可，
+ * 相应的能力类查不到配置就会自动跳过这件遗物。</p>
  *
- * @param item   遗物对应的物品
- * @param id     内部编号
- * @param rarity 遗物固有稀有度（沿用材料档位）
- * @param effect 携带时生效的属性加成；没有则为 {@code null}
- * @param ward   受到攻击时的守护效果；没有则为 {@code null}
+ * @param item          遗物对应的物品
+ * @param id            内部编号
+ * @param rarity        遗物固有稀有度（沿用材料档位）
+ * @param effect        携带时生效的属性加成；没有则为 {@code null}
+ * @param ward          受到攻击时的守护效果；没有则为 {@code null}
+ * @param arrivalEffect 刚开始携带时是否播放一记「入手」表现
  */
-public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect effect, DamageWard ward) {
+public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect effect, DamageWard ward,
+        boolean arrivalEffect) {
 
     /**
-     * 登记一件没有守护效果的遗物。
+     * 登记一件没有守护效果、也不做入手表现的遗物。
      *
      * @param item   遗物对应的物品
      * @param id     内部编号
@@ -34,7 +37,20 @@ public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, R
      * @param effect 携带时生效的属性加成；没有则为 {@code null}
      */
     public RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect effect) {
-        this(item, id, rarity, effect, null);
+        this(item, id, rarity, effect, null, false);
+    }
+
+    /**
+     * 登记一件不做入手表现的遗物。
+     *
+     * @param item   遗物对应的物品
+     * @param id     内部编号
+     * @param rarity 遗物固有稀有度（沿用材料档位）
+     * @param effect 携带时生效的属性加成；没有则为 {@code null}
+     * @param ward   受到攻击时的守护效果；没有则为 {@code null}
+     */
+    public RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect effect, DamageWard ward) {
+        this(item, id, rarity, effect, ward, false);
     }
 
     /**
@@ -68,5 +84,12 @@ public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, R
      */
     public boolean hasDamageWard() {
         return this.ward != null;
+    }
+
+    /**
+     * @return 本遗物刚开始被携带时，是否要在玩家身上放一记「入手」表现
+     */
+    public boolean hasArrivalEffect() {
+        return this.arrivalEffect;
     }
 }

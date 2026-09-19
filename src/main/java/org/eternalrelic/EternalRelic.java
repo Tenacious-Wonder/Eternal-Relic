@@ -1,18 +1,24 @@
 package org.eternalrelic;
 
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.util.Identifier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eternalrelic.capability.carried.CarriedRelicEffect;
+import org.eternalrelic.capability.carried.CourageEmblemEffect;
 import org.eternalrelic.capability.carried.DamageWardEffect;
+import org.eternalrelic.capability.carried.EnchantedRabbitFootEffect;
 import org.eternalrelic.capability.carried.SoulLanternEffect;
 import org.eternalrelic.capability.worn.NightwatchEyeVision;
 import org.eternalrelic.capability.worn.WornRelicEffect;
 import org.eternalrelic.network.SoulLanternNetwork;
+import org.eternalrelic.registry.ModBlocks;
 import org.eternalrelic.registry.ModItems;
 import org.eternalrelic.registry.ModParticleTypes;
+import org.eternalrelic.registry.ModRecipes;
+import org.eternalrelic.registry.ModScreens;
 import org.eternalrelic.registry.ModSounds;
 
 /**
@@ -31,6 +37,8 @@ import org.eternalrelic.registry.ModSounds;
  *   <li>{@link CarriedRelicEffect} —— 「携带生效」能力：核对背包、挂属性、播放表现。</li>
  *   <li>{@link DamageWardEffect} —— 「守护」能力：每次挨打时由遗物挡下或削弱那一击，随后碎裂冷却。</li>
  *   <li>{@link SoulLanternEffect} —— 「攒放」能力：击杀攒魂火，按键一次倾泻出去，原地留下灼烧。</li>
+ *   <li>{@link CourageEmblemEffect} —— 「定时馈赠」能力：每隔一分钟替玩家攒下两颗金心。</li>
+ *   <li>{@link EnchantedRabbitFootEffect} —— 「受击加速」能力：挨打时换来一段速度，不挡伤害。</li>
  *   <li>{@link WornRelicEffect} —— 「装入生效」能力：把守夜之瞳装进眼中，并让代价跟随玩家。</li>
  *   <li>{@link NightwatchEyeVision} —— 守夜之瞳的视觉：在暗处看清周围、照见活物。</li>
  *   <li>{@link SoulLanternNetwork} —— 把「按下了释放键」从客户端送到服务端的那条通路。</li>
@@ -55,16 +63,36 @@ public class EternalRelic implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     /**
+     * 拼一个本模组命名空间下的编号。
+     *
+     * <p><b>为什么要有这个入口</b>：物品、方块、音效、粒子、配方、界面、网络包……每一处注册都要
+     * 「取编号」，原先各自抄一遍 {@code new Identifier(MOD_ID, "…")}。抄写的坏处是命名空间一旦写错
+     * 就成了另一个命名空间的东西，游戏既不报错、也找不到，排查起来很费劲。集中到这里之后，
+     * 命名空间只有一处。</p>
+     *
+     * @param path 编号在本模组里的那一段，例如 {@code "soul_lantern"}
+     * @return 完整编号
+     */
+    public static Identifier id(String path) {
+        return new Identifier(MOD_ID, path);
+    }
+
+    /**
      * 由游戏在模组加载阶段调用一次，完成本模组各项内容的登记。
      */
     @Override
     public void onInitialize() {
+        ModBlocks.register();
         ModItems.register();
         ModSounds.register();
         ModParticleTypes.register();
+        ModRecipes.register();
+        ModScreens.register();
         CarriedRelicEffect.register();
         DamageWardEffect.register();
+        EnchantedRabbitFootEffect.register();
         SoulLanternEffect.register();
+        CourageEmblemEffect.register();
         WornRelicEffect.register();
         NightwatchEyeVision.register();
         SoulLanternNetwork.registerServer();

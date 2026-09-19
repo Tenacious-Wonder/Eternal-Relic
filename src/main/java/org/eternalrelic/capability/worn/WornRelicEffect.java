@@ -1,6 +1,8 @@
 package org.eternalrelic.capability.worn;
 
 import java.nio.charset.StandardCharsets;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.UUID;
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -87,6 +89,9 @@ public final class WornRelicEffect {
 
     /** 收拢光点出生的距离区间上浮量。 */
     private static final double SPARK_SPAWN_DISTANCE_SPREAD = 0.9D;
+
+    /** 义眼 → 它挂在生命上限上的固定标识。由眼的短名派生，算一次就够（见 {@link #modifierIdOf}）。 */
+    private static final Map<NightwatchEye, UUID> MODIFIER_IDS = new EnumMap<>(NightwatchEye.class);
 
     private WornRelicEffect() {
     }
@@ -359,11 +364,15 @@ public final class WornRelicEffect {
      * <p>标识必须固定：同一只眼每次都要挂到同一条记录上，否则反复装入会不断堆积扣减。
      * 这里由眼的短名稳定派生，而不是另写一串常量，避免两处信息各写一遍。</p>
      *
+     * <p><b>算一次就存起来</b>：这个方法在「每 10 刻 × 每名暗处的玩家 × 左右眼」的核对里被调用，
+     * 而它每次都要把短名拼成字符串、取出字节、再算一遍 MD5。缓存之后返回值一分不变
+     * （玩家身上已有的扣减认的就是这个值），只是不再重复算。</p>
+     *
      * @param eye 守夜之瞳的某一只眼
      * @return 该只眼对应的属性扣减标识
      */
     private static UUID modifierIdOf(NightwatchEye eye) {
-        return UUID.nameUUIDFromBytes(
-                ("eternal_relic:nightwatch_eye_" + eye.id()).getBytes(StandardCharsets.UTF_8));
+        return MODIFIER_IDS.computeIfAbsent(eye, e -> UUID.nameUUIDFromBytes(
+                ("eternal_relic:nightwatch_eye_" + e.id()).getBytes(StandardCharsets.UTF_8)));
     }
 }

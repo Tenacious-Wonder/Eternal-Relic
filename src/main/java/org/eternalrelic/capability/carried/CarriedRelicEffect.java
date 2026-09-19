@@ -11,6 +11,7 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -18,19 +19,28 @@ import net.minecraft.sound.SoundCategory;
 
 import org.eternalrelic.registry.ModRelics;
 import org.eternalrelic.registry.ModSounds;
-import org.eternalrelic.relic.AotaPulseParticleEffect;
+import org.eternalrelic.relic.RelicArrivalParticleEffect;
+import org.eternalrelic.relic.RelicAttachment;
 import org.eternalrelic.relic.RelicDefinition;
 import org.eternalrelic.relic.RelicEffect;
 
 /**
- * 「携带生效」能力：遗物放在背包里时，把它的属性加成挂到玩家身上。
+ * 「携带生效」能力：遗物带在身上时，把它的属性加成挂到玩家身上。
+ *
+ * <p><b>「带在身上」有两个来源</b>：一是背包里放着本体（主背包或副手），
+ * 二是**正穿着或正拿着的装备上附着了一枚**（见 {@link RelicAttachment}）。
+ * 附着那几份怎么与背包份合起来算，**逐件遗物可配**（见 {@link RelicAttachment.Stacking}）：
+ * 有的要求「四个部位各算一份」，有的「钉几件都只算一次」。件数怎么算见 {@link #countRelics}。</p>
  *
  * <p>这一层只认遗物表里的数据，不认具体是哪件遗物：把 {@link ModRelics} 里登记的
  * 携带效果逐件应用到玩家身上，因此新增属性类遗物只需登记，不必改动这里。</p>
  *
- * <p><b>为什么用「按最终总量放大」这种运算</b>：它先把基础值与其它模组提供的加成相加，
- * 最后才乘以本遗物的倍率。其它模组增加同一属性的手段依然完整生效，本模组也不去和它们
- * 争抢「加固定值」的位置，因此不会互相覆盖。</p>
+ * <p><b>加成用哪种运算由遗物表决定</b>：
+ * {@link org.eternalrelic.relic.RelicBonusKind#PERCENT} 先把基础值与其它模组提供的加成相加、
+ * 最后才乘以本遗物的倍率，其它模组增加同一属性的手段依然完整生效；
+ * {@link org.eternalrelic.relic.RelicBonusKind#FLAT} 则直接加上一个固定数值，
+ * 供护甲这类以点数为单位的属性使用。两种方式都只按遗物编号占一个固定位置，
+ * 不与其它模组争抢位置，因此不会互相覆盖。</p>
  */
 public final class CarriedRelicEffect {
 
@@ -39,6 +49,9 @@ public final class CarriedRelicEffect {
 
     /** 记录每位玩家当前已生效的携带件数：玩家编号 → （遗物编号 → 件数）。 */
     private static final Map<UUID, Map<UUID, Integer>> APPLIED_COUNTS = new HashMap<>();
+
+    /** 遗物 → 它挂在属性上的固定标识。由遗物编号派生，算一次就够（见 {@link #modifierIdOf}）。 */
+    private static final Map<Item, UUID> MODIFIER_IDS = new HashMap<>();
 
     /** 只带一件遗物时，搏动声的音量。 */
     private static final float PULSE_MIN_VOLUME = 1.0F;
@@ -117,13 +130,20 @@ public final class CarriedRelicEffect {
                 continue;
             }
 
-            double oldModifier = previous <= 0 ? 0.0D : effect.valueFor(previous);
             double newModifier = current <= 0 ? 0.0D : effect.valueFor(current);
 
             EntityAttributeInstance attribute = player.getAttributeInstance(effect.attribute().attribute());
             if (attribute == null) {
                 continue;
             }
+
+            boolean isMaxHealth = effect.attribute().attribute() == EntityAttributes.GENERIC_MAX_HEALTH;
+
+            // ⚠️ 生命上限的折算必须用"**改动之前**"的上限，所以只能先量、再改。
+            // 这里曾经写成"改完之后拿加成反推旧上限"，反推出来的是**完全没有加成时的上限**，
+            // 而不是改动前那一刻的上限 —— 于是反复穿脱加生命上限的遗物能把血一路抬到满
+            // （每来回一次约乘 1.39 倍），是个可以刷的漏洞。改动顺序之前先读这段注释。
+            double oldMax = isMaxHealth ? player.getMaxHealth() : 0.0D;
 
             attribute.removeModifier(modifierId);
 
@@ -132,27 +152,30 @@ public final class CarriedRelicEffect {
                         modifierId,
                         "eternal_relic:" + definition.id().getPath(),
                         newModifier,
-                        EntityAttributeModifier.Operation.MULTIPLY_TOTAL));
+                        effect.kind().operation()));
             }
 
-            if (effect.attribute().attribute() == EntityAttributes.GENERIC_MAX_HEALTH) {
-                keepHealthRatio(player, oldModifier, newModifier);
+            if (isMaxHealth) {
+                keepHealthRatio(player, oldMax);
             }
 
-            if (previous <= 0 && current > 0) {
-                playBirthEffect(player, current);
+            if (previous <= 0 && current > 0 && definition.hasArrivalEffect()) {
+                playArrivalEffect(player, current);
             }
         }
     }
 
     /**
-     * 统计玩家携带的遗物及件数。
+     * 统计玩家身上生效的遗物及件数。
      *
-     * <p>主背包与副手都会被计入——玩家把遗物换到副手时效果应当继续生效，
-     * 反过来只要离开了这些位置，效果也应当立刻撤销。</p>
+     * <p>两个来源：一是**背在身上的本体**（主背包与副手，玩家把遗物换到副手时应当继续生效）；
+     * 二是**附着在正穿着 / 正拿着的装备上**的那一份（见 {@link RelicAttachment#activeRelics}）。</p>
+     *
+     * <p>附着份**永远只算一份**：同一枚遗物钉在头盔、胸甲、护腿、靴子上，加起来还是一份。
+     * 它与背包份之间算不算叠加，由这件遗物自己的登记值决定——不叠加的取两边较多的那个。</p>
      *
      * @param player 目标玩家
-     * @return 遗物编号 → 携带件数；没有携带任何遗物时为空表
+     * @return 遗物编号 → 生效件数；一件都没有时为空表
      */
     private static Map<UUID, Integer> countRelics(PlayerEntity player) {
         Map<UUID, Integer> carried = new HashMap<>();
@@ -165,7 +188,37 @@ public final class CarriedRelicEffect {
             collectRelic(stack, carried);
         }
 
+        for (Map.Entry<Item, Integer> entry : RelicAttachment.activeRelicCounts(player).entrySet()) {
+            RelicDefinition definition = ModRelics.definitionOf(entry.getKey());
+            if (definition != null && definition.hasCarriedEffect()) {
+                collectAttached(definition, entry.getValue(), carried);
+            }
+        }
+
         return carried;
+    }
+
+    /**
+     * 把「附着在装备上」的那几份计入统计。
+     *
+     * <p>件数怎么算由这件遗物自己的登记值决定：要求「多件装备各算一份」的就按件数加，
+     * 否则一律只算一份。要不要叠在背包份之上，也在同一份登记里。</p>
+     *
+     * @param definition    遗物定义
+     * @param attachedCount 正穿着 / 正拿着的装备上一共附了几枚
+     * @param carried       统计结果，就地累加
+     */
+    private static void collectAttached(RelicDefinition definition, int attachedCount, Map<UUID, Integer> carried) {
+        UUID modifierId = modifierIdOf(definition);
+        int inBackpack = carried.getOrDefault(modifierId, 0);
+
+        RelicAttachment.Spec spec = RelicAttachment.specOf(definition.item());
+        RelicAttachment.Stacking stacking = spec == null ? RelicAttachment.Stacking.NONE : spec.stacking();
+
+        int fromAttachment = stacking.acrossItems() ? attachedCount : 1;
+        int total = stacking.withCarried() ? inBackpack + fromAttachment : Math.max(inBackpack, fromAttachment);
+
+        carried.put(modifierId, total);
     }
 
     /**
@@ -198,16 +251,16 @@ public final class CarriedRelicEffect {
     /**
      * 生命上限变化后，按变化前的血量比例重新折算当前血量。
      *
-     * <p>折算结果不允许超过新的生命上限，因此撤销携带效果时当前血量会平滑回落到上限之内，
+     * <p><b>调用前必须先量好旧上限</b>（见上面那段）：旧上限读一次就够，而且只有"改之前"读到
+     * 的才是真的旧上限 —— 加成一旦挂上/摘下，就已经没有别的办法把它还原出来了。
+     * 折算结果不允许超过新的生命上限，因此撤销携带效果时当前血量会平滑回落到上限之内，
      * 不会留下比上限还高的数值。</p>
      *
-     * @param player      目标玩家
-     * @param oldModifier 变更前的加成倍率
-     * @param newModifier 变更后的加成倍率
+     * @param player 目标玩家
+     * @param oldMax 变更**之前**的生命上限
      */
-    private static void keepHealthRatio(ServerPlayerEntity player, double oldModifier, double newModifier) {
-        double oldMax = player.getMaxHealth() / (1.0D + oldModifier);
-        double newMax = oldMax * (1.0D + newModifier);
+    private static void keepHealthRatio(ServerPlayerEntity player, double oldMax) {
+        double newMax = player.getMaxHealth();
 
         if (oldMax <= 0.0D || newMax <= 0.0D) {
             return;
@@ -223,15 +276,24 @@ public final class CarriedRelicEffect {
      * <p>标识必须固定：同一个遗物每次都要挂到同一条记录上，否则反复添加会不断堆积。
      * 这里用遗物编号稳定派生，而不是在代码里另写一串常量，避免两处信息各写一遍。</p>
      *
+     * <p><b>算一次就存起来</b>：这个方法在「每 5 刻 × 每名玩家 × 每件携带遗物」的核对里被调用，
+     * 同一件物品在好几个格子里还会重复问同一个值；而它每次都要把遗物编号拼成字符串、
+     * 取出字节、再算一遍 MD5。缓存之后返回值一分不变（旧存档里玩家身上挂着的加成认的就是这个值），
+     * 只是不再重复算。</p>
+     *
      * @param definition 遗物定义
      * @return 该遗物的属性加成标识
      */
     private static UUID modifierIdOf(RelicDefinition definition) {
-        return UUID.nameUUIDFromBytes(definition.id().toString().getBytes(StandardCharsets.UTF_8));
+        return MODIFIER_IDS.computeIfAbsent(definition.item(),
+                item -> UUID.nameUUIDFromBytes(definition.id().toString().getBytes(StandardCharsets.UTF_8)));
     }
 
     /**
-     * 在玩家刚开始携带遗物时播放一次「诞生」表现：搏动声与涌出后收敛的粒子。
+     * 在玩家刚开始携带遗物时播放一次「入手」表现：搏动声与涌出后收敛的粒子。
+     *
+     * <p>只有遗物表里登记了「入手表现」的遗物才会走到这里；其余遗物安静地生效，
+     * 既不响也不冒粒子。</p>
      *
      * <p>只在这一刻发生一次：放进背包时响一次，拿出后再放回来才会再次响起，
      * 携带期间既不重复播放声音，也不持续冒粒子。声音与粒子都从玩家身上发出，
@@ -240,7 +302,7 @@ public final class CarriedRelicEffect {
      * @param player 刚开始携带遗物的玩家
      * @param count  当前携带件数。只影响声音大小：带得越多略响一些，粒子数不随它变化
      */
-    private static void playBirthEffect(ServerPlayerEntity player, int count) {
+    private static void playArrivalEffect(ServerPlayerEntity player, int count) {
         float volume = PULSE_MIN_VOLUME
                 + Math.min(1.0F, count / PULSE_FULL_COUNT) * (PULSE_MAX_VOLUME - PULSE_MIN_VOLUME);
         ServerWorld world = player.getServerWorld();
@@ -251,7 +313,7 @@ public final class CarriedRelicEffect {
                 player.getX(),
                 player.getEyeY(),
                 player.getZ(),
-                ModSounds.AOTA_PULSE,
+                ModSounds.RELIC_ARRIVAL,
                 SoundCategory.PLAYERS,
                 volume,
                 1.0F);
@@ -267,7 +329,7 @@ public final class CarriedRelicEffect {
 
         // 第一批：扩散到三格，走完两轮涨落
         world.spawnParticles(
-                new AotaPulseParticleEffect(chestX, chestY, chestZ, 3.0F, 1.0F),
+                new RelicArrivalParticleEffect(chestX, chestY, chestZ, 3.0F, 1.0F),
                 chestX, chestY, chestZ,
                 farCount,
                 0.35D, 0.35D, 0.35D,
@@ -275,7 +337,7 @@ public final class CarriedRelicEffect {
 
         // 第二批：只扩散到一格半，同样走两轮
         world.spawnParticles(
-                new AotaPulseParticleEffect(chestX, chestY, chestZ, 1.5F, 1.0F),
+                new RelicArrivalParticleEffect(chestX, chestY, chestZ, 1.5F, 1.0F),
                 chestX, chestY, chestZ,
                 nearCount,
                 0.30D, 0.30D, 0.30D,

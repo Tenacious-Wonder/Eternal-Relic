@@ -9,6 +9,7 @@ import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 import org.eternalrelic.relic.SoulBurstParticleEffect;
 
@@ -29,6 +30,16 @@ public class SoulBurstParticle extends SpriteBillboardParticle {
 
     /** 散开之后原地停住、逐渐收细，直到寿命结束。 */
     private static final double HOLD_TICKS = 6.0D;
+
+    /**
+     * 一颗粒子的寿命（刻）= 散开 + 停驻。
+     *
+     * <p>之所以公开出去，是因为这个数还有一个外部用途：引魂燃灯挂在携带者身上那圈星点，
+     * 要按寿命换算「每刻补几颗，才能维持住与魂火数相同的颗数」（见 {@code SoulLanternGlow}）。
+     * 那个换算原先在两边各写了一遍 11，改一处漏一处就会让身上的星点数与灯里的魂火数对不上，
+     * 因此这里只留一个来源。</p>
+     */
+    public static final int LIFETIME_TICKS = (int) Math.ceil(SPREAD_TICKS + HOLD_TICKS);
 
     /** 球心（玩家胸口）。 */
     private final double centerX;
@@ -71,7 +82,7 @@ public class SoulBurstParticle extends SpriteBillboardParticle {
 
         // 极小：比飞来的魂火小一圈，只当余韵。再乘上倍率，好让身上的光晕比胸口那圈更细
         this.scale = (0.06F + this.random.nextFloat() * 0.05F) * effect.scale();
-        this.maxAge = (int) Math.ceil(SPREAD_TICKS + HOLD_TICKS);
+        this.maxAge = LIFETIME_TICKS;
         // 不受重力、也不被方块挡住：它是贴着人炸开的光点
         this.collidesWithWorld = false;
         this.gravityStrength = 0.0F;
@@ -90,7 +101,7 @@ public class SoulBurstParticle extends SpriteBillboardParticle {
         super.tick();
 
         if (this.age <= SPREAD_TICKS) {
-            moveAlongRay(ratio(this.age, 0.0D, SPREAD_TICKS));
+            moveAlongRay(ParticleMath.ratio(this.age, 0.0D, SPREAD_TICKS));
         } else {
             this.velocityX = 0.0D;
             this.velocityY = 0.0D;
@@ -132,19 +143,6 @@ public class SoulBurstParticle extends SpriteBillboardParticle {
     }
 
     /**
-     * @param value 当前刻
-     * @param from  区间起点
-     * @param to    区间终点
-     * @return 归一化进度
-     */
-    private static double ratio(double value, double from, double to) {
-        if (to <= from) {
-            return 1.0D;
-        }
-        return MathHelper.clamp((value - from) / (to - from), 0.0D, 1.0D);
-    }
-
-    /**
      * 粒子的工厂，供客户端注册表引用。
      */
     @Environment(EnvType.CLIENT)
@@ -161,21 +159,11 @@ public class SoulBurstParticle extends SpriteBillboardParticle {
                                        double x, double y, double z,
                                        double velocityX, double velocityY, double velocityZ) {
             // 出生点相对球心的指向，就是这颗粒子向外扩散的方向
-            double dirX = x - effect.centerX();
-            double dirY = y - effect.centerY();
-            double dirZ = z - effect.centerZ();
-            double length = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-
-            if (length < 1.0E-4D) {
-                // 正好生在球心上时给个朝上的方向，免得除以零
-                dirX = 0.0D;
-                dirY = 1.0D;
-                dirZ = 0.0D;
-                length = 1.0D;
-            }
+            Vec3d direction = ParticleMath.unitDirection(
+                    x - effect.centerX(), y - effect.centerY(), z - effect.centerZ());
 
             return new SoulBurstParticle(world, x, y, z,
-                    dirX / length, dirY / length, dirZ / length,
+                    direction.x, direction.y, direction.z,
                     effect, this.spriteProvider);
         }
     }

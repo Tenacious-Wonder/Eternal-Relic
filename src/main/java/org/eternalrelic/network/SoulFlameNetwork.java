@@ -23,8 +23,7 @@ import org.eternalrelic.EternalRelic;
 public final class SoulFlameNetwork {
 
     /** 魂火落成的包名，客户端与服务端共用这一个标识。 */
-    public static final Identifier FLAME_PACKET =
-            new Identifier(EternalRelic.MOD_ID, "soul_flame");
+    public static final Identifier FLAME_PACKET = EternalRelic.id("soul_flame");
 
     /** 送到多远之外的玩家。取的可听距离更宽一些，好让走近时它已经在响。 */
     private static final double BROADCAST_RADIUS = 48.0D;

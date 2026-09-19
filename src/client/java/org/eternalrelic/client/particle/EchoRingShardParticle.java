@@ -9,6 +9,7 @@ import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 import org.eternalrelic.relic.EchoRingShardParticleEffect;
 
@@ -153,11 +154,11 @@ public class EchoRingShardParticle extends SpriteBillboardParticle {
         double holdEnd = SPREAD_TICKS + HOLD_TICKS;
 
         if (age <= SPREAD_TICKS) {
-            moveAlongRay(ratio(age, 0.0D, SPREAD_TICKS));
+            moveAlongRay(ParticleMath.ratio(age, 0.0D, SPREAD_TICKS));
         } else if (age <= holdEnd) {
             holdPosition();
         } else {
-            fall(ratio(age, holdEnd, holdEnd + FALL_TICKS));
+            fall(ParticleMath.ratio(age, holdEnd, holdEnd + FALL_TICKS));
         }
     }
 
@@ -243,19 +244,6 @@ public class EchoRingShardParticle extends SpriteBillboardParticle {
     }
 
     /**
-     * @param value 当前刻
-     * @param from  区间起点
-     * @param to    区间终点
-     * @return 归一化进度
-     */
-    private static double ratio(double value, double from, double to) {
-        if (to <= from) {
-            return 1.0D;
-        }
-        return MathHelper.clamp((value - from) / (to - from), 0.0D, 1.0D);
-    }
-
-    /**
      * 粒子的工厂，供客户端注册表引用。
      */
     @Environment(EnvType.CLIENT)
@@ -272,21 +260,11 @@ public class EchoRingShardParticle extends SpriteBillboardParticle {
                                        double x, double y, double z,
                                        double velocityX, double velocityY, double velocityZ) {
             // 出生点相对球心的指向，就是这颗粒子向外扩散的方向
-            double dirX = x - effect.centerX();
-            double dirY = y - effect.centerY();
-            double dirZ = z - effect.centerZ();
-            double length = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-
-            if (length < 1.0E-4D) {
-                // 正好生在球心上时给个朝上的方向，免得除以零
-                dirX = 0.0D;
-                dirY = 1.0D;
-                dirZ = 0.0D;
-                length = 1.0D;
-            }
+            Vec3d direction = ParticleMath.unitDirection(
+                    x - effect.centerX(), y - effect.centerY(), z - effect.centerZ());
 
             return new EchoRingShardParticle(world, x, y, z,
-                    dirX / length, dirY / length, dirZ / length,
+                    direction.x, direction.y, direction.z,
                     effect, this.spriteProvider);
         }
     }

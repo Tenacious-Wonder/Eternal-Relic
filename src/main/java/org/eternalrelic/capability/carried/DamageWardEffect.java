@@ -1,6 +1,5 @@
 package org.eternalrelic.capability.carried;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,21 +8,20 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.random.Random;
 
+import org.eternalrelic.EternalRelic;
 import org.eternalrelic.registry.ModRelics;
 import org.eternalrelic.registry.ModSounds;
+import org.eternalrelic.relic.AttackDamage;
 import org.eternalrelic.relic.DamageWard;
 import org.eternalrelic.relic.EchoRingShardParticleEffect;
 import org.eternalrelic.relic.RelicDefinition;
@@ -62,8 +60,12 @@ public final class DamageWardEffect {
     /** 碎裂形态上记录「何时恢复」的标签名。 */
     private static final String READY_AT_KEY = "ReadyAt";
 
-    /** 碎裂形态 → 它恢复后的原物品。挂上能力时由遗物表填好。 */
-    private static final Map<Item, Item> ORIGINAL_FORMS = new HashMap<>();
+    /**
+     * 碎裂形态 → 它恢复后的原物品。**首次用到时才建**，见 {@link #originalForms()}。
+     *
+     * <p>为 {@code null} 表示还没建过（本模组没有引入空值注解，因此靠这个约定表示「尚未建立」）。</p>
+     */
+    private static Map<Item, Item> ORIGINAL_FORMS;
 
     /** 碎裂时迸出的碎屑颗数下限与随机增量。 */
     private static final int SHARD_COUNT_MIN = 24;
@@ -79,19 +81,12 @@ public final class DamageWardEffect {
     }
 
     /**
-     * 由 {@link org.eternalrelic.EternalRelic#onInitialize()} 调用。
+     * 由 {@link org.eternalrelic.EternalRelic#onInitialize()} 调用，挂上挡伤害的回调与逐刻核对恢复的回调。
      *
-     * <p>先按遗物表建好「碎裂形态 → 原物品」的对照，再挂上挡伤害的回调与逐刻核对恢复的回调。</p>
+     * <p>这里**不再**预先建「碎裂形态 → 原物品」的对照表：那张表要读遗物表，一旦有人调整初始化顺序
+     * 就会静默地空掉（见 {@link #originalForms()}）。</p>
      */
     public static void register() {
-        // 这份对照表必须在遗物表登记完成之后建立，因此本方法要排在 ModItems.register() 之后
-        for (RelicDefinition definition : ModRelics.all()) {
-            DamageWard ward = definition.ward();
-            if (ward != null) {
-                ORIGINAL_FORMS.put(ward.drainedForm(), definition.item());
-            }
-        }
-
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(DamageWardEffect::allowDamage);
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
@@ -103,6 +98,48 @@ public final class DamageWardEffect {
                 recover(player);
             }
         });
+    }
+
+    /**
+     * 取「碎裂形态 → 原物品」的对照表，**第一次用到时才建**（建好后就一直用同一张）。
+     *
+     * <p><b>为什么不在 {@link #register()} 里一次建好</b>：建表要读遗物表，这就要求本能力的初始化
+     * 必须排在 {@code ModItems.register()} 之后。一旦有人调整初始化顺序，表会**静默地空掉**，
+     * 于是挡下攻击后碎裂的回响之环再也变不回来（全项目没有恢复配方），玩家白丢一件遗物，
+     * 而且不报错、没有日志、没人知道发生了什么。改成首次使用时再建，这个顺序依赖就不存在了：
+     * 真到用它的那一刻（服务器已经在跑），遗物表必然已经登记完毕。</p>
+     *
+     * <p><b>表空要大声喊出来，但不要崩。</b>表空说明遗物表本身出了问题（登记漏了，或本方法被在
+     * 模组初始化阶段就调到了）。这时碎掉的遗物将无法复原（全项目没有恢复配方），玩家会白丢一件遗物，
+     * 所以必须留下显眼的日志 —— 但<b>不能抛异常</b>：这个方法是在服务器的每刻回调里被调到的，
+     * 抛出去就是整个服务器崩掉，比"某件遗物暂时修不好"严重得多。宁可降级，也要把话喊清楚。</p>
+     *
+     * <p>空表会被缓存下来（只喊一次），不会每次核对都刷屏。</p>
+     *
+     * @return 碎裂形态 → 原物品的对照表；遗物表异常时返回空表（并已打过错误日志）
+     */
+    private static Map<Item, Item> originalForms() {
+        if (ORIGINAL_FORMS != null) {
+            return ORIGINAL_FORMS;
+        }
+
+        Map<Item, Item> forms = new HashMap<>();
+
+        for (RelicDefinition definition : ModRelics.all()) {
+            DamageWard ward = definition.ward();
+            if (ward != null) {
+                forms.put(ward.drainedForm(), definition.item());
+            }
+        }
+
+        if (forms.isEmpty()) {
+            EternalRelic.LOGGER.error(
+                    "守护遗物的碎裂形态对照表为空：遗物表尚未登记完成，或一件守护遗物都没有登记。"
+                            + "碎裂的遗物将无法复原（全项目没有恢复配方）。见 DamageWardEffect#originalForms()。");
+        }
+
+        ORIGINAL_FORMS = forms;
+        return ORIGINAL_FORMS;
     }
 
     /**
@@ -125,7 +162,7 @@ public final class DamageWardEffect {
             return true;
         }
 
-        if (!isAttack(source)) {
+        if (!AttackDamage.isAttack(source)) {
             return true;
         }
 
@@ -212,43 +249,16 @@ public final class DamageWardEffect {
     }
 
     /**
-     * 判断这次伤害算不算「被攻击」。
-     *
-     * <p>先排除由状态效果造成的伤害类型，以及守卫者光束、幻术师尖牙这类走
-     * {@code indirectMagic} 的魔法弹道——这一步不能省：女巫灌下的伤害药水、守卫者的光束
-     * 同样带着施法者，只看有没有攻击者会把它们误当成普通攻击。</p>
-     *
-     * <p>剩下的分两类都算：一类是有人打的（近战、弓箭、有主的爆炸）；
-     * 另一类是没有主、但同属「炸过来、砸下来」的物理伤害。后者必须单独列出来，
-     * 否则红石引爆的 TNT 会因为查不到攻击者而被放行。</p>
-     *
-     * @param source 伤害来源
-     * @return 是否算一次攻击
-     */
-    private static boolean isAttack(DamageSource source) {
-        if (source.isOf(DamageTypes.MAGIC)
-                || source.isOf(DamageTypes.INDIRECT_MAGIC)
-                || source.isOf(DamageTypes.WITHER)
-                || source.isOf(DamageTypes.DRAGON_BREATH)) {
-            return false;
-        }
-
-        if (source.getAttacker() != null) {
-            return true;
-        }
-
-        return source.isIn(DamageTypeTags.IS_EXPLOSION)
-                || source.isOf(DamageTypes.UNATTRIBUTED_FIREBALL)
-                || source.isOf(DamageTypes.FALLING_ANVIL)
-                || source.isOf(DamageTypes.FALLING_BLOCK)
-                || source.isOf(DamageTypes.FALLING_STALACTITE);
-    }
-
-    /**
      * 找出玩家携带的、可以出手的守护遗物。
      *
-     * <p>主背包与副手都会计入——玩家把遗物换到副手时它应当继续管用。
-     * 携带多件时取最先遇到的那一件出手，其余的留待下次。</p>
+     * <p>判定走共用的 {@link CarriedStacks#firstOf}：主背包与副手都会计入——玩家把遗物换到副手时
+     * 它应当继续管用；这里是「每次挨打」都要走一遍的路径，因此不复制背包，
+     * 而是按遗物表逐件问一句「这件在不在身上」。</p>
+     *
+     * <p>携带多件时取<b>遗物表登记顺序里最先的一件</b>出手，其余的留待下次。
+     * 目前登记了守护效果的只有回响之环一件，因此这句话还看不出差别；
+     * 等第二件守护遗物上线时，要留意它与 {@link #shatter} 的口径是否一致
+     * （那里是按背包格顺序找「第一件守护遗物」的）。</p>
      *
      * <p>返回整条遗物定义而不只是那份配置：出手时的提示文字要报出**这件遗物自己的名字**。
      * 把名字写死成某一件，第二件守护遗物上线时玩家就会看到错误的名字。</p>
@@ -257,29 +267,13 @@ public final class DamageWardEffect {
      * @return 可以出手的那件守护遗物；没有携带时返回 {@code null}
      */
     private static RelicDefinition wardRelicCarriedBy(ServerPlayerEntity player) {
-        for (ItemStack stack : carriedStacks(player)) {
-            RelicDefinition definition = ModRelics.definitionOf(stack.getItem());
-            if (definition != null && definition.hasDamageWard()) {
+        for (RelicDefinition definition : ModRelics.all()) {
+            if (definition.hasDamageWard() && !CarriedStacks.firstOf(player, definition.item()).isEmpty()) {
                 return definition;
             }
         }
 
         return null;
-    }
-
-    /**
-     * 收集玩家身上会参与判定的物品格。
-     *
-     * <p>返回的是一份只读用的副本：这里只拿来查看，改动背包请直接操作
-     * {@link PlayerInventory} 的字段，否则改的只是副本。</p>
-     *
-     * @param player 目标玩家
-     * @return 主背包与副手的物品堆
-     */
-    private static List<ItemStack> carriedStacks(PlayerEntity player) {
-        List<ItemStack> stacks = new ArrayList<>(player.getInventory().main);
-        stacks.addAll(player.getInventory().offHand);
-        return stacks;
     }
 
     /**
@@ -352,13 +346,15 @@ public final class DamageWardEffect {
      * @param now   当前时刻
      */
     private static void recoverIn(List<ItemStack> slots, long now) {
+        Map<Item, Item> originals = originalForms();
+
         for (int i = 0; i < slots.size(); i++) {
             ItemStack stack = slots.get(i);
             if (stack.isEmpty()) {
                 continue;
             }
 
-            Item original = ORIGINAL_FORMS.get(stack.getItem());
+            Item original = originals.get(stack.getItem());
             if (original == null) {
                 continue;
             }

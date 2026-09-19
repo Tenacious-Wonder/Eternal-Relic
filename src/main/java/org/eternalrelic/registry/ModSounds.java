@@ -15,8 +15,13 @@ import org.eternalrelic.EternalRelic;
  */
 public final class ModSounds {
 
-    /** 奥塔的搏动声 —— 奥塔的枝叶开始生效时响起的心跳声。 */
-    public static final SoundEvent AOTA_PULSE = register("aota_pulse");
+    /**
+     * 遗物入手声 —— 一件遗物开始在背包里生效时响起的心跳声。
+     *
+     * <p>它不属于某一件遗物：任何在遗物表里登记了「入手表现」的遗物都会用它，
+     * 因此素材与命名都保持中性，不偏向任何一件。</p>
+     */
+    public static final SoundEvent RELIC_ARRIVAL = register("relic_arrival");
 
     /** 守夜之瞳归位声 —— 义眼装入眼眶时的一记机械声。 */
     public static final SoundEvent NIGHTWATCH_INSTALL = register("nightwatch_install");
@@ -69,6 +74,16 @@ public final class ModSounds {
      */
     public static final SoundEvent SOUL_MOAN = register("soul_moan");
 
+    /**
+     * 装卸台的锤子敲击声 —— 装或拆成功时，台子上的锤子敲一下。
+     *
+     * <p>这个音效事件在 {@code sounds.json} 里挂了三段素材（一记单敲、一段有节奏的连敲、
+     * 一段金属敲击），游戏每次随机挑一个播放，因此不必在代码里自己做随机。
+     * 三段都由制作者提供，**最长的一段原本有 24 秒**，已经剪成 1.4 秒、并加了淡出——
+     * 单次敲击用不了那么长，剪短之后也不会在结尾"啪"地断掉。</p>
+     */
+    public static final SoundEvent STATION_HAMMER = register("station_hammer");
+
     private ModSounds() {
     }
 
@@ -79,7 +94,7 @@ public final class ModSounds {
     }
 
     private static SoundEvent register(String name) {
-        Identifier id = new Identifier(EternalRelic.MOD_ID, name);
+        Identifier id = EternalRelic.id(name);
         return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
     }
 }

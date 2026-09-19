@@ -123,12 +123,37 @@ public class RelicScreen extends Screen {
     /** 打开本界面的那个界面（背包），关闭时回到它。 */
     private final Screen parent;
 
+    /**
+     * 遗物图标。
+     *
+     * <p>图标只跟遗物有关、与帧无关，因此建一次就够——原先每帧都新建一个物品堆，
+     * 白白产生垃圾（一秒钟六十个）。</p>
+     */
+    private final ItemStack iconStack;
+
+    /** 表头那三行文字：遗物名、品阶，以及「描述 / 效果」这两种页类标签。同样与帧无关，各备一份。 */
+    private final Text nameText;
+    private final Text rarityText;
+    private final Text loreKindText;
+    private final Text effectsKindText;
+
     /** 当前页码：0 是描述页，1 起是效果的各页。 */
     private int page;
 
     /** 面板左上角在屏幕上的位置，随窗口大小居中。 */
     private int panelX;
     private int panelY;
+
+    /**
+     * 描述页与效果页的正文折行结果，以及效果部分占几页。
+     *
+     * <p>折行要逐字测宽，开销不小，而这些内容只跟遗物本身与当前字体有关、与帧无关，
+     * 因此在 {@link #init()} 里算一次。原先它们落在每帧的渲染路径上：页码那一条是无条件跑的，
+     * 停在描述页也会算一遍效果文字，翻页瞬间还要再算一次。窗口缩放会重新 init，届时自动重算。</p>
+     */
+    private List<OrderedText> loreLines = List.of();
+    private List<OrderedText> effectLines = List.of();
+    private int effectPageCount = 1;
 
     /** 原版的翻页控件。它自己负责贴图、悬停换帧与翻书音效。 */
     private PageTurnWidget previousPageButton;
@@ -153,16 +178,26 @@ public class RelicScreen extends Screen {
         super(Text.translatable(relic.translationKey()));
         this.relic = relic;
         this.parent = parent;
+        this.iconStack = new ItemStack(relic.item());
+
+        // 表头这几段文字只跟遗物有关（页类标签只有两种），不必每帧现拼
+        this.nameText = relic.item().getName().copy().formatted(Formatting.BOLD);
+        this.rarityText = Text.translatable("relic_screen.eternal_relic.rarity", relic.rarity().displayName())
+                .formatted(Formatting.BOLD);
+        this.loreKindText = Text.translatable("relic_screen.eternal_relic.lore").formatted(Formatting.BOLD);
+        this.effectsKindText = Text.translatable("relic_screen.eternal_relic.effects").formatted(Formatting.BOLD);
     }
 
     /**
-     * 由游戏在界面打开时调用：把面板摆到屏幕正中，并请原版把两个翻页控件挂上。
+     * 由游戏在界面打开时调用：把面板摆到屏幕正中，备好这一页要用的文字，并请原版把两个翻页控件挂上。
      */
     @Override
     protected void init() {
         super.init();
         this.panelX = (this.width - PANEL_WIDTH) / 2;
         this.panelY = (this.height - PANEL_HEIGHT) / 2;
+
+        prepareText();
 
         // 竖直方向跟书页对齐，夹在左右两侧
         int buttonY = this.panelY + (PANEL_HEIGHT - PAGE_BUTTON_HEIGHT) / 2;
@@ -226,8 +261,7 @@ public class RelicScreen extends Screen {
      * @param context 绘制上下文
      */
     private void drawRelicIcon(DrawContext context) {
-        context.drawItem(new ItemStack(this.relic.item()),
-                this.panelX + ITEM_X, this.panelY + ITEM_Y);
+        context.drawItem(this.iconStack, this.panelX + ITEM_X, this.panelY + ITEM_Y);
     }
 
     /**
@@ -239,21 +273,15 @@ public class RelicScreen extends Screen {
      */
     private void drawHeader(DrawContext context) {
         // 一律用粗体：原版字体的粗体是加粗一像素，在米白纸上最容易认，也不用另配字体
-        context.drawText(this.textRenderer,
-                this.relic.item().getName().copy().formatted(Formatting.BOLD),
+        context.drawText(this.textRenderer, this.nameText,
                 this.panelX + NAME_X, this.panelY + NAME_Y, NAME_COLOR, false);
 
-        context.drawText(this.textRenderer,
-                Text.translatable("relic_screen.eternal_relic.rarity", this.relic.rarity().displayName())
-                        .formatted(Formatting.BOLD),
+        context.drawText(this.textRenderer, this.rarityText,
                 this.panelX + TEXT_LEFT, this.panelY + RARITY_Y,
                 this.relic.rarity().color(), false);
 
         // 同一行的右端标明这一页是哪一类，省得玩家猜"现在看的是描述还是效果"
-        Text kind = Text.translatable(this.page == 0
-                ? "relic_screen.eternal_relic.lore"
-                : "relic_screen.eternal_relic.effects")
-                .formatted(Formatting.BOLD);
+        Text kind = this.page == 0 ? this.loreKindText : this.effectsKindText;
 
         context.drawText(this.textRenderer, kind,
                 this.panelX + TEXT_LEFT + TEXT_WIDTH - this.textRenderer.getWidth(kind),
@@ -314,10 +342,7 @@ public class RelicScreen extends Screen {
      * @param alpha   不透明度
      */
     private void drawLorePage(DrawContext context, int alpha) {
-        List<OrderedText> lines = this.textRenderer.wrapLines(
-                Text.translatable(this.relic.translationKey() + ".lore")
-                        .formatted(Formatting.BOLD, Formatting.ITALIC),
-                TEXT_WIDTH);
+        List<OrderedText> lines = this.loreLines;
 
         int centerX = this.panelX + PANEL_WIDTH / 2;
         int y = this.panelY + TEXT_TOP + 14;
@@ -338,7 +363,7 @@ public class RelicScreen extends Screen {
      * @param alpha   不透明度
      */
     private void drawEffectPage(DrawContext context, int alpha) {
-        List<OrderedText> lines = effectLines();
+        List<OrderedText> lines = this.effectLines;
 
         int first = (this.page - 1) * LINES_PER_PAGE;
         int last = Math.min(first + LINES_PER_PAGE, lines.size());
@@ -440,20 +465,28 @@ public class RelicScreen extends Screen {
     }
 
     /**
-     * 把效果说明按正文宽度折行，供分页使用。
+     * 把描述词与效果说明按正文宽度折好行，并记下效果部分占几页。
      *
-     * @return 折行后的效果文字
+     * <p>只在 {@link #init()} 里调用一次。折行是逐字测宽，原先每帧都要跑：
+     * 页码那条路径会无条件地问一次总页数，于是停在描述页时也在算效果文字，
+     * 翻页瞬间还要再算一遍。这些内容不会随帧变化，算一次就够。</p>
      */
-    private List<OrderedText> effectLines() {
-        return this.textRenderer.wrapLines(Text.translatable(this.relic.descriptionKey()), TEXT_WIDTH);
+    private void prepareText() {
+        this.loreLines = this.textRenderer.wrapLines(
+                Text.translatable(this.relic.translationKey() + ".lore")
+                        .formatted(Formatting.BOLD, Formatting.ITALIC),
+                TEXT_WIDTH);
+        this.effectLines = this.textRenderer.wrapLines(
+                Text.translatable(this.relic.descriptionKey()), TEXT_WIDTH);
+
+        this.effectPageCount = Math.max(1, (this.effectLines.size() + LINES_PER_PAGE - 1) / LINES_PER_PAGE);
     }
 
     /**
      * @return 效果部分需要几页（至少一页）
      */
     private int effectPageCount() {
-        int lines = effectLines().size();
-        return Math.max(1, (lines + LINES_PER_PAGE - 1) / LINES_PER_PAGE);
+        return this.effectPageCount;
     }
 
     /**

@@ -10,19 +10,20 @@ import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 
-import org.eternalrelic.relic.AotaPulseParticleEffect;
+import org.eternalrelic.relic.RelicArrivalParticleEffect;
 
 /**
- * 奥塔的搏动粒子 —— 随搏动声两轮「涌出 → 停驻 → 飞回胸口」的绿色光点。
+ * 遗物入手的搏动粒子 —— 随搏动声两轮「涌出 → 停驻 → 飞回胸口」的绿色光点。
  *
  * <p>两轮的时间线与音频的两次心跳峰值对齐：每轮先沿各自随机方向向外扩散成不规则球面，
  * 到达峰值后短暂停驻，再加速飞向玩家<b>此刻</b>的胸口位置——目标实时取自玩家当前位置，
  * 因此玩家走动时粒子会朝人飞，而不是回到拾取时的旧位置。抵达后立即消失，不再回弹。</p>
  */
 @Environment(EnvType.CLIENT)
-public class AotaPulseParticle extends SpriteBillboardParticle {
+public class RelicArrivalParticle extends SpriteBillboardParticle {
 
     /** 粒子的基础大小。 */
     private static final float BASE_SCALE = 0.2F;
@@ -55,10 +56,10 @@ public class AotaPulseParticle extends SpriteBillboardParticle {
     /** 供飞回阶段定位玩家。 */
     private final ClientWorld clientWorld;
 
-    AotaPulseParticle(ClientWorld world,
+    RelicArrivalParticle(ClientWorld world,
                       double x, double y, double z,
                       double dirX, double dirY, double dirZ,
-                      AotaPulseParticleEffect effect,
+                      RelicArrivalParticleEffect effect,
                       SpriteProvider spriteProvider) {
         super(world, x, y, z, 0.0D, 0.0D, 0.0D);
         this.setSprite(spriteProvider.getSprite(this.random));
@@ -139,21 +140,21 @@ public class AotaPulseParticle extends SpriteBillboardParticle {
         double age = this.age / Math.max(0.2D, this.cycleSpeed);
 
         if (age <= t0) {
-            moveAlongRay(this.ratio(age, 0.0D, t0));
+            moveAlongRay(ParticleMath.ratio(age, 0.0D, t0));
         } else if (age <= t1) {
             holdPosition();
         } else if (age <= t2) {
             // 第一轮飞回：只减速停住，不消失，好继续第二轮扩散
-            flyToPlayer(this.ratio(age, t1, t2), false);
+            flyToPlayer(ParticleMath.ratio(age, t1, t2), false);
         } else if (age <= t3) {
             // 第二轮以玩家此刻的胸口为球心，避免两轮重叠在同一处
             updateCenter();
-            moveAlongRay(this.ratio(age, t2, t3));
+            moveAlongRay(ParticleMath.ratio(age, t2, t3));
         } else if (age <= t4) {
             holdPosition();
         } else {
             // 第二轮飞回：抵达胸口后消失
-            flyToPlayer(this.ratio(age, t4, t5), true);
+            flyToPlayer(ParticleMath.ratio(age, t4, t5), true);
         }
     }
 
@@ -260,19 +261,6 @@ public class AotaPulseParticle extends SpriteBillboardParticle {
     }
 
     /**
-     * @param value 当前刻
-     * @param from  区间起点
-     * @param to    区间终点
-     * @return 归一化进度
-     */
-    private double ratio(double value, double from, double to) {
-        if (to <= from) {
-            return 1.0D;
-        }
-        return MathHelper.clamp((value - from) / (to - from), 0.0D, 1.0D);
-    }
-
-    /**
      * 让粒子随时间逐渐缩小，配合淡出形成消散感。
      *
      * @param tickDelta 当前帧在两次游戏刻之间的插值进度，用于让缩小平滑
@@ -296,7 +284,7 @@ public class AotaPulseParticle extends SpriteBillboardParticle {
      * 粒子的工厂，供客户端注册表引用。
      */
     @Environment(EnvType.CLIENT)
-    public static class Factory implements ParticleFactory<AotaPulseParticleEffect> {
+    public static class Factory implements ParticleFactory<RelicArrivalParticleEffect> {
 
         private final SpriteProvider spriteProvider;
 
@@ -305,24 +293,15 @@ public class AotaPulseParticle extends SpriteBillboardParticle {
         }
 
         @Override
-        public Particle createParticle(AotaPulseParticleEffect effect, ClientWorld world,
+        public Particle createParticle(RelicArrivalParticleEffect effect, ClientWorld world,
                                        double x, double y, double z,
                                        double velocityX, double velocityY, double velocityZ) {
             // 生成点相对球心的指向就是这颗粒子的固定方向
-            double dirX = x - effect.centerX();
-            double dirY = y - effect.centerY();
-            double dirZ = z - effect.centerZ();
-            double length = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
+            Vec3d direction = ParticleMath.unitDirection(
+                    x - effect.centerX(), y - effect.centerY(), z - effect.centerZ());
 
-            if (length < 1.0E-4D) {
-                dirX = 0.0D;
-                dirY = 1.0D;
-                dirZ = 0.0D;
-                length = 1.0D;
-            }
-
-            return new AotaPulseParticle(world, x, y, z,
-                    dirX / length, dirY / length, dirZ / length,
+            return new RelicArrivalParticle(world, x, y, z,
+                    direction.x, direction.y, direction.z,
                     effect, this.spriteProvider);
         }
     }

@@ -263,8 +263,6 @@ public class SoulWispParticle extends SpriteBillboardParticle {
     /**
      * 越接近寿命终点越亮，与{@code FlameParticle}同一套做法——火焰本就该越烧越旺。
      *
-     * <p>只抬升方块光那一半，不动天光，因此白天夜里都亮得一致。</p>
-     *
      * @param tint 当前帧的插值进度
      * @return 打包后的光照值
      */
@@ -272,13 +270,7 @@ public class SoulWispParticle extends SpriteBillboardParticle {
     public int getBrightness(float tint) {
         float progress = MathHelper.clamp((this.age + tint) / this.maxAge, 0.0F, 1.0F);
 
-        int packed = super.getBrightness(tint);
-        int blockLight = packed & 0xFF;
-        int skyLight = packed >> 16 & 0xFF;
-
-        blockLight = Math.min(240, blockLight + (int) (progress * 15.0F * 16.0F));
-
-        return blockLight | skyLight << 16;
+        return ParticleMath.brightenBlockLight(progress, super.getBrightness(tint));
     }
 
     /**

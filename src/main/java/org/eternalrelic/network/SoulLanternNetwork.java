@@ -20,8 +20,7 @@ import org.eternalrelic.capability.carried.SoulLanternEffect;
 public final class SoulLanternNetwork {
 
     /** 释放请求的包名。客户端与服务端共用这一个标识。 */
-    public static final Identifier CAST_PACKET =
-            new Identifier(EternalRelic.MOD_ID, "cast_soul_lantern");
+    public static final Identifier CAST_PACKET = EternalRelic.id("cast_soul_lantern");
 
     private SoulLanternNetwork() {
     }

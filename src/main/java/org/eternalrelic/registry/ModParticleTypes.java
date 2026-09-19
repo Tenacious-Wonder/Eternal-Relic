@@ -5,10 +5,9 @@ import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 
 import org.eternalrelic.EternalRelic;
-import org.eternalrelic.relic.AotaPulseParticleEffect;
+import org.eternalrelic.relic.RelicArrivalParticleEffect;
 import org.eternalrelic.relic.EchoRingShardParticleEffect;
 import org.eternalrelic.relic.NightwatchParticleEffect;
 import org.eternalrelic.relic.SoulBurstParticleEffect;
@@ -21,9 +20,9 @@ import org.eternalrelic.relic.SoulWispParticleEffect;
  */
 public final class ModParticleTypes {
 
-    /** 奥塔的搏动粒子 —— 以玩家胸口为中心涨落的绿色光点。 */
-    private static final ParticleType<AotaPulseParticleEffect> AOTA_PULSE =
-            register("aota_pulse", FabricParticleTypes.complex(new AotaPulseParticleEffect.Factory()));
+    /** 遗物入手粒子 —— 以玩家胸口为中心涨落的绿色光点。 */
+    private static final ParticleType<RelicArrivalParticleEffect> RELIC_ARRIVAL =
+            register("relic_arrival", FabricParticleTypes.complex(new RelicArrivalParticleEffect.Factory()));
 
     /** 守夜之瞳装取时的微光点 —— 装入时从四周收拢，取下时向四周飞散。 */
     private static final ParticleType<NightwatchParticleEffect> NIGHTWATCH_SPARK =
@@ -59,10 +58,10 @@ public final class ModParticleTypes {
     }
 
     /**
-     * @return 奥塔的搏动粒子类型
+     * @return 遗物入手粒子的类型
      */
-    public static ParticleType<AotaPulseParticleEffect> aotaPulse() {
-        return AOTA_PULSE;
+    public static ParticleType<RelicArrivalParticleEffect> relicArrival() {
+        return RELIC_ARRIVAL;
     }
 
     /**
@@ -102,8 +101,7 @@ public final class ModParticleTypes {
 
     private static <T extends net.minecraft.particle.ParticleEffect> ParticleType<T> register(
             String name, ParticleType<T> type) {
-        return Registry.register(Registries.PARTICLE_TYPE,
-                new Identifier(EternalRelic.MOD_ID, name), type);
+        return Registry.register(Registries.PARTICLE_TYPE, EternalRelic.id(name), type);
     }
 
     /**
@@ -118,6 +116,6 @@ public final class ModParticleTypes {
      */
     private static DefaultParticleType registerSimple(String name) {
         return Registry.register(Registries.PARTICLE_TYPE,
-                new Identifier(EternalRelic.MOD_ID, name), FabricParticleTypes.simple());
+                EternalRelic.id(name), FabricParticleTypes.simple());
     }
 }

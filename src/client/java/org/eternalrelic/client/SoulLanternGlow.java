@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.random.Random;
 
 import org.eternalrelic.capability.carried.SoulLanternEffect;
+import org.eternalrelic.client.particle.SoulBurstParticle;
 import org.eternalrelic.registry.ModItems;
 import org.eternalrelic.relic.SoulBurstParticleEffect;
 
@@ -33,9 +34,10 @@ public final class SoulLanternGlow {
      * 一颗粒子的寿命（刻）。这个数<b>必须与星点粒子自己的寿命一致</b>——
      * 它决定"每刻补几颗才能维持住 N 颗同时存在"。
      *
-     * <p>{@code SoulBurstParticle} 的寿命固定为「扩散 5 刻 + 停驻 6 刻」，改那边记得同步改这里。</p>
+     * <p>因此这里直接引用 {@link SoulBurstParticle#LIFETIME_TICKS}（它由「扩散 + 停驻」算出来），
+     * 不再在两处各写一遍：那边一调，身上的星点数会立刻跟着对上，不必靠人记得同步。</p>
      */
-    private static final float AURA_LIFETIME_TICKS = 11.0F;
+    private static final float AURA_LIFETIME_TICKS = SoulBurstParticle.LIFETIME_TICKS;
 
     /** 星点离身体中轴多远：薄薄一圈贴着身子，而不是飘在远处。 */
     private static final double GLOW_RADIUS_MIN = 0.28D;
@@ -86,7 +88,7 @@ public final class SoulLanternGlow {
             return;
         }
 
-        // 寿命 11 刻 = 同时存在的颗数 × (1/11) 颗每刻，因此这样补正好维持「魂火数」颗
+        // 按寿命换算：同时存在的颗数 × (1/寿命) 颗每刻，这样补正好维持「魂火数」颗
         pendingParticles += souls / AURA_LIFETIME_TICKS;
 
         int count = (int) pendingParticles;

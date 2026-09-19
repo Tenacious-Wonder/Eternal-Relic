@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BCs",
+    "NAN",
+    "LLL"
+  ],
+  "key": {
+    "B": {
+      "item": "eternal_relic:hammer"
+    },
+    "C": {
+      "item": "minecraft:red_carpet"
+    },
+    "s": {
+      "item": "eternal_relic:small_hammer"
+    },
+    "N": {
+      "item": "minecraft:gold_nugget"
+    },
+    "A": {
+      "item": "minecraft:anvil"
+    },
+    "L": {
+      "item": "minecraft:stone_slab"
+    }
+  },
+  "result": {
+    "item": "eternal_relic:relic_station",
+    "count": 1
+  }
+}
