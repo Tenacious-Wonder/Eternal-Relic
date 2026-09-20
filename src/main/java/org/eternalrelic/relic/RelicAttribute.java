@@ -21,7 +21,10 @@ public enum RelicAttribute {
     ATTACK_DAMAGE(EntityAttributes.GENERIC_ATTACK_DAMAGE),
 
     /** 护甲值。 */
-    ARMOR(EntityAttributes.GENERIC_ARMOR);
+    ARMOR(EntityAttributes.GENERIC_ARMOR),
+
+    /** 盔甲韧性 —— 挨重击时用来保住减伤的属性，护甲条与提示框上都不显示。 */
+    ARMOR_TOUGHNESS(EntityAttributes.GENERIC_ARMOR_TOUGHNESS);
 
     private final EntityAttribute attribute;
 

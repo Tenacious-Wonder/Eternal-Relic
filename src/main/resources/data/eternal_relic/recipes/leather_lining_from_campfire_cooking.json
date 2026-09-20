@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "misc",
+  "cookingtime": 600,
+  "experience": 0.35,
+  "ingredient": {
+    "item": "eternal_relic:leather_lining_unfinished"
+  },
+  "result": "eternal_relic:leather_lining"
+}

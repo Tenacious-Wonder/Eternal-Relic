@@ -7,7 +7,8 @@
     "EnchantmentHelperMixin",
     "EntityMixin",
     "ItemEntityMixin",
-    "PlayerEntityMixin"
+    "PlayerEntityMixin",
+    "ProjectileEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

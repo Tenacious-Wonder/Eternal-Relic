@@ -47,16 +47,40 @@ import net.minecraft.util.Identifier;
 public final class RelicEnchantmentBonus {
 
     /** 每件会补附魔的遗物 → 它补的附魔及等级，按登记顺序。 */
-    private static final Map<Item, Map<Enchantment, Integer>> BY_RELIC = new LinkedHashMap<>();
+    private static final Map<Item, Map<Enchantment, Grant>> BY_RELIC = new LinkedHashMap<>();
+
+    /**
+     * 一条补魔登记：补几级，以及「只在附着物属于哪一类时才补」。
+     *
+     * @param level  补上的等级，正数
+     * @param onlyOn 只在附着物算这一类时才补；{@code null} 表示不挑对象、一律补上
+     */
+    private record Grant(int level, AttachTarget onlyOn) {
+    }
 
     private RelicEnchantmentBonus() {
     }
 
     /**
-     * 登记一件会给所附着物品补附魔的遗物。
+     * 登记一件会给所附着物品补附魔的遗物 —— 不挑附着物是哪一个部位。
+     *
+     * @param relic       遗物本身
+     * @param enchantment 它补的附魔
+     * @param level       补几级，必须是正数
+     */
+    public static void register(Item relic, Enchantment enchantment, int level) {
+        register(relic, enchantment, level, null);
+    }
+
+    /**
+     * 登记一件会给所附着物品补附魔的遗物，并限定「只在附着物属于这一类时才补」。
+     *
+     * <p>川流纹章就是这么用的：同一条纹章，钉在头盔上补水下呼吸、钉在靴子上补深海探索者，
+     * 各写一次调用、各限定一个类别。限定条件同时决定了<b>提示框上画不画那一行</b>——
+     * 钉在头盔上的纹章不会在面板上多出一行「深海探索者」，因为那条附魔根本不会加到头盔上。</p>
      *
      * <p>同一件遗物可以分多次登记：后来补的那条会加在已经登记过的基础上，
-     * 因此「一件纹章同时补两条附魔」写成两次调用即可。</p>
+     * 因此「一件纹章按部位给两条不同附魔」写成两次调用即可。</p>
      *
      * <p>登记填漏时<b>直接抛错</b>，让它在启动时就暴露：这类登记只有开发者会写，
      * 静默跳过只会变成「进了游戏才发现某件遗物白钉了」。</p>
@@ -64,8 +88,9 @@ public final class RelicEnchantmentBonus {
      * @param relic       遗物本身
      * @param enchantment 它补的附魔
      * @param level       补几级，必须是正数
+     * @param onlyOn      只在附着物算这一类时才补；{@code null} 表示不挑对象
      */
-    public static void register(Item relic, Enchantment enchantment, int level) {
+    public static void register(Item relic, Enchantment enchantment, int level, AttachTarget onlyOn) {
         String name = Registries.ITEM.getId(relic).toString();
 
         if (enchantment == null) {
@@ -76,7 +101,8 @@ public final class RelicEnchantmentBonus {
             throw new IllegalArgumentException("遗物「" + name + "」补的附魔等级必须是正数，实际是 " + level);
         }
 
-        BY_RELIC.computeIfAbsent(relic, key -> new LinkedHashMap<>()).put(enchantment, level);
+        BY_RELIC.computeIfAbsent(relic, key -> new LinkedHashMap<>())
+                .put(enchantment, new Grant(level, onlyOn));
     }
 
     /**
@@ -100,12 +126,20 @@ public final class RelicEnchantmentBonus {
         Map<Enchantment, Integer> bonuses = new LinkedHashMap<>();
 
         for (Item relic : attached) {
-            Map<Enchantment, Integer> granted = BY_RELIC.get(relic);
+            Map<Enchantment, Grant> granted = BY_RELIC.get(relic);
             if (granted == null) {
                 continue;
             }
 
-            granted.forEach((enchantment, level) -> bonuses.merge(enchantment, level, Integer::sum));
+            granted.forEach((enchantment, grant) -> {
+                // 限定部位的附魔要先问一句「附着物是不是这类东西」：不是就整条不算，
+                // 这样面板上也不会画出那条用不上的附魔。
+                if (grant.onlyOn() != null && !grant.onlyOn().covers(stack.getItem())) {
+                    return;
+                }
+
+                bonuses.merge(enchantment, grant.level(), Integer::sum);
+            });
         }
 
         return bonuses;

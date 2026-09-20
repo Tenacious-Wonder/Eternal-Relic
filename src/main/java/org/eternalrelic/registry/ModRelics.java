@@ -150,6 +150,55 @@ public final class ModRelics {
             MaterialRarity.SUPREME,
             null);
 
+    /**
+     * 川流纹章 —— 钉在头盔上视同带有「水下呼吸」，钉在靴子上视同带有「深海探索者」。
+     *
+     * <p>它没有持续的属性加成，也不在挨打时出手：价值全在「把那一件护具补成水下专用的」上。
+     * 给哪条附魔取决于附着物是头盔还是靴子，两条都由
+     * {@link org.eternalrelic.relic.RelicEnchantmentBonus} 负责。</p>
+     *
+     * <p>固有稀有度为成材：效果实用，但只在水下有用。</p>
+     */
+    public static final RelicDefinition STREAM_EMBLEM = define(
+            ModItems.STREAM_EMBLEM,
+            MaterialRarity.LUMBER,
+            null);
+
+    /**
+     * 坚铁甲片 —— 缝在防具上，为穿着它的人加一点护甲。
+     *
+     * <p><b>放在背包里完全没有用</b>：它是第一件「只认附着份」的遗物，这份护甲加成的来源被限定为
+     * 「正穿着的那件防具上缝了它」（见 {@link RelicDefinition#isAttachmentOnly()}）。
+     * 这里照常登记护甲加成，由 {@link org.eternalrelic.capability.carried.CarriedRelicEffect}
+     * 决定从哪一份计入。</p>
+     *
+     * <p><b>每缝一件各算一份</b>，四个部位都缝满合计 +4 点（两个护甲图标）——与斑驳的铜甲片
+     * 同一套「各算一份」的规矩，只是单片给得更多、且必须先缝上去才管用。</p>
+     *
+     * <p>固有稀有度为成材：一块处理过的铁片，实在、耐用，但称不上稀罕。</p>
+     */
+    public static final RelicDefinition HARDENED_IRON_PLATE = defineAttachmentOnly(
+            ModItems.HARDENED_IRON_PLATE,
+            MaterialRarity.LUMBER,
+            RelicEffect.flatPerCopy(RelicAttribute.ARMOR, 1.0D, 4));
+
+    /**
+     * 皮革内衬 —— 缝在防具上，为穿着它的人加一点盔甲韧性。
+     *
+     * <p>与坚铁甲片同一类：<b>放在背包里完全没有用</b>，这份加成的来源被限定为
+     * 「正穿着的那件防具上缝了它」（见 {@link RelicDefinition#isAttachmentOnly()}）。</p>
+     *
+     * <p><b>它加的是盔甲韧性而不是护甲值</b>：这项属性在护甲条与提示框上都看不见，
+     * 只在挨重击时保住减伤，因此是一件「看不出来、但确实在起作用」的遗物。
+     * 每缝一件各算一份，四个部位都缝满合计 +2 点（相当于一件钻石甲自带的韧性）。</p>
+     *
+     * <p>固有稀有度为粗石：一块厚实的软皮，顶用，但称不上讲究。</p>
+     */
+    public static final RelicDefinition LEATHER_LINING = defineAttachmentOnly(
+            ModItems.LEATHER_LINING,
+            MaterialRarity.ROUGH_STONE,
+            RelicEffect.flatPerCopy(RelicAttribute.ARMOR_TOUGHNESS, 0.5D, 4));
+
     // ==================== 品阶样本（测试用） ====================
 
     /**
@@ -292,8 +341,36 @@ public final class ModRelics {
      */
     private static RelicDefinition define(Item item, MaterialRarity rarity, RelicEffect effect, DamageWard ward,
             boolean arrivalEffect) {
+        return define(item, rarity, effect, ward, arrivalEffect, false);
+    }
+
+    /**
+     * 登记一件「只认附着份」的遗物——它的属性加成放在背包里不算数，必须缝在装备上。
+     *
+     * @param item   遗物对应的物品
+     * @param rarity 遗物固有稀有度（沿用材料档位）
+     * @param effect 缝在装备上时生效的属性加成
+     * @return 登记好的遗物定义
+     */
+    private static RelicDefinition defineAttachmentOnly(Item item, MaterialRarity rarity, RelicEffect effect) {
+        return define(item, rarity, effect, null, false, true);
+    }
+
+    /**
+     * 登记一件遗物。
+     *
+     * @param item           遗物对应的物品
+     * @param rarity         遗物固有稀有度（沿用材料档位）
+     * @param effect         携带时生效的属性加成，没有则为 {@code null}
+     * @param ward           受到攻击时的守护效果，没有则为 {@code null}
+     * @param arrivalEffect  刚开始携带时是否播放一记「入手」表现
+     * @param attachmentOnly 属性加成是否只认附着份（放在背包里不算数）
+     * @return 登记好的遗物定义
+     */
+    private static RelicDefinition define(Item item, MaterialRarity rarity, RelicEffect effect, DamageWard ward,
+            boolean arrivalEffect, boolean attachmentOnly) {
         RelicDefinition definition = new RelicDefinition(item, Registries.ITEM.getId(item), rarity, effect, ward,
-                arrivalEffect);
+                arrivalEffect, attachmentOnly);
         BY_ITEM.put(item, definition);
         return definition;
     }

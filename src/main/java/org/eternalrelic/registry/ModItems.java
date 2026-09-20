@@ -84,6 +84,42 @@ public final class ModItems {
     public static final Item ETERNAL_EMBLEM = register("eternal_emblem",
             new RelicItem(new Item.Settings().maxCount(1)));
 
+    /**
+     * 川流纹章 —— 钉在头盔或靴子上，把那一件护具补成水下专用的。
+     *
+     * <p>它是第一件「同一条纹章按附着部位给不同附魔」的遗物：头盔补水下呼吸、靴子补深海探索者，
+     * 因此只能钉在这两处，钉在别的地方什么也给不了。给哪条见 {@link EnchantingRelics}。</p>
+     */
+    public static final Item STREAM_EMBLEM = register("stream_emblem",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 坚铁甲片 —— 缝在防具上的护甲片，为穿着它的人加一点护甲。
+     *
+     * <p>它是第一件「放在背包里毫无用处」的遗物：必须缝在正穿着的防具上才算数，
+     * 见 {@link ModRelics} 里那一行的说明。</p>
+     */
+    public static final Item HARDENED_IRON_PLATE = register("hardened_iron_plate",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 皮革内衬 —— 缝在防具上的软衬，为穿着它的人加一点盔甲韧性。
+     *
+     * <p>与坚铁甲片同类：放在背包里毫无用处，必须缝在正穿着的防具上才算数。
+     * 它由「皮革内衬（半成品）」烤制而成，见 {@link #LEATHER_LINING_UNFINISHED}。</p>
+     */
+    public static final Item LEATHER_LINING = register("leather_lining",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 皮革内衬（半成品）—— 加工到一半的内衬，放进熔炉或篝火烤过之后才能缝到防具上。
+     *
+     * <p>它是普通材料、<b>不是遗物</b>：没有登记进遗物表，也没有任何效果，
+     * 因此提示框上不会出现「遗物稀有度」那一行。可以堆叠。</p>
+     */
+    public static final Item LEATHER_LINING_UNFINISHED = register("leather_lining_unfinished",
+            new Item(new Item.Settings()));
+
     // ==================== 锤子（武器 + 装卸台的合成材料） ====================
 
     /** 两把锤子的攻击速度修正。玩家的基础攻速是 4.0，因此 4.0 - 3.4 = 0.6。 */
@@ -198,6 +234,10 @@ public final class ModItems {
             entries.add(COURAGE_EMBLEM);
             entries.add(ENCHANTED_RABBIT_FOOT);
             entries.add(ETERNAL_EMBLEM);
+            entries.add(STREAM_EMBLEM);
+            entries.add(HARDENED_IRON_PLATE);
+            entries.add(LEATHER_LINING);
+            entries.add(LEATHER_LINING_UNFINISHED);
             entries.add(NIGHTWATCH_EYE_LEFT);
             entries.add(NIGHTWATCH_EYE_RIGHT);
             entries.add(NIGHTWATCH_EYE_LEFT_DRAINED);

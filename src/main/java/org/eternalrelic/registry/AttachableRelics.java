@@ -60,5 +60,29 @@ public final class AttachableRelics {
                 AttachTarget.ARMOR,
                 AttachTarget.WEAPON,
                 AttachTarget.TOOL);
+
+        // 川流纹章：蜡制的，配蜜脾；只钉头盔与靴子——它给的两条附魔分别只对这两个部位有意义，
+        // 钉在别处既拿不到效果、面板上也不该多出用不上的附魔行
+        RelicAttachment.register(
+                ModItems.STREAM_EMBLEM,
+                Items.HONEYCOMB,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.HELMET,
+                AttachTarget.BOOTS);
+
+        // 坚铁甲片：铁的，配铁锭；只缝四个部位的防具，盾牌不算（它本身不提供护甲）。
+        // 四个部位各缝一枚时各算一份，因此用 ACROSS_ITEMS 而不是 NONE
+        RelicAttachment.register(
+                ModItems.HARDENED_IRON_PLATE,
+                Items.IRON_INGOT,
+                RelicAttachment.Stacking.ACROSS_ITEMS,
+                AttachTarget.ARMOR_PIECE);
+
+        // 皮革内衬：皮做的，配皮革；与坚铁甲片一样只缝四个部位的防具，各缝一枚各算一份
+        RelicAttachment.register(
+                ModItems.LEATHER_LINING,
+                Items.LEATHER,
+                RelicAttachment.Stacking.ACROSS_ITEMS,
+                AttachTarget.ARMOR_PIECE);
     }
 }

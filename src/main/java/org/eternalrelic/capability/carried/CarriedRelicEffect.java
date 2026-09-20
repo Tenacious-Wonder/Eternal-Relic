@@ -237,6 +237,12 @@ public final class CarriedRelicEffect {
             return;
         }
 
+        // 只认附着份的遗物（坚铁甲片）：背在背包里不算数，必须真的缝在装备上。
+        // 附着那一份由 countRelics 的另一半负责，这里只是把「背包」这一路让开。
+        if (definition.isAttachmentOnly()) {
+            return;
+        }
+
         carried.merge(modifierIdOf(definition), stack.getCount(), Integer::sum);
     }
 

@@ -13,20 +13,25 @@ import net.minecraft.util.Identifier;
  * <p>这里的稀有度取自<b>材料档位</b> {@link MaterialRarity}，登记一次便固定不变——
  * 遗物的成色由它自身决定，不随谁做出来而改变。</p>
  *
- * <p>三处能力插槽各自独立：{@code effect} 管「一直挂在身上的数值」，
- * {@code ward} 管「每次挨打时出手一次」，{@code arrivalEffect} 管「刚开始携带时要不要亮相」。
- * 一件遗物可以只有其中任意几项；没有的那一项留 {@code null}（开关留 {@code false}）即可，
- * 相应的能力类查不到配置就会自动跳过这件遗物。</p>
+ * <p>四处能力插槽各自独立：{@code effect} 管「一直挂在身上的数值」，
+ * {@code ward} 管「每次挨打时出手一次」，{@code arrivalEffect} 管「刚开始携带时要不要亮相」，
+ * {@code attachmentOnly} 则决定那份数值<b>从哪儿算起</b>（见下）。一件遗物可以只有其中任意几项；
+ * 没有的那一项留 {@code null}（开关留 {@code false}）即可，相应的能力类查不到配置就会自动跳过这件遗物。</p>
  *
- * @param item          遗物对应的物品
- * @param id            内部编号
- * @param rarity        遗物固有稀有度（沿用材料档位）
- * @param effect        携带时生效的属性加成；没有则为 {@code null}
- * @param ward          受到攻击时的守护效果；没有则为 {@code null}
- * @param arrivalEffect 刚开始携带时是否播放一记「入手」表现
+ * <p><b>{@code attachmentOnly}：属性加成只认「缝在装备上的那一份」。</b>
+ * 关着（默认）时，遗物放在背包里就生效、缝在装备上也生效；打开之后，背包里那一份完全不算数，
+ * 必须真的缝在正穿着 / 正拿着的装备上才给属性（坚铁甲片就是这一类）。</p>
+ *
+ * @param item           遗物对应的物品
+ * @param id             内部编号
+ * @param rarity         遗物固有稀有度（沿用材料档位）
+ * @param effect         携带时生效的属性加成；没有则为 {@code null}
+ * @param ward           受到攻击时的守护效果；没有则为 {@code null}
+ * @param arrivalEffect  刚开始携带时是否播放一记「入手」表现
+ * @param attachmentOnly 属性加成是否只认附着份（放在背包里不算数）
  */
 public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect effect, DamageWard ward,
-        boolean arrivalEffect) {
+        boolean arrivalEffect, boolean attachmentOnly) {
 
     /**
      * 登记一件没有守护效果、也不做入手表现的遗物。
@@ -37,7 +42,7 @@ public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, R
      * @param effect 携带时生效的属性加成；没有则为 {@code null}
      */
     public RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect effect) {
-        this(item, id, rarity, effect, null, false);
+        this(item, id, rarity, effect, null, false, false);
     }
 
     /**
@@ -50,7 +55,7 @@ public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, R
      * @param ward   受到攻击时的守护效果；没有则为 {@code null}
      */
     public RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect effect, DamageWard ward) {
-        this(item, id, rarity, effect, ward, false);
+        this(item, id, rarity, effect, ward, false, false);
     }
 
     /**
@@ -91,5 +96,12 @@ public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, R
      */
     public boolean hasArrivalEffect() {
         return this.arrivalEffect;
+    }
+
+    /**
+     * @return 本遗物的属性加成是否<b>只认附着份</b>——放在背包里不算数，必须缝在装备上
+     */
+    public boolean isAttachmentOnly() {
+        return this.attachmentOnly;
     }
 }
