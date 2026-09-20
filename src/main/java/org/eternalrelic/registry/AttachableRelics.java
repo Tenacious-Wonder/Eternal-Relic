@@ -51,7 +51,14 @@ public final class AttachableRelics {
                 RelicAttachment.Stacking.ACROSS_ITEMS,
                 AttachTarget.ARMOR);
 
-        // 注意：武器与工具两张名单目前是**空的**——这是正常状态（白名单就是可以空着）。
-        // 想往上面挂东西时，把对应的 AttachTarget 加进上面某一条即可。
+        // 永恒纹章：蜡制的，配蜜脾；防具、武器、工具都能钉——它保的是「这件东西本身不被毁掉」，
+        // 因此不该限定用在哪一类上。它没有携带属性加成，累加方式用不上，登记 NONE 即可
+        RelicAttachment.register(
+                ModItems.ETERNAL_EMBLEM,
+                Items.HONEYCOMB,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.ARMOR,
+                AttachTarget.WEAPON,
+                AttachTarget.TOOL);
     }
 }

@@ -135,6 +135,21 @@ public final class ModRelics {
             MaterialRarity.ROUGH_STONE,
             null);
 
+    /**
+     * 永恒纹章 —— 钉在一件物品上，使那件物品不会被火烧、岩浆、爆炸、仙人掌与虚空毁掉，
+     * 并视同带有「经验修补」。
+     *
+     * <p>它没有持续的属性加成，也不在挨打时出手：价值全在「钉住之后那件东西不会没」上。
+     * 两条效果分别由 {@link org.eternalrelic.relic.ItemPreservation}（保全）与
+     * {@link org.eternalrelic.relic.RelicEnchantmentBonus}（补魔）负责。</p>
+     *
+     * <p>固有稀有度为至宝：能让一件东西彻底免于损毁，这份量值得放在最上面两档。</p>
+     */
+    public static final RelicDefinition ETERNAL_EMBLEM = define(
+            ModItems.ETERNAL_EMBLEM,
+            MaterialRarity.SUPREME,
+            null);
+
     // ==================== 品阶样本（测试用） ====================
 
     /**

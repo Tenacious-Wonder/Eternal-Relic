@@ -78,6 +78,12 @@ public final class ModItems {
     public static final Item ENCHANTED_RABBIT_FOOT = register("enchanted_rabbit_foot",
             new EnchantedRabbitFootItem(new Item.Settings().maxCount(1)));
 
+    /**
+     * 永恒纹章 —— 钉在任意防具、武器或工具上，使那件东西不再被毁掉，并视同带有经验修补。
+     */
+    public static final Item ETERNAL_EMBLEM = register("eternal_emblem",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
     // ==================== 锤子（武器 + 装卸台的合成材料） ====================
 
     /** 两把锤子的攻击速度修正。玩家的基础攻速是 4.0，因此 4.0 - 3.4 = 0.6。 */
@@ -171,6 +177,7 @@ public final class ModItems {
     public static void register() {
         ModRelics.register();
         AttachableRelics.register();
+        EnchantingRelics.register();
         VanillaMaterialRarities.register();
         VanillaItemGrades.register();
 
@@ -190,6 +197,7 @@ public final class ModItems {
             entries.add(MOTTLED_COPPER_PLATE);
             entries.add(COURAGE_EMBLEM);
             entries.add(ENCHANTED_RABBIT_FOOT);
+            entries.add(ETERNAL_EMBLEM);
             entries.add(NIGHTWATCH_EYE_LEFT);
             entries.add(NIGHTWATCH_EYE_RIGHT);
             entries.add(NIGHTWATCH_EYE_LEFT_DRAINED);
