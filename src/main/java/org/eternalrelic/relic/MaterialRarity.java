@@ -37,7 +37,7 @@ public enum MaterialRarity {
     private final String displayName;
     private final int color;
 
-    private MaterialRarity(int level, String displayName, int color) {
+    MaterialRarity(int level, String displayName, int color) {
         this.level = level;
         this.displayName = displayName;
         this.color = color;

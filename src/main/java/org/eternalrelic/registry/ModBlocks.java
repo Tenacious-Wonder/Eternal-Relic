@@ -1,10 +1,8 @@
 package org.eternalrelic.registry;
 
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -13,7 +11,6 @@ import net.minecraft.sound.BlockSoundGroup;
 
 import org.eternalrelic.EternalRelic;
 import org.eternalrelic.block.RelicStationBlock;
-import org.eternalrelic.block.RelicStationBlockEntity;
 
 /**
  * 本模组的方块注册入口。
@@ -27,6 +24,9 @@ public final class ModBlocks {
      * 遗物装卸台 —— 既能装遗物、也能拆遗物的工作方块。
      *
      * <p>硬度与音效都比照原版锻造台：它是同类东西，玩家上手时应当有一样的质感。</p>
+     *
+     * <p>它没有方块实体：内容全在打开界面的那一次会话里（见
+     * {@link org.eternalrelic.screen.RelicStationScreenHandler}），方块只当开关用。</p>
      */
     public static final Block RELIC_STATION = register("relic_station",
             new RelicStationBlock(AbstractBlock.Settings.create()
@@ -38,16 +38,6 @@ public final class ModBlocks {
     /** 遗物装卸台的方块物品。 */
     public static final BlockItem RELIC_STATION_ITEM = registerItem("relic_station",
             new BlockItem(RELIC_STATION, new Item.Settings()));
-
-    /**
-     * 遗物装卸台的方块实体类型。
-     *
-     * <p>它把「这个方块里能存东西」这件事告诉游戏，并绑定到 {@link #RELIC_STATION} 上。</p>
-     */
-    public static final BlockEntityType<RelicStationBlockEntity> RELIC_STATION_ENTITY =
-            Registry.register(Registries.BLOCK_ENTITY_TYPE,
-                    EternalRelic.id("relic_station"),
-                    FabricBlockEntityTypeBuilder.create(RelicStationBlockEntity::new, RELIC_STATION).build());
 
     private ModBlocks() {
     }

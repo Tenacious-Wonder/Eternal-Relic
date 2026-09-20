@@ -1,4 +1,4 @@
-package org.eternalrelic.block;
+package org.eternalrelic.screen;
 
 import java.util.List;
 
@@ -10,10 +10,14 @@ import net.minecraft.item.ItemStack;
 import org.eternalrelic.relic.RelicAttachment;
 
 /**
- * 遗物装卸台界面上那六格「已附遗物」的内容 —— 它不是另存一份清单，而是**工件那一格的实时视图**。
+ * 遗物装卸台界面上那六格「已附遗物」的内容 —— 它不是另存一份清单，而是**成品栏里那件东西的实时视图**。
  *
- * <p>放在中间的那件东西身上记着"附了哪些遗物"（见 {@link RelicAttachment}），
+ * <p>成品栏里放着的那件成品身上记着"附了哪些遗物"（见 {@link RelicAttachment}），
  * 这个类把那份记录当成六格库房来用：读出来就是格子里的东西，拿走一枚就等于拆下一枚。</p>
+ *
+ * <p><b>六格只在"拆"的时候才有内容</b>：最左侧的工件格里一有东西，界面走的就是"装"这一路，
+ * 而"装"的入口不承担拆解 —— 那时六格一律空着（见 {@link #center()}）。要拆，就把已附遗物的成品
+ * 放进成品栏、并把工件格腾空；这也是"六格围着成品栏"这张画的本来意思。</p>
  *
  * <p><b>⚠️ 这个类最容易出事的地方，是它与原版容器框架之间的约定。</b>原版把"把东西从一格取走"
  * 分成好几条路，其中有的会调用 {@link #removeStack}，有的<b>改的是 {@link #getStack} 返回的那个对象</b>、
@@ -25,25 +29,44 @@ import org.eternalrelic.relic.RelicAttachment;
  * 这不是刁难——如果能往里放，玩家就能把自己背包里的遗物直接拖进去，**跳过配料白嫖一次附着**。</p>
  *
  * <p><b>还有一条同样重要的规矩在容器那边</b>：六格被排除在一切"通用搬运"之外
- * （见 {@code RelicStationScreenHandler.quickMove}）。原因是原版搬运逻辑里有一段"合并同款物品"，
+ * （见 {@link RelicStationScreenHandler#quickMove}）。原因是原版搬运逻辑里有一段"合并同款物品"，
  * 它<b>不检查能不能放</b>，只比对物品是否相同就把玩家手里那叠东西清零、去改一个临时对象——
  * 落到只读视图上就是**玩家的东西凭空消失**。所以六格既不接受通用放入，也不接受通用合并。</p>
+ *
+ * <p>拆下一枚要在台子那儿响一声，但本类不认识世界与坐标：那一响由构造时收到的通知转发出去。</p>
  */
 public class RelicStationAttachments implements Inventory {
 
-    private final RelicStationBlockEntity station;
+    /** 四格内容的来源 —— 六格要照的成品栏、以及用来判断装/拆的工件格，都从它读。 */
+    private final Inventory contents;
 
-    public RelicStationAttachments(RelicStationBlockEntity station) {
-        this.station = station;
+    /** 拆下一枚时按的通知：由界面在台子那一格的位置播声音。 */
+    private final Runnable hammer;
+
+    /**
+     * @param contents 四格内容的来源
+     * @param hammer   拆下一枚时按的通知
+     */
+    public RelicStationAttachments(Inventory contents, Runnable hammer) {
+        this.contents = contents;
+        this.hammer = hammer;
     }
 
     /**
-     * @return 工件格里那件东西（界面正中间那一格）；没有方块实体时返回空
+     * 六格要照的那件东西。
+     *
+     * <p><b>工件格里一有东西，这里就返回空</b> —— 那是"装"的模式，拆解能力不属于这条入口。
+     * 反过来，工件格空着时成品栏里放的必然是玩家自己的成品（界面保证台子不会在这时往里写），
+     * 六格照的就是它。</p>
+     *
+     * @return 成品栏里那件待拆的成品；正在"装"、或成品栏为空时返回空
      */
     private ItemStack center() {
-        return this.station == null
-                ? ItemStack.EMPTY
-                : this.station.getStack(RelicStationBlockEntity.SLOT_TOOL);
+        if (!this.contents.getStack(RelicStationInventory.SLOT_TOOL).isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+
+        return this.contents.getStack(RelicStationInventory.SLOT_RESULT);
     }
 
     @Override
@@ -71,7 +94,7 @@ public class RelicStationAttachments implements Inventory {
 
         // 「拿走」就是「拆下」：直接改动工件身上那份附着记录。
         // 这是唯一会真正改动记录的地方，其余几条路都汇到这里。
-        detachAt(slot, shown);
+        detachAt(shown);
         return shown;
     }
 
@@ -99,27 +122,24 @@ public class RelicStationAttachments implements Inventory {
 
         ItemStack shown = getStack(slot);
         if (!shown.isEmpty()) {
-            detachAt(slot, shown);
+            detachAt(shown);
         }
     }
 
     /**
-     * 第 {@code slot} 格显示的那一枚，若还在工件身上就把它拆下来。
+     * 某一枚遗物若还挂在工件身上，就把它拆下来。
      *
      * <p>按"这一格现在显示的是哪一件"去拆，而不是按调用方给的东西去拆 —— 视图是按顺序铺开的，
      * 调用方手里的那份可能已经过期。</p>
      *
-     * @param slot   格子编号
-     * @param shown  该格当前显示的那一枚（拆之前先取好）
+     * @param shown 该格当前显示的那一枚（拆之前先取好）
      */
-    private void detachAt(int slot, ItemStack shown) {
+    private void detachAt(ItemStack shown) {
         if (RelicAttachment.detach(center(), shown.getItem())) {
             markDirty();
 
             // 拆下来了：锤子敲一下
-            if (this.station != null) {
-                this.station.knock();
-            }
+            this.hammer.run();
         }
     }
 
@@ -130,14 +150,12 @@ public class RelicStationAttachments implements Inventory {
 
     @Override
     public void markDirty() {
-        if (this.station != null) {
-            this.station.markDirty();
-        }
+        this.contents.markDirty();
     }
 
     @Override
     public boolean canPlayerUse(PlayerEntity player) {
-        return this.station == null || this.station.canPlayerUse(player);
+        return true;
     }
 
     @Override

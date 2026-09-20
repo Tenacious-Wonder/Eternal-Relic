@@ -4,25 +4,26 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.slot.Slot;
 
-import org.eternalrelic.mixin.client.HandledScreenAccessor;
+import org.eternalrelic.client.mixin.HandledScreenAccessor;
 import org.eternalrelic.registry.ModRelics;
 import org.eternalrelic.relic.RelicDefinition;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * 遗物界面的入口：在背包里把鼠标停在遗物上，按一下 Shift（或 V）即可打开。
+ * 遗物界面的入口：把鼠标停在任意容器界面里的遗物上，按一下 Shift（或 V）即可打开。
  *
- * <p><b>认的是「带界面的背包」这一大类，而不是某一个界面类</b>：生存模式的背包
- * （{@code InventoryScreen}）与创造模式的物品栏（{@code CreativeInventoryScreen}）
- * 是两个不同的类，界面模组还可能再包一层。它们共同继承自
- * {@link AbstractInventoryScreen}，认这个父类才能一次覆盖全部情况——
- * 写死其中任何一个，在另一种模式下都会毫无反应。</p>
+ * <p><b>认的是「带槽位的容器界面」这一大类，而不是某几个具体界面</b>：只要界面里有格子、
+ * 鼠标能压在一件物品上，这件事就有得可做 —— 背包、创造模式物品栏、箱子、熔炉、工作台、
+ * 装卸台……它们共同继承自 {@link HandledScreen}（原版把"容器界面"的共性与
+ * "鼠标此刻压着哪一格"的记录都放在这个父类里），认它就一次覆盖全部。</p>
+ *
+ * <p>早先只认背包那一支（{@code AbstractInventoryScreen}），换个界面看遗物就毫无反应；
+ * 而"鼠标压着的是哪一格"本来就只有 {@link HandledScreen} 知道，收窄到背包没有换来任何好处。</p>
  *
  * <p><b>逐刻读按键状态而不是接按键事件</b>：背包界面自己重写了按键处理，实测按 Shift
  * 收不到事件回调。逐刻读一次状态不依赖任何事件链，谁覆盖了谁都不影响；靠前后两刻的差别
@@ -31,7 +32,7 @@ import org.lwjgl.glfw.GLFW;
  * <p>除 Shift 之外还认一个 V 键：中文输入法会吞掉 Shift 的按下，V 不受影响。</p>
  *
  * <p><b>界面上有输入框正在收字时一概不触发</b>：这两个键读的都是最原始的键盘状态，不看输入焦点，
- * 因此创造模式的物品栏（它同样属于 {@link AbstractInventoryScreen}）里打字时会误触发，详见
+ * 因此带搜索框或改名框的界面（创造模式物品栏、铁砧……）里打字时会误触发，详见
  * {@link #checkTrigger(MinecraftClient)}。</p>
  */
 public final class RelicScreenOpener {
@@ -59,7 +60,7 @@ public final class RelicScreenOpener {
      * 从遗物界面关回背包时同理，需要先松开再按一次才会重开。</p>
      *
      * <p><b>有输入框正在收字时不响应</b>：这里读的是最原始的键盘状态，不知道此刻谁拿着输入焦点。
-     * 于是创造模式物品栏（它属于 {@link AbstractInventoryScreen}）会出事——在搜索框里打一个含 v 的词，
+     * 于是带输入框的界面会出事——创造模式物品栏的搜索框、铁砧的改名框，在里面打一个含 v 的词，
      * 而鼠标又恰好悬停在过滤出来的遗物格上时，会当场弹出遗物界面，把这一下按键连字一起吞掉。
      * 输入框自己知道有没有焦点，问它最准。判断交由 {@link #isTypingInTextField(Screen)}。</p>
      *
@@ -72,20 +73,20 @@ public final class RelicScreenOpener {
         boolean justPressed = triggerDown && !triggerWasDown;
         triggerWasDown = triggerDown;
 
-        if (!(client.currentScreen instanceof AbstractInventoryScreen<?> inventory) || !justPressed) {
+        if (!(client.currentScreen instanceof HandledScreen<?> container) || !justPressed) {
             return;
         }
 
-        if (isTypingInTextField(inventory)) {
+        if (isTypingInTextField(container)) {
             return;
         }
 
-        RelicDefinition relic = relicUnderMouse(inventory);
+        RelicDefinition relic = relicUnderMouse(container);
         if (relic == null) {
             return;
         }
 
-        client.setScreen(new RelicScreen(relic, inventory));
+        client.setScreen(new RelicScreen(relic, container));
     }
 
     /**
