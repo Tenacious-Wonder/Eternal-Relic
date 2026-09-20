@@ -3,6 +3,7 @@ package org.eternalrelic;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 
+import org.eternalrelic.registry.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,12 +15,6 @@ import org.eternalrelic.capability.carried.SoulLanternEffect;
 import org.eternalrelic.capability.worn.NightwatchEyeVision;
 import org.eternalrelic.capability.worn.WornRelicEffect;
 import org.eternalrelic.network.SoulLanternNetwork;
-import org.eternalrelic.registry.ModBlocks;
-import org.eternalrelic.registry.ModItems;
-import org.eternalrelic.registry.ModParticleTypes;
-import org.eternalrelic.registry.ModRecipes;
-import org.eternalrelic.registry.ModScreens;
-import org.eternalrelic.registry.ModSounds;
 
 /**
  * <h1>TW 的永恒遗物 —— 模组主入口</h1>
@@ -50,51 +45,15 @@ import org.eternalrelic.registry.ModSounds;
  * 并把来自客户端的释放请求接住。</p>
  */
 public class EternalRelic implements ModInitializer {
-
-    /** 本模组的命名空间，与 {@code fabric.mod.json} 中的 id 保持一致。 */
     public static final String MOD_ID = "eternal_relic";
-
-    /**
-     * 模组日志出口，留给排查问题用。
-     *
-     * <p>目前没有调用点：功能本身不需要长期打印日志，调试时临时用它打几行、查完即删，
-     * 比在代码里常驻一堆输出干净。</p>
-     */
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    /**
-     * 拼一个本模组命名空间下的编号。
-     *
-     * <p><b>为什么要有这个入口</b>：物品、方块、音效、粒子、配方、界面、网络包……每一处注册都要
-     * 「取编号」，原先各自抄一遍 {@code new Identifier(MOD_ID, "…")}。抄写的坏处是命名空间一旦写错
-     * 就成了另一个命名空间的东西，游戏既不报错、也找不到，排查起来很费劲。集中到这里之后，
-     * 命名空间只有一处。</p>
-     *
-     * @param path 编号在本模组里的那一段，例如 {@code "soul_lantern"}
-     * @return 完整编号
-     */
     public static Identifier id(String path) {
         return new Identifier(MOD_ID, path);
     }
 
-    /**
-     * 由游戏在模组加载阶段调用一次，完成本模组各项内容的登记。
-     */
     @Override
     public void onInitialize() {
-        ModBlocks.register();
-        ModItems.register();
-        ModSounds.register();
-        ModParticleTypes.register();
-        ModRecipes.register();
-        ModScreens.register();
-        CarriedRelicEffect.register();
-        DamageWardEffect.register();
-        EnchantedRabbitFootEffect.register();
-        SoulLanternEffect.register();
-        CourageEmblemEffect.register();
-        WornRelicEffect.register();
-        NightwatchEyeVision.register();
-        SoulLanternNetwork.registerServer();
+        RegistryInit.init();
     }
 }

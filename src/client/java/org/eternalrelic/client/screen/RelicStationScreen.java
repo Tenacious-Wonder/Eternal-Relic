@@ -37,6 +37,30 @@ public class RelicStationScreen extends HandledScreen<RelicStationScreenHandler>
         this.playerInventoryTitleY = 10000;
     }
 
+    /**
+     * 画出整页：背景遮罩 → 底图与格子里的物品 → 鼠标底下那件物品的介绍框。
+     *
+     * <p><b>⚠️ 头一行与末一行必须自己写，原版不会替我们做。</b>
+     * 这是 1.20.1 的规矩：{@code HandledScreen} 只管把界面本体画出来，
+     * 「背后的世界要不要变暗」（{@link #renderBackground}）与「悬停的物品要不要弹介绍框」
+     * （{@link #drawMouseoverTooltip}）都由子类在 {@code render} 里点一下 —— 原版每个容器界面
+     * （箱子、熔炉、工作台……）都写着这两行。</p>
+     *
+     * <p>漏掉首行的后果是打开界面时背后的世界亮得像没开界面；漏掉末行就是
+     * <b>鼠标停在任何物品上都不弹介绍框</b>。</p>
+     *
+     * @param context 绘制上下文
+     * @param mouseX  鼠标横坐标
+     * @param mouseY  鼠标纵坐标
+     * @param delta   距上一帧的时间占一刻的比例（本界面没有动画，用不到）
+     */
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackground(context);
+        super.render(context, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(context, mouseX, mouseY);
+    }
+
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
         int x = (this.width - this.backgroundWidth) / 2;

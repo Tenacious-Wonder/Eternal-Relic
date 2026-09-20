@@ -1,4 +1,4 @@
-package org.eternalrelic.mixin.client;
+package org.eternalrelic.client.mixin;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.eternalrelic.mixin.client;
+package org.eternalrelic.client.mixin;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
