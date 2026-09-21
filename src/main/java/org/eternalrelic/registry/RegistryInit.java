@@ -1,5 +1,6 @@
 package org.eternalrelic.registry;
 
+import org.eternalrelic.bodypart.MeleeBodyPartDetector;
 import org.eternalrelic.capability.carried.*;
 import org.eternalrelic.capability.worn.NightwatchEyeVision;
 import org.eternalrelic.capability.worn.WornRelicEffect;
@@ -13,6 +14,7 @@ public class RegistryInit {
         ModParticleTypes.register();
         ModRecipes.register();
         ModScreens.register();
+        MeleeBodyPartDetector.register();
         CarriedRelicEffect.register();
         DamageWardEffect.register();
         EnchantedRabbitFootEffect.register();
