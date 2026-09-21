@@ -78,10 +78,11 @@ public final class AttachableRelics {
                 RelicAttachment.Stacking.ACROSS_ITEMS,
                 AttachTarget.ARMOR_PIECE);
 
-        // 皮革内衬：皮做的，配皮革；与坚铁甲片一样只缝四个部位的防具，各缝一枚各算一份
+        // 皮革内衬：配铁粒 —— 内衬（半成品）的合成里本就要用两粒铁粒缝住，缝到防具上沿用同一种材料。
+        // 与坚铁甲片一样只缝四个部位的防具，各缝一枚各算一份
         RelicAttachment.register(
                 ModItems.LEATHER_LINING,
-                Items.LEATHER,
+                Items.IRON_NUGGET,
                 RelicAttachment.Stacking.ACROSS_ITEMS,
                 AttachTarget.ARMOR_PIECE);
     }
