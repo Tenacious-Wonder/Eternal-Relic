@@ -81,6 +81,9 @@ public final class MaterialTooltip {
                     .formatted(Formatting.DARK_GRAY));
         }
 
+        // 属性行由原版写出，这里把遗物的份额接到那几行上（金色）
+        RelicAttributeTooltip.decorate(stack, lines);
+
         appendAttachments(lines, stack);
 
         appendFlavor(lines, stack.getTranslationKey());
