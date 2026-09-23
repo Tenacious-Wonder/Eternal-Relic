@@ -1,6 +1,9 @@
 package org.eternalrelic.mixin;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.WeakHashMap;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -14,6 +17,8 @@ import org.eternalrelic.bodypart.BodyPart;
 import org.eternalrelic.bodypart.BodyPartHits;
 import org.eternalrelic.bodypart.BodyPartResolver;
 import org.eternalrelic.bodypart.ProjectileBodyPartHit;
+import org.eternalrelic.capability.attached.ShoulderGuardEffect;
+import org.eternalrelic.debug.BodyPartHitReport;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -47,12 +52,26 @@ public abstract class ProjectileEntityMixin {
     private static final double TARGETING_MARGIN = 0.3;
 
     /**
+     * 已经被肩甲弹开过的弹射物 → 它是在哪位玩家身上被弹开的。
+     *
+     * <p>被崩回去的箭速度只剩十分之一，还会在玩家身上停留几刻，于是同一个游戏刻到随后几刻里
+     * 会反复报出同一次碰撞。原版举盾挡箭时靠「盾牌每次碰撞都拦下来」解决这件事，
+     * 我们这里照做：进过这张表的箭，在它离开这位玩家之前，每一次碰撞都继续拦着，
+     * 否则它下一刻意就会扎进身体、照常造成伤害，"弹开"就白弹了。</p>
+     *
+     * <p>键是弹射物实体本身，用弱引用表是为了让它被移除（扎进地里、被回收）之后自动清掉，
+     * 不必另外写一处清理。</p>
+     */
+    @Unique
+    private static final Map<ProjectileEntity, UUID> DEFLECTED = new WeakHashMap<>();
+
+    /**
      * 在弹射物处理碰撞之前，抢先记下这次命中打在玩家哪个部位。
      *
      * @param hitResult     本次碰撞的结果，只有其中的「撞到实体」才是这里关心的
      * @param callbackInfo  原方法（无返回值）的回调；这里不取消，原版流程照常继续
      */
-    @Inject(method = "onCollision", at = @At("HEAD"))
+    @Inject(method = "onCollision", at = @At("HEAD"), cancellable = true)
     private void eternal_relic$locateBodyPart(HitResult hitResult, CallbackInfo callbackInfo) {
         if (!(hitResult instanceof EntityHitResult entityHit)) {
             return;
@@ -62,6 +81,13 @@ public abstract class ProjectileEntityMixin {
         }
 
         ProjectileEntity projectile = (ProjectileEntity) (Object) this;
+
+        // 已经被肩甲弹开过的这一箭还在玩家身上打转，继续拦着，别让它造成伤害
+        if (player.getUuid().equals(DEFLECTED.get(projectile))) {
+            callbackInfo.cancel();
+            return;
+        }
+
         Vec3d hitPos = locateHitPoint(projectile, player);
 
         // 求不出交点，说明这一刻弹射物并没有真的穿过身体。
@@ -72,7 +98,34 @@ public abstract class ProjectileEntityMixin {
         }
 
         BodyPart part = BodyPartResolver.resolve(player, hitPos);
-        BodyPartHits.fire(new ProjectileBodyPartHit(player, projectile, part, hitPos));
+        ProjectileBodyPartHit hit = new ProjectileBodyPartHit(player, projectile, part, hitPos);
+        BodyPartHits.fire(hit);
+
+        // 龟壳肩甲：打中护着那一侧的箭有几率被整个弹开。这里拦下原版的命中处理
+        // （于是这一箭既不造成伤害、也不会扎进身体），再照原版的动作把它崩回去
+        if (ShoulderGuardEffect.deflects(player, part)) {
+            DEFLECTED.put(projectile, player.getUuid());
+            deflect(projectile);
+            BodyPartHitReport.reportDeflected(hit);
+            callbackInfo.cancel();
+        }
+    }
+
+    /**
+     * 把这一箭掉头崩回去 —— <b>动作照抄原版</b>。
+     *
+     * <p>原版在「这一击没打动对方」时就是这么处理的（例如对方举着盾，见
+     * {@code PersistentProjectileEntity#onEntityHit} 的 else 分支）：速度反向并衰减到十分之一、
+     * 朝向加 180 度。照抄的好处是箭随后的表现与原版完全一致——晃晃悠悠反向飘出去、
+     * 落到地上，而不是凭空消失或卡在身体里。</p>
+     *
+     * @param projectile 被弹开的弹射物
+     */
+    @Unique
+    private static void deflect(ProjectileEntity projectile) {
+        projectile.setVelocity(projectile.getVelocity().multiply(-0.1));
+        projectile.setYaw(projectile.getYaw() + 180.0F);
+        projectile.prevYaw += 180.0F;
     }
 
     /**

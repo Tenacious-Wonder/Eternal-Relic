@@ -1,6 +1,7 @@
 package org.eternalrelic.registry;
 
 import org.eternalrelic.bodypart.MeleeBodyPartDetector;
+import org.eternalrelic.capability.attached.ShoulderGuardEffect;
 import org.eternalrelic.capability.carried.*;
 import org.eternalrelic.capability.worn.NightwatchEyeVision;
 import org.eternalrelic.capability.worn.WornRelicEffect;
@@ -18,6 +19,8 @@ public class RegistryInit {
         CarriedRelicEffect.register();
         DamageWardEffect.register();
         EnchantedRabbitFootEffect.register();
+        DayNightEmblemEffect.register();
+        ShoulderGuardEffect.register();
         SoulLanternEffect.register();
         CourageEmblemEffect.register();
         WornRelicEffect.register();

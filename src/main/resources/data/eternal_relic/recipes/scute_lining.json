@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "eternal_relic:leather_lining"
+    },
+    {
+      "item": "eternal_relic:armadillo_scute"
+    },
+    {
+      "item": "eternal_relic:armadillo_scute"
+    },
+    {
+      "item": "eternal_relic:armadillo_scute"
+    },
+    {
+      "item": "eternal_relic:armadillo_scute"
+    },
+    {
+      "item": "eternal_relic:armadillo_scute"
+    },
+    {
+      "item": "eternal_relic:armadillo_scute"
+    },
+    {
+      "item": "minecraft:string"
+    },
+    {
+      "item": "minecraft:string"
+    }
+  ],
+  "result": {
+    "item": "eternal_relic:scute_lining"
+  }
+}

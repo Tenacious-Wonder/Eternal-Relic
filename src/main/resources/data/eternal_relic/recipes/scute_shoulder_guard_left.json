@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "eternal_relic:leather_shoulder_guard_left"
+    },
+    {
+      "item": "eternal_relic:armadillo_scute"
+    },
+    {
+      "item": "eternal_relic:armadillo_scute"
+    },
+    {
+      "item": "minecraft:string"
+    }
+  ],
+  "result": {
+    "item": "eternal_relic:scute_shoulder_guard_left"
+  }
+}

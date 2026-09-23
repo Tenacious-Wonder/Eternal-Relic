@@ -24,6 +24,7 @@ import java.util.function.Consumer;
  * @see ProjectileBodyPartHit 弹射物那一种的完整记录
  * @see MeleeBodyPartHit 近战那一种的完整记录
  * @see BodyPartResolver 弹射物的部位是怎么算出来的
+ * @see MeleeBodyPartGeometry 近战的部位是怎么算出来的
  */
 public final class BodyPartHits {
 

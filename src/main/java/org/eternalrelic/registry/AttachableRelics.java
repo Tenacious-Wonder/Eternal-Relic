@@ -85,5 +85,97 @@ public final class AttachableRelics {
                 Items.IRON_NUGGET,
                 RelicAttachment.Stacking.ACROSS_ITEMS,
                 AttachTarget.ARMOR_PIECE);
+
+        // 鳞甲内衬：配线 —— 内衬是缝上去的，与它配方里那两缕线是同一种材料。
+        // 与坚铁甲片一样只缝四个部位的防具，各缝一枚各算一份
+        RelicAttachment.register(
+                ModItems.SCUTE_LINING,
+                Items.STRING,
+                RelicAttachment.Stacking.ACROSS_ITEMS,
+                AttachTarget.ARMOR_PIECE);
+
+        // 龟壳内衬：同样配线，同样只缝四个部位的防具、各缝一枚各算一份
+        RelicAttachment.register(
+                ModItems.TURTLE_SHELL_LINING,
+                Items.STRING,
+                RelicAttachment.Stacking.ACROSS_ITEMS,
+                AttachTarget.ARMOR_PIECE);
+
+        // 皮革肩甲（左 / 右 / 一套）：肩甲是缝在胸甲上的皮革件，配线——与鳞甲内衬、龟壳内衬同一种材料。
+        // 三件都**只缝胸甲**：它们护的是肩膀，缝在头盔、护腿或靴子上没有意义。
+        // 累加方式用 NONE：这三件都是「只认附着份」的遗物，背包里那一份本来就不算数；
+        // 而它们又只能缝在胸甲这一处，一件胸甲上同一件最多出现一枚，件数永远是一，没有可累加的地方
+        RelicAttachment.register(
+                ModItems.LEATHER_SHOULDER_GUARD_LEFT,
+                Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        RelicAttachment.register(
+                ModItems.LEATHER_SHOULDER_GUARD_RIGHT,
+                Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        RelicAttachment.register(
+                ModItems.LEATHER_SHOULDER_GUARD_PAIR,
+                Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        // 鳞片肩甲（左 / 右 / 一套）：与皮革那三件同一路登记——同样配线、同样只缝胸甲，
+        // 门槛也一样。两档的差别在减伤点数与韧性上，不在这里
+        RelicAttachment.register(
+                ModItems.SCUTE_SHOULDER_GUARD_LEFT,
+                Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        RelicAttachment.register(
+                ModItems.SCUTE_SHOULDER_GUARD_RIGHT,
+                Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        RelicAttachment.register(
+                ModItems.SCUTE_SHOULDER_GUARD_PAIR,
+                Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        // 龟壳肩甲（左 / 右 / 一套）：与前两档同一路登记——配线、只缝胸甲、只认附着份。
+        // 「会弹开远程」那一条不在这里，它登记在肩甲表（registry/ShoulderGuards）
+        RelicAttachment.register(
+                ModItems.TURTLE_SHELL_SHOULDER_GUARD_LEFT,
+                Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        RelicAttachment.register(
+                ModItems.TURTLE_SHELL_SHOULDER_GUARD_RIGHT,
+                Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        RelicAttachment.register(
+                ModItems.TURTLE_SHELL_SHOULDER_GUARD_PAIR,
+                Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        // 太阳纹章：蜡制的，配蜜脾；能缝在四个部位的防具与盾牌上（用户指定「装备和盾牌」）。
+        // 它本身放在背包里就生效，缝上去只是多一条生效路径；多缝几件也不会叠出更高等级，累加方式用 NONE
+        RelicAttachment.register(
+                ModItems.SUN_EMBLEM,
+                Items.HONEYCOMB,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.ARMOR);
+
+        // 月亮纹章：与太阳纹章同一路登记，只是管夜晚、给的是速度
+        RelicAttachment.register(
+                ModItems.MOON_EMBLEM,
+                Items.HONEYCOMB,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.ARMOR);
     }
 }

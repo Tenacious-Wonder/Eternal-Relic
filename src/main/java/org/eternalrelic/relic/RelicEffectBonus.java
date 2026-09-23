@@ -25,6 +25,9 @@ import org.eternalrelic.registry.ModRelics;
  * {@link RelicEffect#valueFor(int) valueFor(1)} —— 对「每份加一点」（坚铁甲片）与
  * 「只加一次」（铜甲片）两种登记都成立。同一件装备上缝了两枚加同一属性的遗物时，这里按属性合并求和。</p>
  *
+ * <p><b>一件遗物可以给好几种属性</b>（鳞甲内衬既给韧性又给护甲值），因此这里把
+ * {@link RelicDefinition#effects()} 逐条走一遍，各记各的。</p>
+ *
  * <p>算出的份额画在提示框上，由客户端那侧的 {@code RelicAttributeTooltip} 负责。</p>
  */
 public final class RelicEffectBonus {
@@ -57,13 +60,13 @@ public final class RelicEffectBonus {
                 continue;
             }
 
-            RelicEffect effect = definition.effect();
+            for (RelicEffect effect : definition.effects()) {
+                if (effect.kind() != RelicBonusKind.FLAT) {
+                    continue;
+                }
 
-            if (effect.kind() != RelicBonusKind.FLAT) {
-                continue;
+                bonuses.merge(effect.attribute(), effect.valueFor(1), Double::sum);
             }
-
-            bonuses.merge(effect.attribute(), effect.valueFor(1), Double::sum);
         }
 
         return bonuses;

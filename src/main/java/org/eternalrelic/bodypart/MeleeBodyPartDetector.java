@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 
 import org.eternalrelic.relic.AttackDamage;
@@ -13,9 +14,11 @@ import org.eternalrelic.relic.AttackDamage;
 /**
  * <h1>近战受击部位判定</h1>
  *
- * <p>玩家被近战打中时，抽一个部位出来并广播（{@link BodyPartHits}）。与弹射物那一套的区别只有一点：
- * 箭有明确的飞行轨迹，命中点可以算（{@link BodyPartResolver}）；近战是贴脸砍，游戏根本不给出刀落在哪儿，
- * 所以这里<b>按概率抽签</b>，抽签表见 {@link #CHANCES}。</p>
+ * <p>玩家被近战打中时，算出这一刀落在哪个部位并广播（{@link BodyPartHits}）。与弹射物那一套的区别
+ * 只有一点：箭有明确的飞行轨迹，命中点可以算（{@link BodyPartResolver}）；近战是贴脸砍，
+ * 游戏根本不给出刀落在哪儿，所以改为<b>按双方站位推算</b>——攻击者的出手点够得着哪几块、
+ * 其中哪一块离他最近，哪一块就更容易中签。几何算法单独放在 {@link MeleeBodyPartGeometry}，
+ * 这里只负责「什么时候算」与「算完怎么广播」。</p>
  *
  * <p><b>为什么不用 mixin</b>：项目里已有 {@code ServerLivingEntityEvents.ALLOW_DAMAGE} 这条现成的路
  * （守护与附魔兔脚都挂在它上面），「挨打了没」不需要再动游戏内部代码。</p>
@@ -24,23 +27,14 @@ import org.eternalrelic.relic.AttackDamage;
  * 那一方；箭、火球那类远程的直接来源是飞行中的弹射物（射手只算「主使」，不算直接来源），
  * 因此不会与 {@link org.eternalrelic.mixin.ProjectileEntityMixin} 那一套重复触发。</p>
  *
+ * <p><b>为什么拿得到攻击者的位置</b>：近战攻击的直接来源就是攻击者本人，他的位置、身高、
+ * 朝向在服务端都是现成的，站在哪儿就决定了刀落在哪儿——这正是几何算法需要的那点信息。</p>
+ *
  * <p><b>运行位置</b>：事件本身只在服务端触发，联机时各人看到的部位一致。</p>
+ *
+ * @see MeleeBodyPartGeometry 这一刀打在哪儿是怎么算出来的
  */
 public final class MeleeBodyPartDetector {
-
-    /**
-     * 各部位的中签权重 —— <b>要调手感就改这一张表</b>。
-     *
-     * <p>权重之和不必凑成 100，抽签时按总和归一。当前取法贴近「正面对砍」的常识：
-     * 躯干最容易挨刀（正胸 + 腹部 = 45），两条肩膀一样多，头最小（10）。</p>
-     */
-    private static final List<Chance> CHANCES = List.of(
-            new Chance(BodyPart.HEAD, 10),
-            new Chance(BodyPart.CHEST, 25),
-            new Chance(BodyPart.ABDOMEN, 20),
-            new Chance(BodyPart.LEFT_SHOULDER, 15),
-            new Chance(BodyPart.RIGHT_SHOULDER, 15),
-            new Chance(BodyPart.LEGS, 15));
 
     private MeleeBodyPartDetector() {
     }
@@ -53,7 +47,8 @@ public final class MeleeBodyPartDetector {
     }
 
     /**
-     * 在伤害即将落下时抽签。恒返回 {@code true} —— 本判定不参与伤害结算，只是搭一次顺风车。
+     * 在伤害即将落下时算出手点、抽一个部位。恒返回 {@code true} —— 本判定不参与伤害结算，
+     * 只是搭一次顺风车。
      *
      * @param entity 受伤的实体
      * @param source 伤害来源
@@ -73,7 +68,7 @@ public final class MeleeBodyPartDetector {
             return true;
         }
 
-        // 刚挨过打的短时间里，游戏本来还会挡掉后续伤害（无敌帧）。这段时间不抽签，
+        // 刚挨过打的短时间里，游戏本来还会挡掉后续伤害（无敌帧）。这段时间不算，
         // 一下挨打只报一次，免得连击时刷出一串部位。
         if (player.hurtTime > 0) {
             return true;
@@ -84,40 +79,38 @@ public final class MeleeBodyPartDetector {
             return true;
         }
 
-        BodyPartHits.fire(new MeleeBodyPartHit(player, attacker, draw(player.getRandom())));
+        Vec3d reference = MeleeBodyPartGeometry.referencePointOf(attacker);
+        BodyPart part = draw(MeleeBodyPartGeometry.weightsFor(player, reference), player.getRandom());
+        BodyPartHits.fire(new MeleeBodyPartHit(player, attacker, part));
         return true;
     }
 
     /**
-     * 按 {@link #CHANCES} 的权重抽一个部位。
+     * 按各部位的权重抽一次签。
      *
-     * @param random 抽签用的随机源（取受击者自己的那一个，服务端持有）
+     * <p>权重来自站位（近的、朝着攻击者的那一侧更重），所以这一抽既是随机的、也带着方向——
+     * 抽出来的结果不会跑到攻击者够不着的那一边去。</p>
+     *
+     * @param weights 各部位的相对权重，由 {@link MeleeBodyPartGeometry#weightsFor} 给出，至少一项
+     * @param random  抽签用的随机源（取受击者自己的那一个，服务端持有）
      * @return 抽中的部位
      */
-    private static BodyPart draw(Random random) {
-        int total = 0;
-        for (Chance chance : CHANCES) {
-            total += chance.weight();
+    private static BodyPart draw(List<MeleeBodyPartGeometry.PartWeight> weights, Random random) {
+        double total = 0.0;
+        for (MeleeBodyPartGeometry.PartWeight weight : weights) {
+            total += weight.weight();
         }
 
-        int roll = random.nextInt(total);
-        for (Chance chance : CHANCES) {
-            roll -= chance.weight();
-            if (roll < 0) {
-                return chance.part();
+        double roll = random.nextDouble() * total;
+        for (MeleeBodyPartGeometry.PartWeight weight : weights) {
+            roll -= weight.weight();
+            if (roll < 0.0) {
+                return weight.part();
             }
         }
 
-        // 走不到这里：上面的减法必然在总和耗尽之前命中某一项
-        return BodyPart.CHEST;
-    }
-
-    /**
-     * 抽签表的一行：某个部位占多少权重。
-     *
-     * @param part   部位
-     * @param weight 权重（相对值，不必凑成 100）
-     */
-    private record Chance(BodyPart part, int weight) {
+        // 正常走不到这里：上面的减法必然在总和耗尽之前命中某一项。
+        // 只有浮点零头把 roll 恰好留在边界上时才会落到这儿，兜给最后一项即可。
+        return weights.get(weights.size() - 1).part();
     }
 }

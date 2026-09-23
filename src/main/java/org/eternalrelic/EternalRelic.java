@@ -1,24 +1,23 @@
 package org.eternalrelic;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import org.eternalrelic.registry.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eternalrelic.bodypart.BodyPart;
-import org.eternalrelic.bodypart.BodyPartHit;
-import org.eternalrelic.bodypart.BodyPartHits;
-import org.eternalrelic.bodypart.ProjectileBodyPartHit;
+import org.eternalrelic.capability.carried.BeeswaxPendantEffect;
 import org.eternalrelic.capability.carried.CarriedRelicEffect;
 import org.eternalrelic.capability.carried.CourageEmblemEffect;
 import org.eternalrelic.capability.carried.DamageWardEffect;
 import org.eternalrelic.capability.carried.EnchantedRabbitFootEffect;
 import org.eternalrelic.capability.carried.SoulLanternEffect;
+import org.eternalrelic.capability.carried.WolfAweEffect;
+import org.eternalrelic.capability.carried.WolfTamingEffect;
 import org.eternalrelic.capability.worn.NightwatchEyeVision;
 import org.eternalrelic.capability.worn.WornRelicEffect;
+import org.eternalrelic.debug.BodyPartHitReport;
 import org.eternalrelic.network.SoulLanternNetwork;
 
 /**
@@ -39,6 +38,9 @@ import org.eternalrelic.network.SoulLanternNetwork;
  *   <li>{@link SoulLanternEffect} —— 「攒放」能力：击杀攒魂火，按键一次倾泻出去，原地留下灼烧。</li>
  *   <li>{@link CourageEmblemEffect} —— 「定时馈赠」能力：每隔一分钟替玩家攒下两颗金心。</li>
  *   <li>{@link EnchantedRabbitFootEffect} —— 「受击加速」能力：挨打时换来一段速度，不挡伤害。</li>
+ *   <li>{@link BeeswaxPendantEffect} —— 「挡下蜂毒」能力：被蜜蜂蜇时照常挨伤害，只是不会中毒。</li>
+ *   <li>{@link WolfAweEffect} —— 「野狼慑服」能力：身边的野狼被狼王气息镇住而坐下，走开即恢复。</li>
+ *   <li>{@link WolfTamingEffect} —— 「喂骨头更容易认主」能力：把驯服狼的机会从三分之一抬到六分之五。</li>
  *   <li>{@link WornRelicEffect} —— 「装入生效」能力：把守夜之瞳装进眼中，并让代价跟随玩家。</li>
  *   <li>{@link NightwatchEyeVision} —— 守夜之瞳的视觉：在暗处看清周围、照见活物。</li>
  *   <li>{@link SoulLanternNetwork} —— 把「按下了释放键」从客户端送到服务端的那条通路。</li>
@@ -61,46 +63,8 @@ public class EternalRelic implements ModInitializer {
     public void onInitialize() {
         RegistryInit.init();
 
-        registerBodyPartDebugOutput();
-    }
-
-    /**
-     * <b>临时调试用</b>：有东西打中玩家时，把命中部位直接显示在受击者的聊天栏。
-     *
-     * <p>部位判定本身是后台计算，游戏里本来什么都不显示，所以需要这么一段「看得见」的输出才能核对
-     * 判定是否准确。<b>它不是正式功能</b>，核对无误后应当连同上面的调用一起整段删除。</p>
-     */
-    private static void registerBodyPartDebugOutput() {
-        BodyPartHits.register(hit -> hit.player().sendMessage(Text.literal(String.format(
-                "§e[命中部位] §f%s §7%s",
-                bodyPartName(hit.part()),
-                hitDetail(hit))), false));
-    }
-
-    /**
-     * 调试输出里的补充信息：弹射物报出打在离脚底多高，近战则只标一下来源
-     * （近战没有命中点，部位是抽签得出的，报不出高度）。
-     */
-    private static String hitDetail(BodyPartHit hit) {
-        if (hit instanceof ProjectileBodyPartHit projectileHit) {
-            return String.format("(弹射物 / 离脚底 %.2f 格 / 身高 %.2f)",
-                    projectileHit.hitPos().y - hit.player().getY(),
-                    hit.player().getHeight());
-        }
-        return "(近战)";
-    }
-
-    /**
-     * 部位的中文名，仅供上面那段临时调试输出使用。
-     */
-    private static String bodyPartName(BodyPart part) {
-        return switch (part) {
-            case HEAD -> "头部";
-            case LEFT_SHOULDER -> "左肩";
-            case RIGHT_SHOULDER -> "右肩";
-            case CHEST -> "正胸";
-            case ABDOMEN -> "腹部";
-            case LEGS -> "腿部";
-        };
+        // 临时调试输出：把每次挨打的部位与实际伤害打在聊天栏里（见 debug.BodyPartHitReport）。
+        // 不是正式功能，不需要时删掉这一行与那个类即可
+        BodyPartHitReport.register();
     }
 }

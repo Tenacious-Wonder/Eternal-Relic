@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "eternal_relic:turtle_shell_shoulder_guard_left"
+    },
+    {
+      "item": "eternal_relic:turtle_shell_shoulder_guard_right"
+    }
+  ],
+  "result": {
+    "item": "eternal_relic:turtle_shell_shoulder_guard_pair"
+  }
+}

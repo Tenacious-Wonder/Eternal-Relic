@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "eternal_relic:item/turtle_shell_shoulder_guard_right"
+  }
+}

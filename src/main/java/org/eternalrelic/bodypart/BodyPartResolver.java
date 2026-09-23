@@ -13,7 +13,8 @@ import net.minecraft.util.math.Vec3d;
  * <h2>怎么算的</h2>
  * <p>命中点是<b>世界坐标</b>（比如「东经 128、高度 70、南纬 40」），而「打中左肩还是右肩」是
  * <b>相对玩家身体</b>的说法——玩家一转身，同一个世界坐标对应的部位就变了。所以这里先把命中点
- * 换算到玩家自己的身体坐标系里：原点在脚底正中，纵轴向上，横轴指向玩家<b>右手边</b>。</p>
+ * 换算到玩家自己的身体坐标系里：原点在脚底正中，纵轴向上，横轴指向玩家<b>右手边</b>，
+ * 另一根横轴指向玩家<b>面朝的方向</b>。三根轴后面分别称作「高度」「横向」「前后」。</p>
  *
  * <h2>为什么用「盒子」而不是「高度区间」</h2>
  * <p>第一版把身体按高度切成几段来比大小，结果一错到底。换成盒子之后有两处本质不同：</p>
@@ -26,6 +27,14 @@ import net.minecraft.util.math.Vec3d;
  *       「挑最近的盒子」这一步，前面那轮精确匹配只是让明显落进去的点不必绕远。</li>
  * </ul>
  * <p>这套盒子范围取自同类模组（Modern Damage Control，MIT）按玩家模型校准的结果。</p>
+ *
+ * <h2>躯干的前后是分开的</h2>
+ * <p>正胸与腹部只吃躯干的<b>前半</b>，后背吃<b>后半</b>。这样从背后偷袭摸到的是后背，
+ * 而不是「正胸」——按身体哪一面挨打来命名，玩家才对得上号。</p>
+ *
+ * <p>要让这件事成立，换算时必须<b>把前后方向一起带进身体坐标系</b>。早先的版本把它丢掉了
+ * （无论从哪边打来，前后坐标一律按 0 处理），于是正胸与后背完全分不开：从背后射来的箭
+ * 会被算成正胸。代价是躯干那几块的距离数值都比从前大了半个身位，但前后关系从此是对的。</p>
  *
  * <h2>一个必须知道的几何限制</h2>
  * <p>射手在玩家<b>正前方或正后方</b>时，横向由射手的瞄准决定，左肩、右肩、正胸分得很准。
@@ -45,11 +54,14 @@ public final class BodyPartResolver {
     /** 左肩：躯干左侧向外伸出的那一条。 */
     private static final Box LEFT_SHOULDER_BOX = new Box(-0.4, 0.7, -0.15, -0.3, 1.5, 0.15);
 
-    /** 正胸：躯干的上半。 */
-    private static final Box CHEST_BOX = new Box(-0.3, 1.1, -0.15, 0.3, 1.5, 0.15);
+    /** 正胸：躯干<b>前半</b>的上半。前后方向从 0 起，是因为躯干的正副两半在这里对半分。 */
+    private static final Box CHEST_BOX = new Box(-0.3, 1.1, 0.0, 0.3, 1.5, 0.15);
 
-    /** 腹部：躯干的下半。 */
-    private static final Box ABDOMEN_BOX = new Box(-0.3, 0.7, -0.15, 0.3, 1.1, 0.15);
+    /** 腹部：躯干<b>前半</b>的下半。 */
+    private static final Box ABDOMEN_BOX = new Box(-0.3, 0.7, 0.0, 0.3, 1.1, 0.15);
+
+    /** 后背：躯干<b>后半</b>整块，从腰一直到肩胛，不再分上下。 */
+    private static final Box BACK_BOX = new Box(-0.3, 0.7, -0.15, 0.3, 1.5, 0.0);
 
     /** 腿与脚：合并成一段，不再细分左右。 */
     private static final Box LEGS_BOX = new Box(-0.2, 0.0, -0.2, 0.2, 0.7, 0.2);
@@ -62,14 +74,22 @@ public final class BodyPartResolver {
      *
      * <p>先比小部位（头、两侧肩膀），最后才轮到躯干。这样当一个点同时贴着肩膀盒与躯干盒时，
      * 会算成肩膀——否则肩膀那两条又窄又靠外的盒子永远抢不过中间的大块躯干。</p>
+     *
+     * <p><b>后背排在最后</b>：它只吃躯干的后半，与前胸腹部并不重叠，本无争夺；排在最后是为了让
+     * 正好落在前后分界线（身体正中被竖着切的那一刀）上的点算成正胸或腹部——侧面打来的箭恰好
+     * 落在这条线上，算成正面那两块更合乎直觉。</p>
+     *
+     * <p><b>包内可见</b>：近战那一套（{@link MeleeBodyPartGeometry}）要拿同一批盒子算「够不够得着」。
+     * 两边的部位范围必须出自同一处，否则同一个人身上会冒出两套互相矛盾的身体。</p>
      */
-    private static final List<PartBox> PART_BOXES = List.of(
+    static final List<PartBox> PART_BOXES = List.of(
             new PartBox(HEAD_BOX, BodyPart.HEAD),
             new PartBox(RIGHT_SHOULDER_BOX, BodyPart.RIGHT_SHOULDER),
             new PartBox(LEFT_SHOULDER_BOX, BodyPart.LEFT_SHOULDER),
             new PartBox(LEGS_BOX, BodyPart.LEGS),
             new PartBox(CHEST_BOX, BodyPart.CHEST),
-            new PartBox(ABDOMEN_BOX, BodyPart.ABDOMEN));
+            new PartBox(ABDOMEN_BOX, BodyPart.ABDOMEN),
+            new PartBox(BACK_BOX, BodyPart.BACK));
 
     private BodyPartResolver() {
     }
@@ -117,8 +137,16 @@ public final class BodyPartResolver {
      * </ul>
      *
      * <p>横向（左右）在任何姿势下都按玩家<b>右手边</b>为正来量，与人是否躺下无关。</p>
+     *
+     * <p><b>第三根轴（前后）在躺下时取自世界的上下方向</b>，并且要按趴着还是仰着定正负：
+     * 游泳、滑翔、激流都是趴着，背朝天，于是身体上方那一片是后背；睡觉是仰卧，肚皮朝天，
+     * 身体上方那一片反倒成了正面。判错的后果是「背后中箭」被报成「正胸中箭」。</p>
+     *
+     * @param player 作为基准的玩家
+     * @param hitPos 世界坐标下的一个点
+     * @return 该点在玩家身体坐标系里的位置：横向、离脚底的高度、以及前后（正为面朝方向）
      */
-    private static Vec3d toBodyLocal(PlayerEntity player, Vec3d hitPos) {
+    static Vec3d toBodyLocal(PlayerEntity player, Vec3d hitPos) {
         Vec3d relative = hitPos.subtract(player.getPos());
 
         double yaw = Math.toRadians(player.getYaw());
@@ -130,13 +158,14 @@ public final class BodyPartResolver {
         double depth = relative.x * forwardX + relative.z * forwardZ;
 
         if (isLyingFlat(player)) {
-            // 躺平时「前后」的偏移范围就是 ±半身高，加上半身高正好平移到 0 ~ 身高这一段，
-            // 于是下面那些按站立姿势量好的盒子可以原样套用，不必另备一套。
-            return new Vec3d(side, depth + STANDING_HEIGHT / 2.0, 0.0);
+            // 人一躺下，两根轴就对调了：世界的前后偏移变成身体的高度，
+            // 世界的上下偏移变成身体的前后。高度那一根照旧平移半身高，好套用直立时量好的盒子。
+            double bellyUp = player.getPose() == EntityPose.SLEEPING ? 1.0 : -1.0;
+            return new Vec3d(side, depth + STANDING_HEIGHT / 2.0, bellyUp * (relative.y - player.getHeight() / 2.0));
         }
 
         double scale = player.getHeight() / STANDING_HEIGHT;
-        return new Vec3d(side, relative.y / scale, 0.0);
+        return new Vec3d(side, relative.y / scale, depth);
     }
 
     /**
@@ -170,6 +199,6 @@ public final class BodyPartResolver {
     }
 
     /** 一个部位盒子与它代表的部位。 */
-    private record PartBox(Box box, BodyPart part) {
+    record PartBox(Box box, BodyPart part) {
     }
 }

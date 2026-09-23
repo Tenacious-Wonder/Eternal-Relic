@@ -7,8 +7,13 @@
     "EnchantmentHelperMixin",
     "EntityMixin",
     "ItemEntityMixin",
+    "LivingEntityMixin",
+    "PlayerDamageMixin",
     "PlayerEntityMixin",
-    "ProjectileEntityMixin"
+    "ProjectileEntityMixin",
+    "SitGoalMixin",
+    "WolfAweMixin",
+    "WolfTamingMixin"
   ],
   "injectors": {
     "defaultRequire": 1

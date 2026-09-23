@@ -45,6 +45,9 @@ public enum AttachTarget {
     /** 只算戴在头上的那一件。 */
     HELMET("头盔"),
 
+    /** 只算穿在胸前的那一件。 */
+    CHESTPLATE("胸甲"),
+
     /** 只算穿在脚上的那一件。 */
     BOOTS("靴子"),
 
@@ -81,6 +84,7 @@ public enum AttachTarget {
             case ARMOR -> item instanceof ArmorItem || item instanceof ShieldItem;
             case ARMOR_PIECE -> item instanceof ArmorItem;
             case HELMET -> isArmorIn(item, EquipmentSlot.HEAD);
+            case CHESTPLATE -> isArmorIn(item, EquipmentSlot.CHEST);
             case BOOTS -> isArmorIn(item, EquipmentSlot.FEET);
             case WEAPON -> item instanceof SwordItem
                     || item instanceof AxeItem

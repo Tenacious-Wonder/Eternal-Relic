@@ -1,5 +1,7 @@
 package org.eternalrelic.relic;
 
+import java.util.List;
+
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 
@@ -13,10 +15,14 @@ import net.minecraft.util.Identifier;
  * <p>这里的稀有度取自<b>材料档位</b> {@link MaterialRarity}，登记一次便固定不变——
  * 遗物的成色由它自身决定，不随谁做出来而改变。</p>
  *
- * <p>四处能力插槽各自独立：{@code effect} 管「一直挂在身上的数值」，
+ * <p>四处能力插槽各自独立：{@code effects} 管「一直挂在身上的数值」，
  * {@code ward} 管「每次挨打时出手一次」，{@code arrivalEffect} 管「刚开始携带时要不要亮相」，
  * {@code attachmentOnly} 则决定那份数值<b>从哪儿算起</b>（见下）。一件遗物可以只有其中任意几项；
- * 没有的那一项留 {@code null}（开关留 {@code false}）即可，相应的能力类查不到配置就会自动跳过这件遗物。</p>
+ * 没有的那一项留空（空表 / {@code null} / {@code false}）即可，相应的能力类查不到配置就会自动跳过这件遗物。</p>
+ *
+ * <p><b>属性加成是一条还是多条，由遗物自己决定。</b>只给一种属性的（皮革内衬只给盔甲韧性）
+ * 登记一条，两种同时给的（龟壳内衬既给韧性又给护甲值）登记两条——
+ * {@code effects} 因此是一份清单而不是单个值。每条各算各的份数，互不影响。</p>
  *
  * <p><b>{@code attachmentOnly}：属性加成只认「缝在装备上的那一份」。</b>
  * 关着（默认）时，遗物放在背包里就生效、缝在装备上也生效；打开之后，背包里那一份完全不算数，
@@ -25,37 +31,48 @@ import net.minecraft.util.Identifier;
  * @param item           遗物对应的物品
  * @param id             内部编号
  * @param rarity         遗物固有稀有度（沿用材料档位）
- * @param effect         携带时生效的属性加成；没有则为 {@code null}
+ * @param effects        携带时生效的属性加成，可以登记多条；没有则为空表
  * @param ward           受到攻击时的守护效果；没有则为 {@code null}
  * @param arrivalEffect  刚开始携带时是否播放一记「入手」表现
  * @param attachmentOnly 属性加成是否只认附着份（放在背包里不算数）
  */
-public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect effect, DamageWard ward,
-        boolean arrivalEffect, boolean attachmentOnly) {
+public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, List<RelicEffect> effects,
+        DamageWard ward, boolean arrivalEffect, boolean attachmentOnly) {
 
     /**
-     * 登记一件没有守护效果、也不做入手表现的遗物。
+     * 收下登记进来的属性加成，并复制一份存起来。
      *
-     * @param item   遗物对应的物品
-     * @param id     内部编号
-     * @param rarity 遗物固有稀有度（沿用材料档位）
-     * @param effect 携带时生效的属性加成；没有则为 {@code null}
+     * <p>复制是为了让这份清单此后只读：遗物表里的内容一旦登记完就不再改动，
+     * 谁也不能从外面把它改掉。</p>
      */
-    public RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect effect) {
-        this(item, id, rarity, effect, null, false, false);
+    public RelicDefinition {
+        effects = effects == null ? List.of() : List.copyOf(effects);
+    }
+
+    /**
+     * 登记一件只有属性加成、没有守护效果、也不做入手表现的遗物。
+     *
+     * @param item    遗物对应的物品
+     * @param id      内部编号
+     * @param rarity  遗物固有稀有度（沿用材料档位）
+     * @param effects 携带时生效的属性加成，可以登记多条；没有则一条都不写
+     */
+    public RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect... effects) {
+        this(item, id, rarity, List.of(effects), null, false, false);
     }
 
     /**
      * 登记一件不做入手表现的遗物。
      *
-     * @param item   遗物对应的物品
-     * @param id     内部编号
-     * @param rarity 遗物固有稀有度（沿用材料档位）
-     * @param effect 携带时生效的属性加成；没有则为 {@code null}
-     * @param ward   受到攻击时的守护效果；没有则为 {@code null}
+     * @param item    遗物对应的物品
+     * @param id      内部编号
+     * @param rarity  遗物固有稀有度（沿用材料档位）
+     * @param effects 携带时生效的属性加成，可以登记多条；没有则一条都不写
+     * @param ward    受到攻击时的守护效果，没有则为 {@code null}
      */
-    public RelicDefinition(Item item, Identifier id, MaterialRarity rarity, RelicEffect effect, DamageWard ward) {
-        this(item, id, rarity, effect, ward, false, false);
+    public RelicDefinition(Item item, Identifier id, MaterialRarity rarity, List<RelicEffect> effects,
+            DamageWard ward) {
+        this(item, id, rarity, effects, ward, false, false);
     }
 
     /**
@@ -81,7 +98,7 @@ public record RelicDefinition(Item item, Identifier id, MaterialRarity rarity, R
      * @return 本遗物是否带有「携带生效」的属性加成
      */
     public boolean hasCarriedEffect() {
-        return this.effect != null;
+        return !this.effects.isEmpty();
     }
 
     /**
