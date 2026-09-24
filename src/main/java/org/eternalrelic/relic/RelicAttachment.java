@@ -100,8 +100,9 @@ public final class RelicAttachment {
      * @param targets  能附到哪几类目标上；不能为空
      * @param material 附着时第一格要放的辅料
      * @param stacking 附着份怎么与其它来源累加
+     * @param category 作为「装备配件」时属于哪一类；纹章之类不是配件，这里为 {@code null}
      */
-    public record Spec(Set<AttachTarget> targets, Item material, Stacking stacking) {
+    public record Spec(Set<AttachTarget> targets, Item material, Stacking stacking, FittingCategory category) {
 
         /**
          * @param target 目标类别
@@ -134,6 +135,37 @@ public final class RelicAttachment {
      * @param targets  允许附着的目标类别，至少写一个
      */
     public static void register(Item relic, Item material, Stacking stacking, AttachTarget... targets) {
+        register(relic, null, material, stacking, targets);
+    }
+
+    /**
+     * 登记一件「装备配件」—— 与普通可附遗物的区别只在于<b>它属于某一类</b>，
+     * 而同一类配件在一件装备上只能有一件（见 {@link #categoryAllows}）。
+     *
+     * <p>分档变体（皮革 / 鳞片 / 龟壳）要登记成同一类，它们之间才会互斥；
+     * 左右肩甲要分成两类，玩家才能一边挂一只。</p>
+     *
+     * <p>登记填漏时**直接抛错**，让它在启动时就暴露：这类登记只有开发者会写，
+     * 静默跳过只会变成"进了游戏才发现某件配件能重复装"。</p>
+     *
+     * @param fitting  配件本身
+     * @param category 它属于哪一类；不能为 {@code null}
+     * @param material 附着时第一格要放的辅料
+     * @param stacking 附着份怎么与其它来源累加
+     * @param targets  允许附着的目标类别，至少写一个
+     */
+    public static void registerFitting(Item fitting, FittingCategory category, Item material, Stacking stacking,
+            AttachTarget... targets) {
+        if (category == null) {
+            throw new IllegalArgumentException(
+                    "装备配件「" + Registries.ITEM.getId(fitting) + "」没有写明属于哪一类");
+        }
+
+        register(fitting, category, material, stacking, targets);
+    }
+
+    private static void register(Item relic, FittingCategory category, Item material, Stacking stacking,
+            AttachTarget... targets) {
         String name = Registries.ITEM.getId(relic).toString();
 
         if (targets.length == 0) {
@@ -146,7 +178,7 @@ public final class RelicAttachment {
 
         EnumSet<AttachTarget> set = EnumSet.noneOf(AttachTarget.class);
         Collections.addAll(set, targets);
-        SPECS.put(relic, new Spec(Collections.unmodifiableSet(set), material, stacking));
+        SPECS.put(relic, new Spec(Collections.unmodifiableSet(set), material, stacking, category));
     }
 
     /**
@@ -155,6 +187,48 @@ public final class RelicAttachment {
      */
     public static Spec specOf(Item item) {
         return SPECS.get(item);
+    }
+
+    /**
+     * 这件物品作为「装备配件」属于哪一类。
+     *
+     * <p>不是配件的（纹章之类）与压根不可附的都返回 {@code null}——调用方据此判断
+     * "要不要受同类只能一件的限制"。</p>
+     *
+     * @param item 待查询的物品
+     * @return 它的配件类别；不属于任何一类时返回 {@code null}
+     */
+    public static FittingCategory categoryOf(Item item) {
+        Spec spec = SPECS.get(item);
+        return spec == null ? null : spec.category();
+    }
+
+    /**
+     * 这件装备上还装得下这一类配件吗。
+     *
+     * <p><b>这是"同类只能一件"的判定处</b>：一件胸甲上不能同时挂着两套肩甲，
+     * 也不能同时挂着两只左肩甲；但左肩甲与右肩甲是两类，可以各挂一只。</p>
+     *
+     * <p>不是配件的东西（纹章）一律放行——它们本来就可以叠着钉。</p>
+     *
+     * @param target 待检查的装备
+     * @param relic  想装上去的那一件
+     * @return 允许装上去时返回 {@code true}
+     */
+    public static boolean categoryAllows(ItemStack target, Item relic) {
+        FittingCategory category = categoryOf(relic);
+
+        if (category == null) {
+            return true;
+        }
+
+        for (Item attached : attachedTo(target)) {
+            if (categoryOf(attached) == category) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -181,6 +255,11 @@ public final class RelicAttachment {
         }
 
         if (attachedTo(target).size() >= MAX_ATTACHMENTS) {
+            return false;
+        }
+
+        // 同一类配件一件装备上只能有一件（肩甲·左 与 肩甲·右 是两类，互不影响）
+        if (!categoryAllows(target, relic)) {
             return false;
         }
 

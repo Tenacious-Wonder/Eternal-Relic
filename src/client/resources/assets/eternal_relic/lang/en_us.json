@@ -2,6 +2,8 @@
   "modmenu.nameTranslation.eternal_relic": "TW's Eternal Relic",
   "modmenu.descriptionTranslation.eternal_relic": "Explore the world and collect the Eternal Relics scattered across it — each one grants you a unique power.",
   "block.eternal_relic.relic_station": "Relic Station",
+  "block.eternal_relic.chestplate_station": "Chestplate Station",
+  "container.eternal_relic.chestplate_station": "Chestplate Station",
   "item.eternal_relic.hammer": "Hammer",
   "item.eternal_relic.small_hammer": "Small Hammer",
   "container.eternal_relic.relic_station": "Relic Station",

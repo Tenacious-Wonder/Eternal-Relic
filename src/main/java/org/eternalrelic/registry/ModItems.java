@@ -374,6 +374,7 @@ public final class ModItems {
 
         ItemGroupEvents.modifyEntriesEvent(RELIC_GROUP_KEY).register(entries -> {
             entries.add(ModBlocks.RELIC_STATION_ITEM);
+            entries.add(ModBlocks.CHESTPLATE_STATION_ITEM);
             entries.add(HAMMER);
             entries.add(SMALL_HAMMER);
             entries.add(AOTA_BRANCH);

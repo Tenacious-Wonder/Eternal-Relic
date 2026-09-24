@@ -3,6 +3,8 @@
   "modmenu.descriptionTranslation.eternal_relic": "探索世界，收集散落各处的永恒遗物，让每一件遗物都赋予你独特的能力。",
 
   "block.eternal_relic.relic_station": "遗物装卸台",
+  "block.eternal_relic.chestplate_station": "胸甲台",
+  "container.eternal_relic.chestplate_station": "胸甲台",
   "item.eternal_relic.hammer": "铁锤",
   "item.eternal_relic.small_hammer": "小铁锤",
   "container.eternal_relic.relic_station": "遗物装卸台",

@@ -10,6 +10,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
 
 import org.eternalrelic.EternalRelic;
+import org.eternalrelic.block.ChestplateStationBlock;
 import org.eternalrelic.block.RelicStationBlock;
 
 /**
@@ -38,6 +39,24 @@ public final class ModBlocks {
     /** 遗物装卸台的方块物品。 */
     public static final BlockItem RELIC_STATION_ITEM = registerItem("relic_station",
             new BlockItem(RELIC_STATION, new Item.Settings()));
+
+    /**
+     * 胸甲台 —— 给胸甲装卸盔甲配件的工作方块，也是四个部位台子里的第一个。
+     *
+     * <p><b>它和遗物装卸台正好相反</b>：那个方块什么都不存，这个方块必须自己记住台上的胸甲
+     * （所以它有方块实体，见 {@link ModBlockEntityTypes}），因为胸甲平时就摆在台子上当展示。
+     * 台上的胸甲由客户端那边的渲染器画出来，方块模型本身只是台座。</p>
+     */
+    public static final Block CHESTPLATE_STATION = register("chestplate_station",
+            new ChestplateStationBlock(AbstractBlock.Settings.create()
+                    .mapColor(MapColor.IRON_GRAY)
+                    .strength(2.0F)
+                    .nonOpaque()
+                    .sounds(BlockSoundGroup.STONE)));
+
+    /** 胸甲台的方块物品。 */
+    public static final BlockItem CHESTPLATE_STATION_ITEM = registerItem("chestplate_station",
+            new BlockItem(CHESTPLATE_STATION, new Item.Settings()));
 
     private ModBlocks() {
     }

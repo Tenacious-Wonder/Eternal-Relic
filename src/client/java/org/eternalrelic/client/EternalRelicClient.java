@@ -4,12 +4,16 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 
 import org.eternalrelic.client.network.SoulFlameClientNetwork;
 import org.eternalrelic.client.particle.ModParticleFactories;
 import org.eternalrelic.client.render.FlatAndThreeDItemRenderer;
+import org.eternalrelic.client.render.block.blockentity.ChestplateStationBlockEntityRenderer;
+import org.eternalrelic.client.screen.ChestplateStationScreen;
 import org.eternalrelic.client.screen.RelicScreenOpener;
 import org.eternalrelic.client.screen.RelicStationScreen;
+import org.eternalrelic.registry.ModBlockEntityTypes;
 import org.eternalrelic.registry.ModBlocks;
 import org.eternalrelic.registry.ModScreens;
 
@@ -30,14 +34,20 @@ public class EternalRelicClient implements ClientModInitializer {
         SoulFlameClientNetwork.register();
         MaterialTooltip.register();
 
-        // 装卸台的界面：把容器类型与画它的界面绑起来
+        // 两个工作方块的界面：各自的容器类型与画它的界面绑起来
         HandledScreens.register(ModScreens.RELIC_STATION, RelicStationScreen::new);
+        HandledScreens.register(ModScreens.CHESTPLATE_STATION, ChestplateStationScreen::new);
 
         // 台子的贴图里有镂空的地方（不属于它的像素是透明的），必须显式声明用「镂空」渲染层。
         // 方块默认那一层不接受透明度，会把透明像素画成黑色实心方块。
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.RELIC_STATION, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.CHESTPLATE_STATION, RenderLayer.getCutout());
 
         // 引魂燃灯与两把锤子：物品栏显示制作者画的平面图标，手上与地上显示立体模型
         FlatAndThreeDItemRenderer.register();
+
+        // 胸甲台：台上摆着的那件胸甲由这个渲染器画出来
+        BlockEntityRendererFactories.register(ModBlockEntityTypes.CHESTPLATE_STATION,
+                ChestplateStationBlockEntityRenderer::new);
     }
 }

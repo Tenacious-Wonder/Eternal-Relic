@@ -10,6 +10,7 @@ import org.eternalrelic.network.SoulLanternNetwork;
 public class RegistryInit {
     public static void init() {
         ModBlocks.register();
+        ModBlockEntityTypes.register();
         ModItems.register();
         ModSounds.register();
         ModParticleTypes.register();

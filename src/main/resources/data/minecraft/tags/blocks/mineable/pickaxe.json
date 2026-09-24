@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "eternal_relic:relic_station"
+    "eternal_relic:relic_station",
+    "eternal_relic:chestplate_station"
   ]
 }
