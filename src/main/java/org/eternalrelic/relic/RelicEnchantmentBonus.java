@@ -146,25 +146,30 @@ public final class RelicEnchantmentBonus {
     }
 
     /**
-     * 把「物品自己的附魔」与「遗物补上的那一份」合成一张表，供游戏读取。
+     * 把「游戏原本读出来的那张附魔表」与「遗物补上的那一份」合成一张表，供游戏读取。
      *
-     * <p><b>返回的永远是一份拷贝</b>：{@code ItemStack#getEnchantments()} 交出来的是物品自身数据里的
-     * 那一个列表，就地往上加等级等于把虚拟附魔写进物品——那正是本类存在的意义所要避免的事。
-     * 没有遗物补魔时直接返回原表，不白白复制一份。</p>
+     * <p><b>原表由调用方递进来</b>，本类不再自己向物品要一次。这样接的好处是：
+     * 别的模组若也改了那次读取，我们会加在<b>它的结果</b>之上，而不是把它顶掉 ——
+     * 两边的附魔因此可以叠加（做法与理由见 {@code EnchantmentHelperMixin} 的类注释）。</p>
      *
-     * @param stack 待读取的物品
+     * <p><b>返回的永远是一份拷贝</b>：递进来的那张表来自物品自身的数据，
+     * 就地往上加等级等于把虚拟附魔写进物品——那正是本类存在的意义所要避免的事。
+     * 没有遗物补魔时<b>原样返回递进来的表</b>，不白白复制一份。</p>
+     *
+     * @param stack    待读取的物品（用来查它身上缝了哪些遗物）
+     * @param original 游戏原本读出来的附魔表
      * @return 合并后的附魔表
      */
-    public static NbtList merged(ItemStack stack) {
-        // 先问「有没有遗物补魔」再取原表：没有补魔时这条路就走完了，
+    public static NbtList merged(ItemStack stack, NbtList original) {
+        // 先问「有没有遗物补魔」再动原表：没有补魔时这条路就走完了，
         // 一次多余的表拷贝都不做——它是每 tick 会被叫到很多次的路径。
         Map<Enchantment, Integer> bonuses = bonusOf(stack);
 
         if (bonuses.isEmpty()) {
-            return stack.getEnchantments();
+            return original;
         }
 
-        NbtList merged = stack.getEnchantments().copy();
+        NbtList merged = original.copy();
         bonuses.forEach((enchantment, level) -> addLevel(merged, enchantment, level));
         return merged;
     }
