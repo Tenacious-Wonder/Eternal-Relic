@@ -37,13 +37,24 @@ public final class RelicAttachment {
     private static final String ATTACHMENTS_KEY = "EternalRelicAttachments";
 
     /**
-     * 一件装备最多能附几枚遗物。
+     * 一件装备最多能钉几枚<b>遗物</b>（纹章一类）。
      *
      * <p>这个数字来自遗物装卸台界面上画着的那 6 个格子——界面上放得下几枚，实际就只允许几枚。
      * 两条附着途径（锻造台与装卸台）共用这一个上限，因此不会出现「锻造台能钉第 7 枚、
      * 装卸台却显示不出来」这种对不上的情况。</p>
+     *
+     * <p><b>它只管遗物这一桶</b>：装备配件（肩甲 / 内衬 / 甲片 / 胸甲片）另算一桶，见
+     * {@link #MAX_FITTINGS}。两桶分开计数，缝满配件不会挤掉纹章的位置。</p>
      */
     public static final int MAX_ATTACHMENTS = 6;
+
+    /**
+     * 一件装备最多能缝几个<b>装备配件</b>（肩甲 / 内衬 / 甲片 / 胸甲片）。
+     *
+     * <p>同样来自界面：胸甲台上画着 6 个配件槽。它与 {@link #MAX_ATTACHMENTS} 各算各的、
+     * 互不挤占，因此一件胸甲最多能带「6 枚遗物 + 6 个配件」。</p>
+     */
+    public static final int MAX_FITTINGS = 6;
 
     /**
      * 附着上来的那一份，与其它来源之间怎么累加。
@@ -241,8 +252,12 @@ public final class RelicAttachment {
     /**
      * 判断一件目标物品能否接受某件遗物。
      *
-     * <p>三件事都要成立：这件遗物登记过、它允许附到目标这一类上、而且**这枚遗物还没附在这件装备上**
-     * ——同一件装备上重复附同一枚没有意义，所以直接不接受。</p>
+     * <p>四件事都要成立：这件遗物登记过、它允许附到目标这一类上、**这枚遗物还没附在这件装备上**
+     * （同一件装备上重复附同一枚没有意义），以及**它所在的那一桶还没满**。</p>
+     *
+     * <p><b>上限按「桶」分别算</b>：遗物一桶（{@link #MAX_ATTACHMENTS} 枚）、装备配件一桶
+     * （{@link #MAX_FITTINGS} 个），两桶互不挤占——缝满配件之后纹章仍旧钉得上，反过来也一样。
+     * 「这枚算哪一桶」看它有没有类别（见 {@link #isFitting}）。</p>
      *
      * @param target 要被附着的装备 / 武器 / 工具
      * @param relic  那件遗物
@@ -254,7 +269,9 @@ public final class RelicAttachment {
             return false;
         }
 
-        if (attachedTo(target).size() >= MAX_ATTACHMENTS) {
+        boolean fitting = isFitting(relic);
+        int used = (fitting ? fittingsOn(target) : relicsOn(target)).size();
+        if (used >= (fitting ? MAX_FITTINGS : MAX_ATTACHMENTS)) {
             return false;
         }
 
@@ -371,6 +388,41 @@ public final class RelicAttachment {
         }
 
         return attached;
+    }
+
+    /**
+     * @param relic 待查询的遗物
+     * @return 它是不是「装备配件」——也就是有类别的那几种（肩甲 / 内衬 / 甲片 / 胸甲片）；
+     *         纹章一类不是配件，返回 {@code false}
+     */
+    public static boolean isFitting(Item relic) {
+        Spec spec = SPECS.get(relic);
+        return spec != null && spec.category() != null;
+    }
+
+    /**
+     * 读出这件物品上附着的<b>遗物</b>（不含装备配件）。
+     *
+     * <p>遗物装卸台的六格用它：那一页只该看到纹章一类的东西，配件归胸甲台管。</p>
+     *
+     * @param stack 待查看的物品
+     * @return 上面附着的遗物；没有则为空表
+     */
+    public static List<Item> relicsOn(ItemStack stack) {
+        return attachedTo(stack).stream().filter(item -> !isFitting(item)).toList();
+    }
+
+    /**
+     * 读出这件物品上缝着的<b>装备配件</b>（不含遗物）。
+     *
+     * <p>胸甲台的六个配件槽用它。它与 {@link #relicsOn} 合起来正好是 {@link #attachedTo}
+     * 的全部内容，一件不多、一件不少。</p>
+     *
+     * @param stack 待查看的物品
+     * @return 上面缝着的配件；没有则为空表
+     */
+    public static List<Item> fittingsOn(ItemStack stack) {
+        return attachedTo(stack).stream().filter(RelicAttachment::isFitting).toList();
     }
 
     /**

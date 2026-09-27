@@ -54,7 +54,7 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     public static final int BUTTON_APPLY = 0;
 
     /** 台子这边一共有几格：装备格 + 六格配件槽 + 配件格 + 配料格。 */
-    public static final int STATION_SLOTS = 1 + RelicAttachment.MAX_ATTACHMENTS + ChestplateStationInventory.SIZE;
+    public static final int STATION_SLOTS = 1 + RelicAttachment.MAX_FITTINGS + ChestplateStationInventory.SIZE;
 
     // ---- 槽位坐标。**按制作者那张界面底图上画的位置摆**，改这几个数只影响"格子画在哪" ----
 
@@ -159,16 +159,22 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     }
 
     /**
-     * 配件格 —— 只收"能装到台上那件胸甲上的东西"。
+     * 配件格 —— 只收"能装到台上那件胸甲上的<b>装备配件</b>"。
      *
-     * <p>判断直接问 {@link RelicAttachRule#canAttach}：它一并管了"登记过没有、是不是同一类目标、
-     * 有没有重复、有没有超过六枚上限"，因此这里不必再抄一遍规矩。</p>
+     * <p>判断分两问：先问它是不是配件（{@link RelicAttachment#isFitting}），再问
+     * {@link RelicAttachRule#canAttach}——后者一并管了"登记过没有、是不是同一类目标、
+     * 有没有重复、这一桶满了没有"，因此这里不必再抄一遍规矩。</p>
+     *
+     * <p><b>为什么要先问"是不是配件"</b>：纹章一类也能钉在胸甲上，但它们归遗物装卸台管。
+     * 若这里放行，玩家会在胸甲台钉上一枚纹章，而旁边六个配件槽<b>根本不会显示它</b>
+     * （那些格子只列配件），看上去就像白钉了。所以从入口就分开。</p>
      */
     private void addFittingSlot() {
         this.addSlot(new Slot(this.contents, ChestplateStationInventory.SLOT_FITTING, FITTING_X, FITTING_Y) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return RelicAttachRule.canAttach(chestplate(), stack);
+                return RelicAttachment.isFitting(stack.getItem())
+                        && RelicAttachRule.canAttach(chestplate(), stack);
             }
         });
     }
@@ -384,7 +390,7 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
      * @return 是六格之一时返回 {@code true}
      */
     private static boolean isAttachmentSlot(int index) {
-        return index >= 1 && index <= RelicAttachment.MAX_ATTACHMENTS;
+        return index >= 1 && index <= RelicAttachment.MAX_FITTINGS;
     }
 
     /**

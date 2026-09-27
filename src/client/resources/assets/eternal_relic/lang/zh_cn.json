@@ -95,6 +95,7 @@
   "item.eternal_relic.copper_chestplate_plate.desc": "本身没有效果；附着于胸甲时，移动速度降低 3%。被近战或远程打中正胸时，那一击少掉 1.5 点伤害（最低减到 0）；若来的是远程攻击，另有 15% 的概率被整个弹开。它只护正胸，后背受到的伤害不受影响。同一件胸甲上只能附着一片胸甲片。",
   "item.eternal_relic.armadillo_scute": "犰狳鳞甲",
   "itemGroup.eternal_relic.relic_group": "TW 的永恒遗物",
+  "itemGroup.eternal_relic.armor_fitting_group": "盔甲配件",
   "subtitles.eternal_relic.relic_arrival": "遗物入手",
   "subtitles.eternal_relic.nightwatch_install": "义眼归位",
   "subtitles.eternal_relic.nightwatch_release": "义眼脱落",

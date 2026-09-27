@@ -39,6 +39,19 @@ public final class ModItems {
             RegistryKey.of(RegistryKeys.ITEM_GROUP, EternalRelic.id("relic_group"));
 
     /**
+     * 盔甲配件在创造模式物品栏里独占的那一页。
+     *
+     * <p>肩甲、内衬、甲片、胸甲片都属于「装备配件」——它们能缝在装备上，而且同类只能缝一件
+     * （见 {@link org.eternalrelic.relic.FittingCategory}）。数量已经有二十二件，
+     * 再混在遗物那一页里会越来越难找，因此单开一页。</p>
+     *
+     * <p><b>纹章一类不在这里</b>：它们虽然也能钉在装备上，但不属于任何配件类别，
+     * 是本模组的「遗物」，仍旧留在遗物那一页。</p>
+     */
+    private static final RegistryKey<ItemGroup> ARMOR_FITTING_GROUP_KEY =
+            RegistryKey.of(RegistryKeys.ITEM_GROUP, EternalRelic.id("armor_fitting_group"));
+
+    /**
      * 奥塔的枝叶 —— 携带在背包中时提升生命上限的遗物。
      */
     public static final Item AOTA_BRANCH = register("aota_branch",
@@ -506,34 +519,24 @@ public final class ModItems {
                 .displayName(Text.translatable("itemGroup.eternal_relic.relic_group"))
                 .build());
 
-        ItemGroupEvents.modifyEntriesEvent(RELIC_GROUP_KEY).register(entries -> {
-            entries.add(ModBlocks.RELIC_STATION_ITEM);
-            entries.add(ModBlocks.CHESTPLATE_STATION_ITEM);
-            entries.add(HAMMER);
-            entries.add(SMALL_HAMMER);
-            entries.add(AOTA_BRANCH);
-            entries.add(ECHO_RING);
-            entries.add(ECHO_RING_DRAINED);
-            entries.add(SOUL_LANTERN);
+        Registry.register(Registries.ITEM_GROUP, ARMOR_FITTING_GROUP_KEY, FabricItemGroup.builder()
+                .icon(() -> new ItemStack(MITHRIL_CHESTPLATE_PLATE))
+                .displayName(Text.translatable("itemGroup.eternal_relic.armor_fitting_group"))
+                .build());
+
+        // 盔甲配件那一页：按「甲片 → 内衬 → 肩甲（由薄到厚）→ 胸甲片」的顺序摆，
+        // 同一档的左 / 右 / 一套连在一起，翻起来一眼看得出有几档、每档有哪三件
+        ItemGroupEvents.modifyEntriesEvent(ARMOR_FITTING_GROUP_KEY).register(entries -> {
+            // 甲片：缝在四个部位防具上的金属片
             entries.add(MOTTLED_COPPER_PLATE);
-            entries.add(COURAGE_EMBLEM);
-            entries.add(ENCHANTED_RABBIT_FOOT);
-            entries.add(BEESWAX_PENDANT);
-            entries.add(DREADFUL_WOLF_FANG_PENDANT);
-            entries.add(TRAVELER_PENDANT);
-            entries.add(SCHOLAR_MONOCLE);
-            entries.add(CAST_IRON_THUMB_RING);
-            entries.add(HUNTER_BADGE);
-            entries.add(ROUND_CAKE);
-            entries.add(ETERNAL_EMBLEM);
-            entries.add(STREAM_EMBLEM);
-            entries.add(SUN_EMBLEM);
-            entries.add(MOON_EMBLEM);
             entries.add(HARDENED_IRON_PLATE);
+
+            // 内衬：缝在防具内侧的衬里
             entries.add(LEATHER_LINING);
-            entries.add(LEATHER_LINING_UNFINISHED);
             entries.add(SCUTE_LINING);
             entries.add(TURTLE_SHELL_LINING);
+
+            // 肩甲：皮革 → 鳞片 → 龟壳 → 铁片 → 铜片
             entries.add(LEATHER_SHOULDER_GUARD_LEFT);
             entries.add(LEATHER_SHOULDER_GUARD_RIGHT);
             entries.add(LEATHER_SHOULDER_GUARD_PAIR);
@@ -549,8 +552,37 @@ public final class ModItems {
             entries.add(COPPER_SHOULDER_GUARD_LEFT);
             entries.add(COPPER_SHOULDER_GUARD_RIGHT);
             entries.add(COPPER_SHOULDER_GUARD_PAIR);
+
+            // 胸甲片：贴在胸甲正面的圆甲片
             entries.add(COPPER_CHESTPLATE_PLATE);
             entries.add(MITHRIL_CHESTPLATE_PLATE);
+        });
+
+        ItemGroupEvents.modifyEntriesEvent(RELIC_GROUP_KEY).register(entries -> {
+            entries.add(ModBlocks.RELIC_STATION_ITEM);
+            entries.add(ModBlocks.CHESTPLATE_STATION_ITEM);
+            entries.add(HAMMER);
+            entries.add(SMALL_HAMMER);
+            entries.add(AOTA_BRANCH);
+            entries.add(ECHO_RING);
+            entries.add(ECHO_RING_DRAINED);
+            entries.add(SOUL_LANTERN);
+            entries.add(COURAGE_EMBLEM);
+            entries.add(ENCHANTED_RABBIT_FOOT);
+            entries.add(BEESWAX_PENDANT);
+            entries.add(DREADFUL_WOLF_FANG_PENDANT);
+            entries.add(TRAVELER_PENDANT);
+            entries.add(SCHOLAR_MONOCLE);
+            entries.add(CAST_IRON_THUMB_RING);
+            entries.add(HUNTER_BADGE);
+            entries.add(ROUND_CAKE);
+            entries.add(ETERNAL_EMBLEM);
+            entries.add(STREAM_EMBLEM);
+            entries.add(SUN_EMBLEM);
+            entries.add(MOON_EMBLEM);
+            // 盔甲配件（甲片 / 内衬 / 肩甲 / 胸甲片）已挪到专属分类「盔甲配件」那一页。
+            // 半成品皮革内衬是材料、不是配件，仍旧留在这里
+            entries.add(LEATHER_LINING_UNFINISHED);
             entries.add(ARMADILLO_SCUTE);
             entries.add(NIGHTWATCH_EYE_LEFT);
             entries.add(NIGHTWATCH_EYE_RIGHT);

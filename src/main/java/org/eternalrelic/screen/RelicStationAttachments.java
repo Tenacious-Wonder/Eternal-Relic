@@ -76,12 +76,13 @@ public class RelicStationAttachments implements Inventory {
 
     @Override
     public boolean isEmpty() {
-        return RelicAttachment.attachedTo(center()).isEmpty();
+        return RelicAttachment.relicsOn(center()).isEmpty();
     }
 
     @Override
     public ItemStack getStack(int slot) {
-        List<Item> attached = RelicAttachment.attachedTo(center());
+        // 只列「遗物」这一桶：装备配件归胸甲台管，两边各看各的，不会把对方的也列出来
+        List<Item> attached = RelicAttachment.relicsOn(center());
         return slot >= 0 && slot < attached.size() ? new ItemStack(attached.get(slot)) : ItemStack.EMPTY;
     }
 

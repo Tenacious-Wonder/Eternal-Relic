@@ -58,17 +58,18 @@ public class ChestplateStationAttachments implements Inventory {
 
     @Override
     public int size() {
-        return RelicAttachment.MAX_ATTACHMENTS;
+        return RelicAttachment.MAX_FITTINGS;
     }
 
     @Override
     public boolean isEmpty() {
-        return RelicAttachment.attachedTo(center()).isEmpty();
+        return RelicAttachment.fittingsOn(center()).isEmpty();
     }
 
     @Override
     public ItemStack getStack(int slot) {
-        List<Item> attached = RelicAttachment.attachedTo(center());
+        // 只列「装备配件」这一桶：纹章一类归遗物装卸台管，两边各看各的
+        List<Item> attached = RelicAttachment.fittingsOn(center());
         return slot >= 0 && slot < attached.size() ? new ItemStack(attached.get(slot)) : ItemStack.EMPTY;
     }
 

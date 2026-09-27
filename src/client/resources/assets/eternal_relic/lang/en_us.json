@@ -94,6 +94,7 @@
   "item.eternal_relic.copper_chestplate_plate.desc": "No effect on its own. Attached to a chestplate: movement speed -3%. A melee or ranged hit on your chest deals 1.5 less damage (never below 0), and a ranged hit has a 15% chance to be batted away entirely. Only the chest is guarded - your back is not. One chestplate plate per chestplate.",
   "item.eternal_relic.armadillo_scute": "Armadillo Scute",
   "itemGroup.eternal_relic.relic_group": "TW's Eternal Relics",
+  "itemGroup.eternal_relic.armor_fitting_group": "Armour Fittings",
   "subtitles.eternal_relic.relic_arrival": "Relic arrival",
   "subtitles.eternal_relic.nightwatch_install": "Nightwatch Eye clicks into place",
   "subtitles.eternal_relic.nightwatch_release": "Nightwatch Eye comes loose",

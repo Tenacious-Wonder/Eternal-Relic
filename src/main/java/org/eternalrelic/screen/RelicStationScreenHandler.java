@@ -218,12 +218,20 @@ public class RelicStationScreenHandler extends ScreenHandler {
         });
     }
 
-    /** 遗物格：只收登记在可附白名单里的遗物。 */
+    /**
+     * 遗物格：只收登记在可附白名单里的<b>遗物</b>（纹章一类）。
+     *
+     * <p><b>装备配件不从这里进</b>：肩甲、内衬、甲片、胸甲片归胸甲台管。若这里放行，
+     * 玩家会在这台子上缝好一件配件，而右边那六个格子<b>根本不会显示它</b>
+     * （那些格子只列遗物），看上去就像白缝了。所以从入口就分开——
+     * 想要配件，走胸甲台或锻造台。</p>
+     */
     private void addRelicSlot() {
         this.addSlot(new Slot(this.contents, RelicStationInventory.SLOT_RELIC, RELIC_X, RELIC_Y) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return RelicAttachRule.isRelicItem(stack.getItem());
+                return !RelicAttachment.isFitting(stack.getItem())
+                        && RelicAttachRule.isRelicItem(stack.getItem());
             }
         });
     }
