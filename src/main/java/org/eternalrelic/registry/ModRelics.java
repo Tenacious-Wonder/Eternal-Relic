@@ -469,6 +469,127 @@ public final class ModRelics {
             RelicEffect.flat(RelicAttribute.ARMOR_TOUGHNESS, 1.0D));
 
     /**
+     * 铁片肩甲（左）—— 皮革肩甲缝上一大块铁板的形态，护住玩家自身的左肩。
+     *
+     * <p><b>它是四档肩甲里第一件带「代价」的</b>：护肩减伤 2.5 点、远程弹开概率 20%
+     * （都是全档最高），换来的是<b>挥砍慢 4%</b>——那一条就是这里登记的唯一属性，
+     * 而且是负的百分比（见 {@link RelicAttribute#ATTACK_SPEED}）。</p>
+     *
+     * <p>按百分比扣而不是扣固定点数：游戏里攻击速度的基数随武器而变
+     * （剑快、斧慢，都记在同一个属性上），扣固定点数会让原本就慢的武器慢得不成比例；
+     * 按比例扣才是"无论拿什么，挥砍都慢这一成"。</p>
+     *
+     * <p><b>它不给盔甲韧性</b>——这是刻意的：好处已经是最高的减伤与最高的弹开概率，
+     * 再加韧性就全面压过龟壳肩甲了。同样是「只认附着份」、只缝胸甲。</p>
+     *
+     * <p>固有稀有度为成材：与鳞片、龟壳那两档同一档，配得上它这份分量。</p>
+     */
+    public static final RelicDefinition IRON_SHOULDER_GUARD_LEFT = defineAttachmentOnly(
+            ModItems.IRON_SHOULDER_GUARD_LEFT,
+            MaterialRarity.LUMBER,
+            new RelicEffect(RelicAttribute.ATTACK_SPEED, -0.04D, 0.0D, 1));
+
+    /**
+     * 铁片肩甲（右）—— 与左肩那只成对，护住玩家自身的右肩。
+     *
+     * <p>登记内容与左肩那只完全对称：同样是挥砍慢 4%、只认胸甲上的附着份。
+     * 护肩那一侧登记在 {@link ShoulderGuards}。</p>
+     *
+     * <p>左右各缝一只时，两件是两件不同的遗物、各挂各的那一条，合计慢 8%——
+     * 这正是用户要的「每多装备一个就再慢 4%」。</p>
+     */
+    public static final RelicDefinition IRON_SHOULDER_GUARD_RIGHT = defineAttachmentOnly(
+            ModItems.IRON_SHOULDER_GUARD_RIGHT,
+            MaterialRarity.LUMBER,
+            new RelicEffect(RelicAttribute.ATTACK_SPEED, -0.04D, 0.0D, 1));
+
+    /**
+     * 一套铁片肩甲 —— 左右两只合成而来的整体，两侧肩膀都护。
+     *
+     * <p>减伤与弹开概率都与单只相同，但覆盖两侧；代价也只算一枚（挥砍慢 4%）。
+     * 因此"合成一套"换到的是「胸甲上少占一个附着格」「两侧都护」以及
+     * 「代价减半」这三样——比前几档多一样，是这一件最划算的地方。固有稀有度为成材。</p>
+     */
+    public static final RelicDefinition IRON_SHOULDER_GUARD_PAIR = defineAttachmentOnly(
+            ModItems.IRON_SHOULDER_GUARD_PAIR,
+            MaterialRarity.LUMBER,
+            new RelicEffect(RelicAttribute.ATTACK_SPEED, -0.04D, 0.0D, 1));
+
+    /**
+     * 铜片肩甲（左）—— 皮革肩甲缝上一大块铜板的形态，护住玩家自身的左肩。
+     *
+     * <p><b>它比皮革肩甲还薄，却比它多一手</b>：护肩减伤只有 1.5 点（皮革那只 2 点），
+     * 换来的是远程打中左肩时有一成半的几率被整个弹开——不用等到凑齐鳞甲或龟壳，
+     * 铜就能做出会拨箭的肩甲。代价与铁片肩甲一样：<b>挥砍慢 4%</b>（见
+     * {@link RelicAttribute#ATTACK_SPEED}），每缝一枚各算一枚。</p>
+     *
+     * <p><b>它不给盔甲韧性</b>——与铁片肩甲同一条口径：好处全在"少挨一点、偶尔拨开"上，
+     * 不再额外送韧性。同样是「只认附着份」、只缝胸甲。</p>
+     *
+     * <p>固有稀有度为成材：与鳞片、龟壳、铁片那几档同一档。</p>
+     */
+    public static final RelicDefinition COPPER_SHOULDER_GUARD_LEFT = defineAttachmentOnly(
+            ModItems.COPPER_SHOULDER_GUARD_LEFT,
+            MaterialRarity.LUMBER,
+            new RelicEffect(RelicAttribute.ATTACK_SPEED, -0.04D, 0.0D, 1));
+
+    /**
+     * 铜片肩甲（右）—— 与左肩那只成对，护住玩家自身的右肩。
+     *
+     * <p>登记内容与左肩那只完全对称：同样是挥砍慢 4%、只认胸甲上的附着份。
+     * 护肩那一侧登记在 {@link ShoulderGuards}。</p>
+     */
+    public static final RelicDefinition COPPER_SHOULDER_GUARD_RIGHT = defineAttachmentOnly(
+            ModItems.COPPER_SHOULDER_GUARD_RIGHT,
+            MaterialRarity.LUMBER,
+            new RelicEffect(RelicAttribute.ATTACK_SPEED, -0.04D, 0.0D, 1));
+
+    /**
+     * 一套铜片肩甲 —— 左右两只合成而来的整体，两侧肩膀都护。
+     *
+     * <p>减伤与弹开概率都与单只相同，但覆盖两侧；代价也只算一枚（挥砍慢 4%）。固有稀有度为成材。</p>
+     */
+    public static final RelicDefinition COPPER_SHOULDER_GUARD_PAIR = defineAttachmentOnly(
+            ModItems.COPPER_SHOULDER_GUARD_PAIR,
+            MaterialRarity.LUMBER,
+            new RelicEffect(RelicAttribute.ATTACK_SPEED, -0.04D, 0.0D, 1));
+
+    /**
+     * 秘银胸甲片 —— 贴在胸甲正面的一块甲片，护住正胸。
+     *
+     * <p>这里登记的只有 <b>+1 点盔甲韧性</b>；「正胸挨打少掉 3 点、三成的箭被弹开、
+     * 魔法伤害减 1 点」这三件事登记在 {@link ChestplatePlates 胸甲片表} 里——
+     * 一个长期挂在玩家身上，另几个只在挨打的那一刻算一次，结算时机不同，因此分成两处。</p>
+     *
+     * <p><b>它只护正胸，后背一点都挡不住</b>：一块贴在胸前的甲片护不住后背，这是刻意的。
+     * 同样是「只认附着份」、只缝胸甲；类别上自成一类，因此一件胸甲上只能有一片，
+     * 但可以与肩甲同时缝着。</p>
+     *
+     * <p>固有稀有度为珍品：一块来路不明的金属，本事在现有配件里最强。</p>
+     */
+    public static final RelicDefinition MITHRIL_CHESTPLATE_PLATE = defineAttachmentOnly(
+            ModItems.MITHRIL_CHESTPLATE_PLATE,
+            MaterialRarity.TREASURE,
+            RelicEffect.flat(RelicAttribute.ARMOR_TOUGHNESS, 1.0D));
+
+    /**
+     * 铜胸甲片 —— 最普通的一片胸甲片，护住正胸。
+     *
+     * <p>这里登记的只有 <b>移动速度 −3%</b> 这条代价；「正胸挨打少掉 1.5 点、一成半的箭被弹开」
+     * 登记在 {@link ChestplatePlates 胸甲片表} 里。它<b>不挡魔法伤害，也不给盔甲韧性</b>——
+     * 那是秘银那一片的本事，两片同属「胸甲片」类别，一件胸甲上只能挑一片。</p>
+     *
+     * <p>移动速度与肩甲的挥砍速度同属「负面百分比」：按比例扣，所以穿着它跑多快都是慢这一成，
+     * 不会因为骑马 / 疾跑而变样。同样是「只认附着份」、只缝胸甲。</p>
+     *
+     * <p>固有稀有度为碎屑：最普通、最常规的一片，适合新手。</p>
+     */
+    public static final RelicDefinition COPPER_CHESTPLATE_PLATE = defineAttachmentOnly(
+            ModItems.COPPER_CHESTPLATE_PLATE,
+            MaterialRarity.DEBRIS,
+            new RelicEffect(RelicAttribute.MOVEMENT_SPEED, -0.03D, 0.0D, 1));
+
+    /**
      * 太阳纹章 —— 带在身上时，白天持续给「生命恢复」与「力量」。
      *
      * <p>它<b>没有任何属性加成</b>，价值全在白天那两条状态效果上：由

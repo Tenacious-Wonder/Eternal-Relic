@@ -17,11 +17,18 @@ import org.eternalrelic.relic.ShoulderGuard;
  * <p>这是一份**由制作者选定的白名单**：一件遗物没登记在这里，就是没有「护肩」这项本事，
  * 这是正常状态，不是漏写。想让某件遗物护肩，在这里加一行即可，不必改能力类。</p>
  *
- * <p><b>三档肩甲的分工完全一样</b>：左肩甲只护左肩、右肩甲只护右肩，两只合成的一套两侧都护。
- * 差别只在厚度与本事上：皮革那只每件减 {@value #LEATHER_REDUCTION} 点，鳞片与龟壳那两只
- * 每件减 {@value #HEAVY_REDUCTION} 点，而<b>只有龟壳那只会把远程攻击弹开</b>。
+ * <p><b>五档肩甲的分工完全一样</b>：左肩甲只护左肩、右肩甲只护右肩，两只合成的一套两侧都护。
+ * 差别只在厚度与本事上：薄的减得少、厚的减得多——铜片每件减 {@value #COPPER_REDUCTION} 点，
+ * 皮革 {@value #LEATHER_REDUCTION} 点，鳞片、龟壳与铁片那三档每件减 {@value #HEAVY_REDUCTION} 点；
+ * <b>会弹开远程攻击的是铜片、龟壳与铁片三档</b>
+ * （铜片 {@value #COPPER_DEFLECT_CHANCE}、龟壳 {@value #TURTLE_DEFLECT_CHANCE}、
+ * 铁片 {@value #IRON_DEFLECT_CHANCE}）。
  * 一套的长处始终是「两侧都护」，而不是减得更狠或弹得更勤；玩家之所以要合成，
- * 是为了在胸甲上少占一个附着格。</p>
+ * 是为了在胸甲上少占一个附着格（铜片与铁片那两档还多一样：代价只算一枚）。</p>
+ *
+ * <p>⚠️ <b>这张表只登记「护肩」这一件事</b>。铁片肩甲的代价（每缝一枚挥砍慢 4%）不在这里，
+ * 它是一条属性加成，登记在遗物表里——两者结算时机不同：一个只在挨打那一刻算一次，
+ * 一个长期挂在玩家身上。</p>
  *
  * <p><b>护住同一侧的多件不会相加</b>：胸甲上同时缝了护住同一侧的好几件肩甲时，
  * 减伤只认最多的那一件，弹开概率也只认最高的那一件。这条规矩不在这张表里，
@@ -33,14 +40,23 @@ import org.eternalrelic.relic.ShoulderGuard;
  */
 public final class ShoulderGuards {
 
+    /** 铜片肩甲挨打时少掉的伤害点数 —— 比皮革那只还薄，换来的是能拨开箭。 */
+    private static final float COPPER_REDUCTION = 1.5F;
+
     /** 皮革肩甲挨打时少掉的伤害点数。 */
     private static final float LEATHER_REDUCTION = 2.0F;
 
     /** 鳞片肩甲与龟壳肩甲挨打时少掉的伤害点数——都比皮革那只厚。 */
     private static final float HEAVY_REDUCTION = 2.5F;
 
+    /** 铜片肩甲把远程攻击弹开的概率 —— 介于龟壳与铁片之间。 */
+    private static final float COPPER_DEFLECT_CHANCE = 0.15F;
+
     /** 龟壳肩甲把远程攻击弹开的概率。 */
     private static final float TURTLE_DEFLECT_CHANCE = 0.1F;
+
+    /** 铁片肩甲把远程攻击弹开的概率 —— 是龟壳那件的两倍。 */
+    private static final float IRON_DEFLECT_CHANCE = 0.2F;
 
     /** 不会弹开远程攻击的肩甲填这个值。 */
     private static final float NO_DEFLECT = 0.0F;
@@ -52,7 +68,7 @@ public final class ShoulderGuards {
     }
 
     /**
-     * 由 {@link ModItems#register()} 调用，触发本类静态内容初始化（把三档九件肩甲登记进表里）。
+     * 由 {@link ModItems#register()} 调用，触发本类静态内容初始化（把四档十二件肩甲登记进表里）。
      */
     static void register() {
         // 皮革肩甲：左护左肩、右护右肩、一套两侧都护；不会弹开远程
@@ -84,6 +100,28 @@ public final class ShoulderGuards {
                 BodyPart.RIGHT_SHOULDER);
 
         register(ModItems.TURTLE_SHELL_SHOULDER_GUARD_PAIR, HEAVY_REDUCTION, TURTLE_DEFLECT_CHANCE,
+                BodyPart.LEFT_SHOULDER, BodyPart.RIGHT_SHOULDER);
+
+        // 铁片肩甲：厚度与鳞片、龟壳那两档相同（都是 2.5 点），但弹开远程的概率翻倍到 20%。
+        // 换来这一手要付代价：它每缝一枚都让挥砍慢 4%（那一条登记在遗物表里，不在本表）
+        register(ModItems.IRON_SHOULDER_GUARD_LEFT, HEAVY_REDUCTION, IRON_DEFLECT_CHANCE,
+                BodyPart.LEFT_SHOULDER);
+
+        register(ModItems.IRON_SHOULDER_GUARD_RIGHT, HEAVY_REDUCTION, IRON_DEFLECT_CHANCE,
+                BodyPart.RIGHT_SHOULDER);
+
+        register(ModItems.IRON_SHOULDER_GUARD_PAIR, HEAVY_REDUCTION, IRON_DEFLECT_CHANCE,
+                BodyPart.LEFT_SHOULDER, BodyPart.RIGHT_SHOULDER);
+
+        // 铜片肩甲：五档里最薄的一件（只减 1.5 点，比皮革还少），弹开概率则排在中间（一成半）。
+        // 它是最早能做出来的「会拨箭的肩甲」，代价与铁片相同：每缝一枚挥砍慢 4%（登记在遗物表里）
+        register(ModItems.COPPER_SHOULDER_GUARD_LEFT, COPPER_REDUCTION, COPPER_DEFLECT_CHANCE,
+                BodyPart.LEFT_SHOULDER);
+
+        register(ModItems.COPPER_SHOULDER_GUARD_RIGHT, COPPER_REDUCTION, COPPER_DEFLECT_CHANCE,
+                BodyPart.RIGHT_SHOULDER);
+
+        register(ModItems.COPPER_SHOULDER_GUARD_PAIR, COPPER_REDUCTION, COPPER_DEFLECT_CHANCE,
                 BodyPart.LEFT_SHOULDER, BodyPart.RIGHT_SHOULDER);
     }
 

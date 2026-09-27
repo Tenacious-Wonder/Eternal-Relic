@@ -60,19 +60,19 @@ public final class ShoulderGuardEffect {
     }
 
     /**
-     * 算出这一击应当少掉多少伤害，并把便条取走。
+     * 算出这一击应当少掉多少伤害。
      *
-     * <p><b>每一次伤害结算都必须调用它</b>，哪怕玩家身上一件肩甲都没有：
-     * 便条正是在这里被取走并清掉的，跳过它就等于把便条留在了桌上。</p>
+     * <p><b>便条现在由调用方取</b>：一件胸甲上可以同时缝着肩甲与胸甲片，而便条取一次就没了
+     * （见 {@link RecentBodyPartHit}），因此改由伤害结算那一处先取走部位，再分别问肩甲与胸甲片
+     * （见 {@code mixin/PlayerDamageMixin}）。本方法只管「给定部位，该减多少」。</p>
      *
-     * <p>打中的部位由便条给出；便条过期（那一击并没有真的落下）时返回 0，
-     * 于是这一击按原样结算。这一条路只管「少了多少」，扣到 0 为止由调用方保证。</p>
+     * <p>这一条路只管「少了多少」，扣到 0 为止由调用方保证。</p>
      *
      * @param player 挨打的玩家
-     * @return 这一击应当少掉的伤害点数；没有肩甲护着、或便条已过期时返回 0
+     * @param part   这一击打中的部位；没有有效便条时为 {@code null}
+     * @return 这一击应当少掉的伤害点数；没有肩甲护着、或打在别处时返回 0
      */
-    public static float reductionFor(PlayerEntity player) {
-        BodyPart part = RecentBodyPartHit.consume(player);
+    public static float reductionFor(PlayerEntity player, BodyPart part) {
         if (part == null) {
             return 0.0F;
         }

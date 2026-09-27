@@ -31,7 +31,7 @@ import org.eternalrelic.relic.RelicAttachment;
  *       因此可以叠着钉——这本来就是纹章该有的样子。</li>
  * </ul>
  *
- * <p><b>分档变体要填同一类</b>：皮革 / 鳞片 / 龟壳三种肩甲是同一样东西的三个档次，
+ * <p><b>分档变体要填同一类</b>：皮革 / 鳞片 / 龟壳 / 铁片 / 铜片这几种肩甲是同一样东西的不同做法，
  * 所以它们共用 {@link FittingCategory#SHOULDER_LEFT} 之类的同一个类别，彼此互斥；
  * 而<b>左与右分成两类</b>，玩家才能一边挂一只。</p>
  *
@@ -189,6 +189,71 @@ public final class AttachableRelics {
                 ModItems.TURTLE_SHELL_SHOULDER_GUARD_PAIR,
                 FittingCategory.SHOULDER_PAIR,
                 Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        // 铁片肩甲（左 / 右 / 一套）：与前三档肩甲同一路登记——只缝胸甲、只认附着份、
+        // 左中右各自成类（同侧的铁片与皮革互斥，正是"同类只能一件"的意思）。
+        // 辅料不同于前三档的线，用**铁粒**：这是制作者指定的，铁做的甲片拿铁粒来缝
+        RelicAttachment.registerFitting(
+                ModItems.IRON_SHOULDER_GUARD_LEFT,
+                FittingCategory.SHOULDER_LEFT,
+                Items.IRON_NUGGET,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        RelicAttachment.registerFitting(
+                ModItems.IRON_SHOULDER_GUARD_RIGHT,
+                FittingCategory.SHOULDER_RIGHT,
+                Items.IRON_NUGGET,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        RelicAttachment.registerFitting(
+                ModItems.IRON_SHOULDER_GUARD_PAIR,
+                FittingCategory.SHOULDER_PAIR,
+                Items.IRON_NUGGET,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        // 铜片肩甲（左 / 右 / 一套）：与铁片那三件同一路登记，辅料同样是铁粒。
+        // 类别也照旧按左右分开——同侧的铜片与皮革、鳞片、龟壳、铁片互斥
+        RelicAttachment.registerFitting(
+                ModItems.COPPER_SHOULDER_GUARD_LEFT,
+                FittingCategory.SHOULDER_LEFT,
+                Items.IRON_NUGGET,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        RelicAttachment.registerFitting(
+                ModItems.COPPER_SHOULDER_GUARD_RIGHT,
+                FittingCategory.SHOULDER_RIGHT,
+                Items.IRON_NUGGET,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        RelicAttachment.registerFitting(
+                ModItems.COPPER_SHOULDER_GUARD_PAIR,
+                FittingCategory.SHOULDER_PAIR,
+                Items.IRON_NUGGET,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        // 秘银胸甲片：新的一类配件「胸甲片」，只贴胸甲正面，辅料用铁粒（与铁片、铜片肩甲一致）。
+        // 它自成一类，因此可以与肩甲、内衬同时缝在一件胸甲上；但一件胸甲上只能有一片胸甲片
+        RelicAttachment.registerFitting(
+                ModItems.MITHRIL_CHESTPLATE_PLATE,
+                FittingCategory.CHESTPLATE_PLATE,
+                Items.IRON_NUGGET,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        // 铜胸甲片：与秘银那一片同一路登记——同样只贴胸甲正面、同样配铁粒。
+        // 类别也相同（胸甲片），因此两片互斥：一件胸甲上只能挑一片
+        RelicAttachment.registerFitting(
+                ModItems.COPPER_CHESTPLATE_PLATE,
+                FittingCategory.CHESTPLATE_PLATE,
+                Items.IRON_NUGGET,
                 RelicAttachment.Stacking.NONE,
                 AttachTarget.CHESTPLATE);
 

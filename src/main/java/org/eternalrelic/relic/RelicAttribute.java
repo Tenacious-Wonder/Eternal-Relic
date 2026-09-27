@@ -24,7 +24,16 @@ public enum RelicAttribute {
     ARMOR(EntityAttributes.GENERIC_ARMOR),
 
     /** 盔甲韧性 —— 挨重击时用来保住减伤的属性，护甲条与提示框上都不显示。 */
-    ARMOR_TOUGHNESS(EntityAttributes.GENERIC_ARMOR_TOUGHNESS);
+    ARMOR_TOUGHNESS(EntityAttributes.GENERIC_ARMOR_TOUGHNESS),
+
+    /**
+     * 攻击速度 —— 挥砍之后那一下的冷却恢复快慢。
+     *
+     * <p>本模组目前只用它做<b>负面代价</b>：铁片肩甲缝得越多，挥砍越慢（见
+     * {@code registry/ModRelics}）。登记的是负的百分比，因此换什么武器都是「慢掉同样的比例」，
+     * 而不是「固定的点数」——后者会让本来攻速就低的武器慢得不成比例。</p>
+     */
+    ATTACK_SPEED(EntityAttributes.GENERIC_ATTACK_SPEED);
 
     private final EntityAttribute attribute;
 

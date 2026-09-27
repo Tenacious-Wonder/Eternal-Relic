@@ -288,7 +288,8 @@ public final class ModItems {
      * 龟壳肩甲（左）—— 缝在胸甲上的龟壳护片，护住玩家自身的左肩。
      *
      * <p>与皮革、鳞片两档同一路数：<b>放在背包里完全没有用</b>，必须缝在正穿着的那件胸甲上，
-     * 而且只认胸甲。它是三档里唯一会动远程的那一件——打在左肩上的箭有几率被整个弹开。</p>
+     * 而且只认胸甲。打在左肩上的箭有几率被整个弹开——会弹的两档里，它是概率较低的那一档
+     * （10%；铁片那档是 20%）。</p>
      *
      * <p>它由<b>皮革肩甲（左）缝上三块海龟壳</b>做成，与鳞片肩甲并列成两条进阶路线：
      * 鳞片那条给的盔甲韧性更高，龟壳这条韧性低一些，换来一手弹开远程的本事。</p>
@@ -309,6 +310,82 @@ public final class ModItems {
      * 韧性同样是左右两只相加的结果。</p>
      */
     public static final Item TURTLE_SHELL_SHOULDER_GUARD_PAIR = register("turtle_shell_shoulder_guard_pair",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 铁片肩甲（左）—— 缝在胸甲上的铁板护片，护住玩家自身的左肩。
+     *
+     * <p>与前三档肩甲同一路数：<b>放在背包里完全没有用</b>，必须缝在正穿着的那件胸甲上，
+     * 而且只认胸甲。它是四档里最重的一件：打在护着那一侧的远程攻击有<b>两成</b>的几率被整个弹开
+     * （龟壳那档只有一成），代价是每缝一枚都让<b>挥砍慢 4%</b>——好处与代价都登记在
+     * {@code registry/ShoulderGuards} 与遗物表里，这个类只管注册物品。</p>
+     */
+    public static final Item IRON_SHOULDER_GUARD_LEFT = register("iron_shoulder_guard_left",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 铁片肩甲（右）—— 与左肩那只成对，护住玩家自身的右肩。
+     */
+    public static final Item IRON_SHOULDER_GUARD_RIGHT = register("iron_shoulder_guard_right",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 一套铁片肩甲 —— 左右两只合成而来的整体，两侧肩膀都护，两侧的箭都可能被弹开。
+     *
+     * <p>与前三档一样，做成一件是为了让玩家在胸甲上只占掉<b>一个</b>附着格。
+     * 挥砍的代价也<b>只算一枚</b>（4%），比左右各缝一只（合计 8%）轻——这正是合成一套的意义。</p>
+     */
+    public static final Item IRON_SHOULDER_GUARD_PAIR = register("iron_shoulder_guard_pair",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 铜片肩甲（左）—— 缝在胸甲上的铜板护片，护住玩家自身的左肩。
+     *
+     * <p>与铁片肩甲同一路数：<b>放在背包里完全没有用</b>，必须缝在正穿着的那件胸甲上，
+     * 而且只认胸甲。它是四档里<b>最薄的一件</b>（打在护着那一侧时只少掉 1.5 点，皮革那只还有 2 点），
+     * 换来的是不用等好材料就能拨箭：远程打中那一侧时有<b>一成半</b>的几率被整个弹开。
+     * 代价与铁片相同——每缝一枚挥砍慢 4%，登记在遗物表里。</p>
+     */
+    public static final Item COPPER_SHOULDER_GUARD_LEFT = register("copper_shoulder_guard_left",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 铜片肩甲（右）—— 与左肩那只成对，护住玩家自身的右肩。
+     */
+    public static final Item COPPER_SHOULDER_GUARD_RIGHT = register("copper_shoulder_guard_right",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 一套铜片肩甲 —— 左右两只合成而来的整体，两侧肩膀都护，两侧的箭都可能被弹开。
+     *
+     * <p>与其它几档一样，做成一件是为了让玩家在胸甲上只占掉<b>一个</b>附着格；
+     * 挥砍的代价也只算一枚（4%）。</p>
+     */
+    public static final Item COPPER_SHOULDER_GUARD_PAIR = register("copper_shoulder_guard_pair",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 秘银胸甲片 —— 贴在胸甲正面的一块圆形甲片，护住正胸。
+     *
+     * <p>它是本模组第一件<b>胸甲片</b>：与肩甲、内衬、甲片是并列的配件类别，
+     * 因此它可以与肩甲同时缝在一件胸甲上，但<b>一件胸甲上只能有一片胸甲片</b>
+     * （见 {@code relic/FittingCategory}）。</p>
+     *
+     * <p>它护的是<b>正胸</b>——背后挨的刀落在后背那一块上，它一点都挡不住，弹开远程
+     * 也只对正面射来的箭有效。另一手是替玩家挡下魔法伤害，那一条不看部位。
+     * 具体数值见 {@code registry/ChestplatePlates} 与遗物表。</p>
+     */
+    public static final Item MITHRIL_CHESTPLATE_PLATE = register("mithril_chestplate_plate",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 铜胸甲片 —— 最普通的一片胸甲片，护住正胸。
+     *
+     * <p>与秘银胸甲片同属「胸甲片」这一类，因此一件胸甲上只能二选一。它的本事只有秘银那一片的
+     * 一半：减得少、弹开概率也低，而且<b>不挡魔法、不给盔甲韧性</b>；代价是穿着走路略慢
+     * （那一条登记在遗物表里）。</p>
+     */
+    public static final Item COPPER_CHESTPLATE_PLATE = register("copper_chestplate_plate",
             new RelicItem(new Item.Settings().maxCount(1)));
 
     /**
@@ -418,6 +495,7 @@ public final class ModItems {
         ModRelics.register();
         AttachableRelics.register();
         ShoulderGuards.register();
+        ChestplatePlates.register();
         DayNightEmblems.register();
         EnchantingRelics.register();
         VanillaMaterialRarities.register();
@@ -465,6 +543,14 @@ public final class ModItems {
             entries.add(TURTLE_SHELL_SHOULDER_GUARD_LEFT);
             entries.add(TURTLE_SHELL_SHOULDER_GUARD_RIGHT);
             entries.add(TURTLE_SHELL_SHOULDER_GUARD_PAIR);
+            entries.add(IRON_SHOULDER_GUARD_LEFT);
+            entries.add(IRON_SHOULDER_GUARD_RIGHT);
+            entries.add(IRON_SHOULDER_GUARD_PAIR);
+            entries.add(COPPER_SHOULDER_GUARD_LEFT);
+            entries.add(COPPER_SHOULDER_GUARD_RIGHT);
+            entries.add(COPPER_SHOULDER_GUARD_PAIR);
+            entries.add(COPPER_CHESTPLATE_PLATE);
+            entries.add(MITHRIL_CHESTPLATE_PLATE);
             entries.add(ARMADILLO_SCUTE);
             entries.add(NIGHTWATCH_EYE_LEFT);
             entries.add(NIGHTWATCH_EYE_RIGHT);
