@@ -170,6 +170,88 @@ public final class ModRelics {
             MaterialRarity.ROUGH_STONE);
 
     /**
+     * 旅人吊坠 —— 带在身上时，骑乘坐骑的移动速度提升一成半。
+     *
+     * <p>它<b>没有任何属性加成</b>：这份加速落在玩家骑的那只坐骑身上，而不是玩家自己身上，
+     * 因此走不了「属性加成一栏」——那一栏加的永远是玩家自己的属性，而骑乘时的速度只看坐骑的。
+     * 挂上与摘下的时机由
+     * {@link org.eternalrelic.capability.carried.TravelerPendantEffect} 每 5 刻核对一次。</p>
+     *
+     * <p><b>带多枚也只算一次</b>：这里登记的效果为空，能力类只问「带没带」，不问带了几枚。</p>
+     *
+     * <p>固有稀有度为粗石：一块磨得发亮的旧铜板，顶用，但称不上讲究。</p>
+     */
+    public static final RelicDefinition TRAVELER_PENDANT = define(
+            ModItems.TRAVELER_PENDANT,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 学者单片眼镜 —— 带在身上时，每次获得经验都会额外得到一点。
+     *
+     * <p>它<b>没有任何属性加成</b>：经验是游戏在结算时算出来的一个数字，既不是玩家的属性，
+     * 也不能靠「多挂一条」表示，因此这里只登记身份与成色，实际那一点由
+     * {@link org.eternalrelic.mixin.PlayerEntityMixin} 在经验落到玩家身上的那一刻加上去。</p>
+     *
+     * <p><b>带多枚也只算一点</b>：这里登记的效果为空，注入那一处只问「带没带」。</p>
+     *
+     * <p>固有稀有度为粗石：一只做工讲究的小镜子，好用，但谈不上稀罕。</p>
+     */
+    public static final RelicDefinition SCHOLAR_MONOCLE = define(
+            ModItems.SCHOLAR_MONOCLE,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 铸铁拇指戒 —— 带在身上时，用的工具与武器有 5% 的机会不掉耐久。
+     *
+     * <p>它<b>没有任何属性加成</b>：耐久是在物品自己身上一点点扣掉的，既不是玩家的属性，
+     * 也无法靠「多挂一条」表示，因此这里只登记身份与成色，真正的拦截写在
+     * {@link org.eternalrelic.mixin.ItemStackDurabilityMixin} 里——耐久将要落下的那一刻
+     * 掷一次骰子，中了就整次不扣。</p>
+     *
+     * <p><b>只认工具与武器</b>：护甲挨打时也掉耐久，而它走的是同一条路，因此那个注入点
+     * 按物品类别把关（判据复用 {@code AttachTarget} 的分类）。</p>
+     *
+     * <p><b>带多枚也只算 5%</b>：这里登记的效果为空，注入那一处只问「带没带」。</p>
+     *
+     * <p>固有稀有度为粗石：一只没有纹路的铁戒指，顶用，但称不上讲究。</p>
+     */
+    public static final RelicDefinition CAST_IRON_THUMB_RING = define(
+            ModItems.CAST_IRON_THUMB_RING,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 猎人徽章 —— 带在身上时，击杀生物有 5% 的机会额外多掉一件战利品。
+     *
+     * <p>它<b>没有任何属性加成</b>：掉落结果是游戏照掉落表算出来的，既不是玩家的属性，
+     * 也无法靠「多挂一条」表示，因此这里只登记身份与成色。真正的加料写在
+     * {@link org.eternalrelic.capability.carried.HunterBadgeEffect} 里——击杀时先记下
+     * 掉落表给出的每一样东西，再从中随机挑一样、数量多给一个。</p>
+     *
+     * <p><b>只有玩家击杀才算</b>，且带多枚也只算 5%。</p>
+     *
+     * <p>固有稀有度为粗石：一枚饱经风霜的旧徽章，顶用，但称不上讲究。</p>
+     */
+    public static final RelicDefinition HUNTER_BADGE = define(
+            ModItems.HUNTER_BADGE,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 一个圆形的饼 —— 吃下去，人当场回到自己的重生点，并在十秒里飞快回血。
+     *
+     * <p><b>它是本模组第一件消耗品，也是第一件「吃下去才生效」的遗物</b>：效果发生在它消失的
+     * 那一刻，此后什么都不剩。因此这里既没有携带效果、也不在挨打时出手，只登记身份与成色；
+     * 真正的那两件事由 {@link org.eternalrelic.capability.consumed.RoundCakeEffect}
+     * 在吃完时执行。</p>
+     *
+     * <p>填饱肚子的份量与南瓜派逐字相同（直接沿用原版那一份食物数据）。</p>
+     *
+     * <p>固有稀有度为粗石：一块家常的吃食，难得的是那份心意。</p>
+     */
+    public static final RelicDefinition ROUND_CAKE = define(
+            ModItems.ROUND_CAKE,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
      * 永恒纹章 —— 钉在一件物品上，使那件物品不会被火烧、岩浆、爆炸、仙人掌与虚空毁掉，
      * 并视同带有「经验修补」。
      *

@@ -2,6 +2,7 @@ package org.eternalrelic.registry;
 
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.item.FoodComponents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -19,6 +20,7 @@ import org.eternalrelic.item.EchoRingItem;
 import org.eternalrelic.item.EnchantedRabbitFootItem;
 import org.eternalrelic.item.NightwatchEyeItem;
 import org.eternalrelic.item.RelicItem;
+import org.eternalrelic.item.RoundCakeItem;
 import org.eternalrelic.item.SoulLanternItem;
 import org.eternalrelic.relic.NightwatchEye;
 
@@ -98,6 +100,60 @@ public final class ModItems {
      */
     public static final Item DREADFUL_WOLF_FANG_PENDANT = register("dreadful_wolf_fang_pendant",
             new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 旅人吊坠 —— 带在身上时，骑乘坐骑赶路更快。
+     *
+     * <p><b>它是本模组第一件「作用在坐骑身上」的遗物</b>：骑乘时的速度由坐骑自己的移动速度决定，
+     * 与骑手的移动速度毫无关系，所以这份加速必须挂到坐骑身上去，不能像其它遗物那样加在玩家身上。
+     * 挂上与摘下的时机见
+     * {@link org.eternalrelic.capability.carried.TravelerPendantEffect}。</p>
+     */
+    public static final Item TRAVELER_PENDANT = register("traveler_pendant",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 学者单片眼镜 —— 带在身上时，每次获得经验都额外多给一点。
+     *
+     * <p><b>它是本模组第一件「改变经验结算」的遗物</b>：经验是游戏自己算出来的一个数字，
+     * 因此只能在那一步把数字改掉，见
+     * {@link org.eternalrelic.mixin.PlayerEntityMixin}。</p>
+     */
+    public static final Item SCHOLAR_MONOCLE = register("scholar_monocle",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 铸铁拇指戒 —— 带在身上时，用的工具与武器偶尔不掉耐久。
+     *
+     * <p><b>它是本模组第一件「改变耐久损耗」的遗物</b>：耐久是在游戏内部扣的，
+     * 因此只能在那一步替玩家把这一次拦下来，见
+     * {@link org.eternalrelic.mixin.ItemStackDurabilityMixin}。</p>
+     */
+    public static final Item CAST_IRON_THUMB_RING = register("cast_iron_thumb_ring",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 猎人徽章 —— 带在身上时，击杀生物有机会额外多掉一件战利品。
+     *
+     * <p><b>它是本模组第一件「改变掉落结果」的遗物</b>：死掉的生物掉什么是游戏照掉落表算出来的，
+     * 因此只能守在「跑掉落表」那一步加料，见
+     * {@link org.eternalrelic.mixin.LivingEntityMixin}。</p>
+     */
+    public static final Item HUNTER_BADGE = register("hunter_badge",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 一个圆形的饼 —— 吃下去回到重生点，并给一段快速回血。
+     *
+     * <p><b>它是本模组第一件消耗品，也是第一件「吃下去才生效」的遗物</b>：效果发生在它消失的
+     * 那一刻，因此行为写在 {@link RoundCakeItem} 里，接的是游戏给食物留的「吃完时」那个口子，
+     * 不必改动游戏内部代码。</p>
+     *
+     * <p>填饱肚子的份量直接用原版南瓜派那一份（{@link FoodComponents#PUMPKIN_PIE}），
+     * 与原版逐字一致，不另外手写一遍。可堆叠，与南瓜派相同。</p>
+     */
+    public static final Item ROUND_CAKE = register("round_cake",
+            new RoundCakeItem(new Item.Settings().food(FoodComponents.PUMPKIN_PIE)));
 
     /**
      * 永恒纹章 —— 钉在任意防具、武器或工具上，使那件东西不再被毁掉，并视同带有经验修补。
@@ -386,6 +442,11 @@ public final class ModItems {
             entries.add(ENCHANTED_RABBIT_FOOT);
             entries.add(BEESWAX_PENDANT);
             entries.add(DREADFUL_WOLF_FANG_PENDANT);
+            entries.add(TRAVELER_PENDANT);
+            entries.add(SCHOLAR_MONOCLE);
+            entries.add(CAST_IRON_THUMB_RING);
+            entries.add(HUNTER_BADGE);
+            entries.add(ROUND_CAKE);
             entries.add(ETERNAL_EMBLEM);
             entries.add(STREAM_EMBLEM);
             entries.add(SUN_EMBLEM);

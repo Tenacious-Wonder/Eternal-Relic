@@ -20,6 +20,7 @@ public class RegistryInit {
         CarriedRelicEffect.register();
         DamageWardEffect.register();
         EnchantedRabbitFootEffect.register();
+        TravelerPendantEffect.register();
         DayNightEmblemEffect.register();
         ShoulderGuardEffect.register();
         SoulLanternEffect.register();

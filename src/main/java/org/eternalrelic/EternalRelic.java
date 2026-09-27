@@ -9,12 +9,16 @@ import org.slf4j.LoggerFactory;
 
 import org.eternalrelic.capability.carried.BeeswaxPendantEffect;
 import org.eternalrelic.capability.carried.CarriedRelicEffect;
+import org.eternalrelic.capability.carried.CastIronThumbRingEffect;
 import org.eternalrelic.capability.carried.CourageEmblemEffect;
 import org.eternalrelic.capability.carried.DamageWardEffect;
 import org.eternalrelic.capability.carried.EnchantedRabbitFootEffect;
+import org.eternalrelic.capability.carried.HunterBadgeEffect;
 import org.eternalrelic.capability.carried.SoulLanternEffect;
+import org.eternalrelic.capability.carried.TravelerPendantEffect;
 import org.eternalrelic.capability.carried.WolfAweEffect;
 import org.eternalrelic.capability.carried.WolfTamingEffect;
+import org.eternalrelic.capability.consumed.RoundCakeEffect;
 import org.eternalrelic.capability.worn.NightwatchEyeVision;
 import org.eternalrelic.capability.worn.WornRelicEffect;
 import org.eternalrelic.debug.BodyPartHitReport;
@@ -39,6 +43,10 @@ import org.eternalrelic.network.SoulLanternNetwork;
  *   <li>{@link CourageEmblemEffect} —— 「定时馈赠」能力：每隔一分钟替玩家攒下两颗金心。</li>
  *   <li>{@link EnchantedRabbitFootEffect} —— 「受击加速」能力：挨打时换来一段速度，不挡伤害。</li>
  *   <li>{@link BeeswaxPendantEffect} —— 「挡下蜂毒」能力：被蜜蜂蜇时照常挨伤害，只是不会中毒。</li>
+ *   <li>{@link TravelerPendantEffect} —— 「骑乘加速」能力：骑着坐骑赶路时，那只坐骑跑得更快。</li>
+ *   <li>{@link HunterBadgeEffect} —— 「猎人收获」能力：击杀生物时，偶尔多掉一件战利品。</li>
+ *   <li>{@link CastIronThumbRingEffect} —— 「保住耐久」能力：用工具与武器时，偶尔一点耐久都不掉。</li>
+ *   <li>{@link RoundCakeEffect} —— 「一口还乡」能力：吃下那块饼，人当场回到重生点并飞快回血。</li>
  *   <li>{@link WolfAweEffect} —— 「野狼慑服」能力：身边的野狼被狼王气息镇住而坐下，走开即恢复。</li>
  *   <li>{@link WolfTamingEffect} —— 「喂骨头更容易认主」能力：把驯服狼的机会从三分之一抬到六分之五。</li>
  *   <li>{@link WornRelicEffect} —— 「装入生效」能力：把守夜之瞳装进眼中，并让代价跟随玩家。</li>
