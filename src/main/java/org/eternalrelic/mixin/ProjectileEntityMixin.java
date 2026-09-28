@@ -17,8 +17,7 @@ import org.eternalrelic.bodypart.BodyPart;
 import org.eternalrelic.bodypart.BodyPartHits;
 import org.eternalrelic.bodypart.BodyPartResolver;
 import org.eternalrelic.bodypart.ProjectileBodyPartHit;
-import org.eternalrelic.capability.attached.ChestplatePlateEffect;
-import org.eternalrelic.capability.attached.ShoulderGuardEffect;
+import org.eternalrelic.capability.attached.ChestGuardEffect;
 import org.eternalrelic.debug.BodyPartHitReport;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -105,7 +104,7 @@ public abstract class ProjectileEntityMixin {
         // 肩甲（龟壳 / 铁片 / 铜片）与胸甲片（秘银）：打中护着那一块的箭有几率被整个弹开。
         // 这里拦下原版的命中处理（于是这一箭既不造成伤害、也不会扎进身体），
         // 再照原版的动作把它崩回去
-        if (ShoulderGuardEffect.deflects(player, part) || ChestplatePlateEffect.deflects(player, part)) {
+        if (ChestGuardEffect.deflects(player, part)) {
             DEFLECTED.put(projectile, player.getUuid());
             deflect(projectile);
             BodyPartHitReport.reportDeflected(hit);

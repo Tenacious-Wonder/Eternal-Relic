@@ -1,5 +1,7 @@
 package org.eternalrelic.client.render;
 
+import java.util.function.DoubleSupplier;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
@@ -13,6 +15,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 
 import org.eternalrelic.EternalRelic;
 import org.eternalrelic.registry.ModItems;
@@ -39,6 +42,10 @@ import org.eternalrelic.registry.ModItems;
  *   <li>取不到模型要判空、并在两个模型之间兜底，两个都取不到就这一帧不画——
  *       在渲染里抛出异常会让客户端当场闪退。</li>
  * </ul>
+ *
+ * <p><b>第一人称的摇动是可选的。</b>构造时传了「角度供给」的物品（目前只有牧羊人铃铛）会按那一刻
+ * 给出的角度摆动，其余物品照旧纹丝不动——<b>角度为 0 就完全不动</b>。摆动<b>只在第一人称发生</b>：
+ * 第三人称与别人眼里的姿态由模型自己的 {@code display} 决定，这里不去插手。</p>
  */
 @Environment(EnvType.CLIENT)
 public class FlatAndThreeDItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
@@ -55,15 +62,43 @@ public class FlatAndThreeDItemRenderer implements BuiltinItemRendererRegistry.Dy
     private static final Identifier SMALL_HAMMER_FLAT = id("item/small_hammer_flat");
     private static final Identifier SMALL_HAMMER_3D = id("item/small_hammer_3d");
 
+    /** 牧羊人铃铛的平面图标与立体模型。 */
+    private static final Identifier SHEPHERD_BELL_FLAT = id("item/shepherd_bell_flat");
+    private static final Identifier SHEPHERD_BELL_3D = id("item/shepherd_bell_3d");
+
+    /**
+     * 摇摆的支点——<b>黑环的最顶端</b>。
+     *
+     * <p>坐标取自模型里那个黑环旋转之后最高的那个顶点（8.07 / 6.63 / 7.95，除以 16 换算到此处的
+     * 0~1 空间）。铃铛因此像挂在这只环上一样左右摆，而不是绕自己的腰拧。</p>
+     */
+    private static final float SWING_PIVOT_X = 0.504375F;
+    private static final float SWING_PIVOT_Y = 0.414375F;
+    private static final float SWING_PIVOT_Z = 0.496875F;
+
     /** 物品栏里用的那个平面图标。 */
     private final Identifier flatModel;
 
     /** 手持与掉在地上用的立体模型。 */
     private final Identifier threeDModel;
 
+    /**
+     * 第一人称里这一刻应该摆到多少度。
+     *
+     * <p>由物品自己决定：铃铛交给 {@link ShepherdBellSwing}，平时它一直返回 0，也就是「纹丝不动」；
+     * 摇响之后才给出那半秒的摆动角度。</p>
+     */
+    private final DoubleSupplier firstPersonAngle;
+
     public FlatAndThreeDItemRenderer(Identifier flatModel, Identifier threeDModel) {
+        this(flatModel, threeDModel, null);
+    }
+
+    public FlatAndThreeDItemRenderer(Identifier flatModel, Identifier threeDModel,
+            DoubleSupplier firstPersonAngle) {
         this.flatModel = flatModel;
         this.threeDModel = threeDModel;
+        this.firstPersonAngle = firstPersonAngle == null ? () -> 0.0D : firstPersonAngle;
     }
 
     /**
@@ -76,11 +111,16 @@ public class FlatAndThreeDItemRenderer implements BuiltinItemRendererRegistry.Dy
         ModelLoadingPlugin.register(context -> context.addModels(
                 SOUL_LANTERN_FLAT, SOUL_LANTERN_3D,
                 HAMMER_FLAT, HAMMER_3D,
-                SMALL_HAMMER_FLAT, SMALL_HAMMER_3D));
+                SMALL_HAMMER_FLAT, SMALL_HAMMER_3D,
+                SHEPHERD_BELL_FLAT, SHEPHERD_BELL_3D));
 
         registerItem(ModItems.SOUL_LANTERN, SOUL_LANTERN_FLAT, SOUL_LANTERN_3D);
         registerItem(ModItems.HAMMER, HAMMER_FLAT, HAMMER_3D);
         registerItem(ModItems.SMALL_HAMMER, SMALL_HAMMER_FLAT, SMALL_HAMMER_3D);
+
+        // 铃铛平时拿在手里纹丝不动，只有摇响的那半秒里晃两下——角度由它自己的动画给出
+        registerItem(ModItems.SHEPHERD_BELL, SHEPHERD_BELL_FLAT, SHEPHERD_BELL_3D,
+                ShepherdBellSwing::currentDegrees);
     }
 
     /**
@@ -114,6 +154,15 @@ public class FlatAndThreeDItemRenderer implements BuiltinItemRendererRegistry.Dy
         // 所以先把那半格补回来，否则整件东西会偏出去半格。
         matrices.translate(0.5F, 0.5F, 0.5F);
 
+        // 只在第一人称、且这一刻真的该摆时才绕挂环摆一下；平时角度是 0，纹丝不动
+        if (isFirstPerson(mode)) {
+            float swing = (float) this.firstPersonAngle.getAsDouble();
+            if (swing != 0.0F) {
+                swingAroundPivot(matrices,
+                        mode == ModelTransformationMode.FIRST_PERSON_LEFT_HAND ? -swing : swing);
+            }
+        }
+
         // 走原版的物品渲染：四个参数里的 false 表示"不要自己再套一次显示变换"，
         // 模型已经由上面挑好并传进去
         MinecraftClient.getInstance().getItemRenderer()
@@ -128,7 +177,45 @@ public class FlatAndThreeDItemRenderer implements BuiltinItemRendererRegistry.Dy
      * @param threeDModel 它拿在手上与掉在地上用的立体模型编号
      */
     private static void registerItem(Item item, Identifier flatModel, Identifier threeDModel) {
-        BuiltinItemRendererRegistry.INSTANCE.register(item, new FlatAndThreeDItemRenderer(flatModel, threeDModel));
+        registerItem(item, flatModel, threeDModel, null);
+    }
+
+    /**
+     * 给一件物品接上本渲染器，并决定它第一人称里怎么摆。
+     *
+     * @param item             目标物品
+     * @param flatModel        它在物品栏里用的平面图标编号
+     * @param threeDModel      它拿在手上与掉在地上用的立体模型编号
+     * @param firstPersonAngle 第一人称里这一刻该摆多少度；传 {@code null} 表示永远不动
+     */
+    private static void registerItem(Item item, Identifier flatModel, Identifier threeDModel,
+            DoubleSupplier firstPersonAngle) {
+        BuiltinItemRendererRegistry.INSTANCE.register(item,
+                new FlatAndThreeDItemRenderer(flatModel, threeDModel, firstPersonAngle));
+    }
+
+    /**
+     * @param mode 显示场景
+     * @return 这一帧是不是画在玩家自己的第一人称视野里
+     */
+    private static boolean isFirstPerson(ModelTransformationMode mode) {
+        return mode == ModelTransformationMode.FIRST_PERSON_RIGHT_HAND
+                || mode == ModelTransformationMode.FIRST_PERSON_LEFT_HAND;
+    }
+
+    /**
+     * 把物品绕它顶端的挂环摆一个角度。
+     *
+     * <p><b>为什么支点要自己指定</b>：原点在模型中心，直接绕着它转的话，铃铛会像被拧了一圈，
+     * 而不是在摇。挂在环上摆，才是这类东西该有的样子。</p>
+     *
+     * @param matrices 矩阵栈
+     * @param degrees  要摆到的角度（度）
+     */
+    private static void swingAroundPivot(MatrixStack matrices, float degrees) {
+        matrices.translate(SWING_PIVOT_X, SWING_PIVOT_Y, SWING_PIVOT_Z);
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(degrees));
+        matrices.translate(-SWING_PIVOT_X, -SWING_PIVOT_Y, -SWING_PIVOT_Z);
     }
 
     /**

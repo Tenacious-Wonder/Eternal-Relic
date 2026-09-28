@@ -21,6 +21,7 @@ import org.eternalrelic.item.EnchantedRabbitFootItem;
 import org.eternalrelic.item.NightwatchEyeItem;
 import org.eternalrelic.item.RelicItem;
 import org.eternalrelic.item.RoundCakeItem;
+import org.eternalrelic.item.ShepherdBellItem;
 import org.eternalrelic.item.SoulLanternItem;
 import org.eternalrelic.relic.NightwatchEye;
 
@@ -154,6 +155,17 @@ public final class ModItems {
      */
     public static final Item HUNTER_BADGE = register("hunter_badge",
             new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 牧羊人铃铛 —— 拿在主手右键摇响，把四十格内的羊叫到身边的遗物。
+     *
+     * <p><b>它是本模组第一件「让别的生物自己动起来」的遗物</b>：此前所有遗物的作用对象不是玩家
+     * 就是物品，这一件改的是羊的行走目标——铃声一响，范围内的羊自己调头朝你走过来。
+     * 摇铃不消耗物品，唯一的门槛是那 30 秒冷却，判定见
+     * {@link org.eternalrelic.capability.carried.ShepherdBellEffect}。</p>
+     */
+    public static final Item SHEPHERD_BELL = register("shepherd_bell",
+            new ShepherdBellItem(new Item.Settings().maxCount(1)));
 
     /**
      * 一个圆形的饼 —— 吃下去回到重生点，并给一段快速回血。
@@ -331,7 +343,7 @@ public final class ModItems {
      * <p>与前三档肩甲同一路数：<b>放在背包里完全没有用</b>，必须缝在正穿着的那件胸甲上，
      * 而且只认胸甲。它是四档里最重的一件：打在护着那一侧的远程攻击有<b>两成</b>的几率被整个弹开
      * （龟壳那档只有一成），代价是每缝一枚都让<b>挥砍慢 4%</b>——好处与代价都登记在
-     * {@code registry/ShoulderGuards} 与遗物表里，这个类只管注册物品。</p>
+     * {@code registry/ChestGuards} 与遗物表里，这个类只管注册物品。</p>
      */
     public static final Item IRON_SHOULDER_GUARD_LEFT = register("iron_shoulder_guard_left",
             new RelicItem(new Item.Settings().maxCount(1)));
@@ -386,7 +398,7 @@ public final class ModItems {
      *
      * <p>它护的是<b>正胸</b>——背后挨的刀落在后背那一块上，它一点都挡不住，弹开远程
      * 也只对正面射来的箭有效。另一手是替玩家挡下魔法伤害，那一条不看部位。
-     * 具体数值见 {@code registry/ChestplatePlates} 与遗物表。</p>
+     * 具体数值见 {@code registry/ChestGuards} 与遗物表。</p>
      */
     public static final Item MITHRIL_CHESTPLATE_PLATE = register("mithril_chestplate_plate",
             new RelicItem(new Item.Settings().maxCount(1)));
@@ -399,6 +411,19 @@ public final class ModItems {
      * （那一条登记在遗物表里）。</p>
      */
     public static final Item COPPER_CHESTPLATE_PLATE = register("copper_chestplate_plate",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 巡夜斗篷 —— 披在胸甲外的一件乌黑斗篷，夜里让人保持清醒。
+     *
+     * <p><b>它的三样本事分属三条路，因此这里只登记身份与成色</b>：夜里（且所处亮度低于 7）的
+     * 移速加成、缝在胸甲上时给的盔甲韧性，两样都由
+     * {@link org.eternalrelic.capability.carried.NightWatchCloakEffect} 按条件挂上挂下；
+     * 「后背挨打少掉 1 点」那一条登记在 {@code registry/ChestGuards} 胸甲护具表里。</p>
+     *
+     * <p>它是全项目第一件<b>条件性属性加成</b>：带着它不一定立刻见效，得等天黑。</p>
+     */
+    public static final Item NIGHTWATCH_CLOAK = register("nightwatch_cloak",
             new RelicItem(new Item.Settings().maxCount(1)));
 
     /**
@@ -507,8 +532,7 @@ public final class ModItems {
     public static void register() {
         ModRelics.register();
         AttachableRelics.register();
-        ShoulderGuards.register();
-        ChestplatePlates.register();
+        ChestGuards.register();
         DayNightEmblems.register();
         EnchantingRelics.register();
         VanillaMaterialRarities.register();
@@ -556,6 +580,7 @@ public final class ModItems {
             // 胸甲片：贴在胸甲正面的圆甲片
             entries.add(COPPER_CHESTPLATE_PLATE);
             entries.add(MITHRIL_CHESTPLATE_PLATE);
+            entries.add(NIGHTWATCH_CLOAK);
         });
 
         ItemGroupEvents.modifyEntriesEvent(RELIC_GROUP_KEY).register(entries -> {
@@ -575,7 +600,11 @@ public final class ModItems {
             entries.add(SCHOLAR_MONOCLE);
             entries.add(CAST_IRON_THUMB_RING);
             entries.add(HUNTER_BADGE);
+            entries.add(SHEPHERD_BELL);
             entries.add(ROUND_CAKE);
+            // 巡夜斗篷：它放在背包里就有用（夜里的移速），所以与遗物并排放在这一页；
+            // 同时它也是一个「胸甲护具」，在「盔甲配件」那一页另有一份
+            entries.add(NIGHTWATCH_CLOAK);
             entries.add(ETERNAL_EMBLEM);
             entries.add(STREAM_EMBLEM);
             entries.add(SUN_EMBLEM);

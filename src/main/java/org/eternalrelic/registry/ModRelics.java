@@ -236,6 +236,22 @@ public final class ModRelics {
             MaterialRarity.ROUGH_STONE);
 
     /**
+     * 牧羊人铃铛 —— 拿在主手右键摇响，四十格内的羊会朝摇铃的人走过来，持续二十秒。
+     *
+     * <p>它<b>没有任何属性加成</b>：铃声不改变玩家的任何数值，改的是羊的行走目标，
+     * 因此这里只登记身份与成色。招呼的时机、范围与冷却由
+     * {@link org.eternalrelic.capability.carried.ShepherdBellEffect} 负责——
+     * 由玩家摇铃触发，不是「放在背包里就生效」那一类。</p>
+     *
+     * <p><b>只招呼羊</b>：牛、猪、鸡一概不理，这是制作者定下的口径。</p>
+     *
+     * <p>固有稀有度为粗石：一只用旧了的黄铜铃铛，顶用，但称不上讲究。</p>
+     */
+    public static final RelicDefinition SHEPHERD_BELL = define(
+            ModItems.SHEPHERD_BELL,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
      * 一个圆形的饼 —— 吃下去，人当场回到自己的重生点，并在十秒里飞快回血。
      *
      * <p><b>它是本模组第一件消耗品，也是第一件「吃下去才生效」的遗物</b>：效果发生在它消失的
@@ -358,7 +374,7 @@ public final class ModRelics {
      *
      * <p>与坚铁甲片、皮革内衬同一类：<b>放在背包里完全没有用</b>，必须缝在正穿着的那件胸甲上，
      * 而且只认胸甲。这里登记的只是那 0.5 点盔甲韧性；「打中左肩时那一击少掉 2 点伤害」
-     * 是另一件事，登记在 {@link ShoulderGuards 肩甲表} 里——一个长期挂在身上，
+     * 是另一件事，登记在 {@link ChestGuards 胸甲护具表} 里——一个长期挂在身上，
      * 一个只在挨打的那一刻算一次，结算时机不同，因此分成两张表。</p>
      *
      * <p>固有稀有度为粗石：一块厚实的皮革护片，与皮革内衬同一档。</p>
@@ -372,7 +388,7 @@ public final class ModRelics {
      * 皮革肩甲（右）—— 与左肩那只成对，护住玩家自身的右肩。
      *
      * <p>登记内容与左肩那只完全对称：同样 0.5 点盔甲韧性、同样只认胸甲上的附着份，
-     * 护肩那一侧登记在 {@link ShoulderGuards}。</p>
+     * 护肩那一侧登记在 {@link ChestGuards}。</p>
      */
     public static final RelicDefinition LEATHER_SHOULDER_GUARD_RIGHT = defineAttachmentOnly(
             ModItems.LEATHER_SHOULDER_GUARD_RIGHT,
@@ -387,7 +403,7 @@ public final class ModRelics {
      * 与「两侧都护」，而不是靠减数值来平衡。</p>
      *
      * <p>护肩那一侧同样是两侧都护，减掉的点数与单只一样（2 点），登记在
-     * {@link ShoulderGuards}。固有稀有度为粗石。</p>
+     * {@link ChestGuards}。固有稀有度为粗石。</p>
      */
     public static final RelicDefinition LEATHER_SHOULDER_GUARD_PAIR = defineAttachmentOnly(
             ModItems.LEATHER_SHOULDER_GUARD_PAIR,
@@ -398,7 +414,7 @@ public final class ModRelics {
      * 鳞片肩甲（左）—— 皮革肩甲缝上一层犰狳鳞甲之后的进阶形态，护住玩家自身的左肩。
      *
      * <p>与皮革肩甲同一路登记，只是数值高一档：<b>盔甲韧性 +1.0</b>（皮革那只 +0.5），
-     * 护肩减伤则是 2.5 点（皮革那只 2 点），登记在 {@link ShoulderGuards 肩甲表}。
+     * 护肩减伤则是 2.5 点（皮革那只 2 点），登记在 {@link ChestGuards 胸甲护具表}。
      * 同样是「只认附着份」、只缝胸甲。</p>
      *
      * <p>它由 {@link ModItems#LEATHER_SHOULDER_GUARD_LEFT 皮革肩甲（左）} 与
@@ -425,7 +441,7 @@ public final class ModRelics {
      * 一套鳞片肩甲 —— 左右两只合成而来的整体，两侧肩膀都护。
      *
      * <p>韧性给到 2.0，同样是左右两只相加的结果（皮革那一套是 1.0）。护肩减伤与单只一样是
-     * 2.5 点，但两侧都护，登记在 {@link ShoulderGuards}。固有稀有度为成材。</p>
+     * 2.5 点，但两侧都护，登记在 {@link ChestGuards}。固有稀有度为成材。</p>
      */
     public static final RelicDefinition SCUTE_SHOULDER_GUARD_PAIR = defineAttachmentOnly(
             ModItems.SCUTE_SHOULDER_GUARD_PAIR,
@@ -437,7 +453,7 @@ public final class ModRelics {
      *
      * <p><b>它与鳞片肩甲是并列的两条路，各有取舍</b>：两者护肩减伤相同（都是 2.5 点），
      * 而鳞片那条给 <b>+1.0 盔甲韧性</b>、龟壳这条只给 <b>+0.5</b>——换来的是龟壳独有的一手：
-     * 打在左肩上的<b>远程攻击有 10% 会被整个弹开</b>（登记在 {@link ShoulderGuards 肩甲表}）。
+     * 打在左肩上的<b>远程攻击有 10% 会被整个弹开</b>（登记在 {@link ChestGuards 胸甲护具表}）。
      * 一条更耐打，一条能拨箭。</p>
      *
      * <p>同样是「只认附着份」、只缝胸甲。固有稀有度为成材：与龟壳内衬、鳞甲内衬同一档。</p>
@@ -461,7 +477,7 @@ public final class ModRelics {
      * 一套龟壳肩甲 —— 左右两只合成而来的整体，两侧肩膀都护，两侧的箭都可能被弹开。
      *
      * <p>韧性给到 1.0，同样是左右两只相加的结果。护肩减伤与弹开概率都与单只相同，
-     * 但覆盖两侧，登记在 {@link ShoulderGuards}。固有稀有度为成材。</p>
+     * 但覆盖两侧，登记在 {@link ChestGuards}。固有稀有度为成材。</p>
      */
     public static final RelicDefinition TURTLE_SHELL_SHOULDER_GUARD_PAIR = defineAttachmentOnly(
             ModItems.TURTLE_SHELL_SHOULDER_GUARD_PAIR,
@@ -493,7 +509,7 @@ public final class ModRelics {
      * 铁片肩甲（右）—— 与左肩那只成对，护住玩家自身的右肩。
      *
      * <p>登记内容与左肩那只完全对称：同样是挥砍慢 4%、只认胸甲上的附着份。
-     * 护肩那一侧登记在 {@link ShoulderGuards}。</p>
+     * 护肩那一侧登记在 {@link ChestGuards}。</p>
      *
      * <p>左右各缝一只时，两件是两件不同的遗物、各挂各的那一条，合计慢 8%——
      * 这正是用户要的「每多装备一个就再慢 4%」。</p>
@@ -537,7 +553,7 @@ public final class ModRelics {
      * 铜片肩甲（右）—— 与左肩那只成对，护住玩家自身的右肩。
      *
      * <p>登记内容与左肩那只完全对称：同样是挥砍慢 4%、只认胸甲上的附着份。
-     * 护肩那一侧登记在 {@link ShoulderGuards}。</p>
+     * 护肩那一侧登记在 {@link ChestGuards}。</p>
      */
     public static final RelicDefinition COPPER_SHOULDER_GUARD_RIGHT = defineAttachmentOnly(
             ModItems.COPPER_SHOULDER_GUARD_RIGHT,
@@ -558,7 +574,7 @@ public final class ModRelics {
      * 秘银胸甲片 —— 贴在胸甲正面的一块甲片，护住正胸。
      *
      * <p>这里登记的只有 <b>+1 点盔甲韧性</b>；「正胸挨打少掉 3 点、三成的箭被弹开、
-     * 魔法伤害减 1 点」这三件事登记在 {@link ChestplatePlates 胸甲片表} 里——
+     * 魔法伤害减 1 点」这三件事登记在 {@link ChestGuards 胸甲护具表} 里——
      * 一个长期挂在玩家身上，另几个只在挨打的那一刻算一次，结算时机不同，因此分成两处。</p>
      *
      * <p><b>它只护正胸，后背一点都挡不住</b>：一块贴在胸前的甲片护不住后背，这是刻意的。
@@ -576,7 +592,7 @@ public final class ModRelics {
      * 铜胸甲片 —— 最普通的一片胸甲片，护住正胸。
      *
      * <p>这里登记的只有 <b>移动速度 −3%</b> 这条代价；「正胸挨打少掉 1.5 点、一成半的箭被弹开」
-     * 登记在 {@link ChestplatePlates 胸甲片表} 里。它<b>不挡魔法伤害，也不给盔甲韧性</b>——
+     * 登记在 {@link ChestGuards 胸甲护具表} 里。它<b>不挡魔法伤害，也不给盔甲韧性</b>——
      * 那是秘银那一片的本事，两片同属「胸甲片」类别，一件胸甲上只能挑一片。</p>
      *
      * <p>移动速度与肩甲的挥砍速度同属「负面百分比」：按比例扣，所以穿着它跑多快都是慢这一成，
@@ -588,6 +604,29 @@ public final class ModRelics {
             ModItems.COPPER_CHESTPLATE_PLATE,
             MaterialRarity.DEBRIS,
             new RelicEffect(RelicAttribute.MOVEMENT_SPEED, -0.03D, 0.0D, 1));
+
+    /**
+     * 巡夜斗篷 —— 披在胸甲外的一件乌黑斗篷。
+     *
+     * <p><b>它的三样本事分属三条路，因此这里的效果一栏是空的</b>：</p>
+     * <ul>
+     *   <li><b>夜里（所处亮度低于 7）移速 +10%</b> —— 带着就行、不必缝；这是全项目第一条
+     *       <b>看天色的属性加成</b>，由 {@code capability.carried.NightWatchCloakEffect}
+     *       每 5 刻核对一次、按需挂上或摘下。⚠️ 下界与末地没有昼夜，那里永远不生效；</li>
+     *   <li><b>缝在胸甲上时盔甲韧性 +0.5</b> —— 同样由那个能力类负责：「只在缝着时给」
+     *       与「带着就给」是两种口径，没法一起写进属性那一栏；</li>
+     *   <li><b>后背受到伤害少 1 点</b> —— 登记在 {@link ChestGuards 胸甲护具表} 里，
+     *       与肩甲、胸甲片同一套机制。</li>
+     * </ul>
+     *
+     * <p>它<b>不是</b>「只认附着份」的遗物：放在背包里也能在夜里拿到移速，只是没有韧性与护背。
+     * 缝在胸甲上时，它与肩甲、内衬、甲片、胸甲片并列，各自占一个配件类别（斗篷自成一类）。</p>
+     *
+     * <p>固有稀有度为成材：与内衬、鳞片那几档同一档。</p>
+     */
+    public static final RelicDefinition NIGHTWATCH_CLOAK = define(
+            ModItems.NIGHTWATCH_CLOAK,
+            MaterialRarity.LUMBER);
 
     /**
      * 太阳纹章 —— 带在身上时，白天持续给「生命恢复」与「力量」。

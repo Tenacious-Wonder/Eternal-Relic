@@ -84,6 +84,16 @@ public final class ModSounds {
      */
     public static final SoundEvent STATION_HAMMER = register("station_hammer");
 
+    /**
+     * 牧羊人铃铛的铃音 —— 摇响时响起的那一记。
+     *
+     * <p><b>音量对齐过</b>：素材原件的峰值是 −4.1 dB，已经抬到与其它动作音效同一档
+     * （−0.2 dB），因此玩家不会觉得摇铃比别人轻。</p>
+     *
+     * <p>由播放方走世界广播，因此附近的人都听得到——铃铛本就该是这样。</p>
+     */
+    public static final SoundEvent SHEPHERD_BELL = register("shepherd_bell");
+
     private ModSounds() {
     }
 

@@ -9,6 +9,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import org.eternalrelic.client.network.SoulFlameClientNetwork;
 import org.eternalrelic.client.particle.ModParticleFactories;
 import org.eternalrelic.client.render.FlatAndThreeDItemRenderer;
+import org.eternalrelic.client.render.ShepherdBellSwing;
 import org.eternalrelic.client.render.block.blockentity.ChestplateStationBlockEntityRenderer;
 import org.eternalrelic.client.screen.ChestplateStationScreen;
 import org.eternalrelic.client.screen.RelicScreenOpener;
@@ -43,8 +44,11 @@ public class EternalRelicClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.RELIC_STATION, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.CHESTPLATE_STATION, RenderLayer.getCutout());
 
-        // 引魂燃灯与两把锤子：物品栏显示制作者画的平面图标，手上与地上显示立体模型
+        // 引魂燃灯、两把锤子与牧羊人铃铛：物品栏显示制作者画的平面图标，手上与地上显示立体模型
         FlatAndThreeDItemRenderer.register();
+
+        // 铃铛的第一人称摇铃动作：平时不动，摇响的那半秒里晃两下（节奏跟着铃声走）
+        ShepherdBellSwing.register();
 
         // 胸甲台：台上摆着的那件胸甲由这个渲染器画出来
         BlockEntityRendererFactories.register(ModBlockEntityTypes.CHESTPLATE_STATION,

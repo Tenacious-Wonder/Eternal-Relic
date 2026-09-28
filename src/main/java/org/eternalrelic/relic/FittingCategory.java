@@ -36,7 +36,10 @@ public enum FittingCategory {
      * 贴在胸甲正面的一块甲片 —— 与「甲片」<b>不是一类</b>：那一种缝在四个部位的防具上，
      * 这一种只贴在胸甲正面、护的是<b>正胸</b>那一块。一件胸甲上只能有一片。
      */
-    CHESTPLATE_PLATE("胸甲片");
+    CHESTPLATE_PLATE("胸甲片"),
+
+    /** 披在胸甲外面的斗篷 —— 护住后背。一件胸甲上只能有一件。 */
+    CLOAK("斗篷");
 
     private final String displayName;
 

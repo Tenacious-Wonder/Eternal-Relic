@@ -98,5 +98,13 @@
         "volume": 1.0
       }
     ]
+  },
+  "shepherd_bell": {
+    "sounds": [
+      {
+        "name": "eternal_relic:relic/shepherd_bell",
+        "volume": 1.0
+      }
+    ]
   }
 }

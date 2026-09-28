@@ -92,6 +92,8 @@
   "item.eternal_relic.mithril_chestplate_plate.desc": "No effect on its own. Attached to a chestplate: +1 armor toughness. A melee or ranged hit on your chest deals 3 less damage (never below 0), a ranged hit has a 30% chance to be batted away entirely, and magic damage is reduced by 1. Only the chest is guarded - your back is not. One chestplate plate per chestplate.",
   "item.eternal_relic.copper_chestplate_plate": "Copper Chestplate Plate",
   "item.eternal_relic.copper_chestplate_plate.desc": "No effect on its own. Attached to a chestplate: movement speed -3%. A melee or ranged hit on your chest deals 1.5 less damage (never below 0), and a ranged hit has a 15% chance to be batted away entirely. Only the chest is guarded - your back is not. One chestplate plate per chestplate.",
+  "item.eternal_relic.nightwatch_cloak": "Night Watch Cloak",
+  "item.eternal_relic.nightwatch_cloak.desc": "Carried in your inventory: +10% movement speed at night, when the light level where you stand is below 7. Attached to a chestplate: an extra +0.5 armor toughness, and damage to your back is reduced by 1 (never below 0). The toughness and the back protection do not depend on the time of day; the Nether and the End have no day or night, so the speed bonus never applies there.",
   "item.eternal_relic.armadillo_scute": "Armadillo Scute",
   "itemGroup.eternal_relic.relic_group": "TW's Eternal Relics",
   "itemGroup.eternal_relic.armor_fitting_group": "Armour Fittings",
@@ -171,6 +173,7 @@
   "item.eternal_relic.copper_shoulder_guard_pair.lore": "Hardened leather carrying plates of copper. Its weight slows the arm that wears it, yet it still blunts a few blows in a messy fight.",
   "item.eternal_relic.mithril_chestplate_plate.lore": "A hard yet feather-light material. Worn over the chest, it ought to turn aside some of the arrows flying your way.",
   "item.eternal_relic.copper_chestplate_plate.lore": "The plainest, most ordinary chestplate plate there is. A good pick for a beginner.",
+  "item.eternal_relic.nightwatch_cloak.lore": "Some herbal treatment went into this cloak - it keeps you clear-headed through the night. Perhaps that is what the faint bitterness is.",
   "item.eternal_relic.leather_shoulder_guard_left.flavor": "A treated leather plate,\nshaped to the curve of\na left shoulder.",
   "item.eternal_relic.leather_shoulder_guard_right.flavor": "A treated leather plate,\nshaped to the curve of\na right shoulder.",
   "item.eternal_relic.leather_shoulder_guard_pair.flavor": "Two treated leather plates\njoined as one, guarding\na shoulder on each side.",
@@ -188,6 +191,7 @@
   "item.eternal_relic.copper_shoulder_guard_pair.flavor": "Two copper-plated leather\nplates joined as one,\nguarding a shoulder on\neach side.",
   "item.eternal_relic.mithril_chestplate_plate.flavor": "A round plate of some unknown,\nmysterious metal, and very\nlight for its size.",
   "item.eternal_relic.copper_chestplate_plate.flavor": "A round plate of copper,\nheavy for its size.",
+  "item.eternal_relic.nightwatch_cloak.flavor": "A black cloak of some thickness.\nWearing it leaves a faint,\nbitter smell.",
   "item.eternal_relic.relic_sample_debris": "Grade Sample (Debris)",
   "item.eternal_relic.relic_sample_debris.desc": "A test relic with no effect at all, used only to check how the Debris grade looks on the screen.",
   "item.eternal_relic.relic_sample_debris.lore": "A broken shard whose name has long been forgotten.",
@@ -220,5 +224,9 @@
   "item.eternal_relic.soul_lantern.cooling": "Cooling down: %s s",
   "key.eternal_relic.cast_soul_lantern": "Release Soul Fire",
   "category.eternal_relic": "TW's Eternal Relic",
-  "message.eternal_relic.soul_lantern_unavailable": "The Soulfire Lantern cannot release right now: no soul fire gathered, or still cooling down."
+  "message.eternal_relic.soul_lantern_unavailable": "The Soulfire Lantern cannot release right now: no soul fire gathered, or still cooling down.",
+  "item.eternal_relic.shepherd_bell": "Shepherd's Bell",
+  "item.eternal_relic.shepherd_bell.desc": "Right-click while held to ring it: sheep within 40 blocks are drawn to you for 20 seconds. 30 second cooldown.",
+  "item.eternal_relic.shepherd_bell.lore": "Perhaps it was never meant for herding sheep.",
+  "item.eternal_relic.shepherd_bell.flavor": "A bell of polished brass.\nThe worn leather strap\nbetween its iron rings\nis inscribed with a\nprayer of calling."
 }

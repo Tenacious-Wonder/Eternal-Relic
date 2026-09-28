@@ -8,8 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 import org.eternalrelic.bodypart.BodyPart;
 import org.eternalrelic.bodypart.RecentBodyPartHit;
-import org.eternalrelic.capability.attached.ChestplatePlateEffect;
-import org.eternalrelic.capability.attached.ShoulderGuardEffect;
+import org.eternalrelic.capability.attached.ChestGuardEffect;
 import org.eternalrelic.debug.BodyPartHitReport;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -45,7 +44,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
  * 胸甲片，而便条取走就没了（见 {@link RecentBodyPartHit}），所以由这里取一次、再分别问两张表。
  * 魔法伤害没有「打中哪儿」可算（药水与凋零是从体内发作的），那一条只看伤害类型。</p>
  *
- * <p>只改这一个数值，不动伤害流程的其它任何一步；扣到 0 为止，不会倒扣成加血。</p>
+ * <p>只改这一个数值，不动伤害流程的其它任何一步；不会倒扣成加血。两条减伤的收敛方式不同：
+ * <b>按部位的那一条可以扣到 0</b>（挡下轻击本来就是护具的本事），而<b>魔法那一条至少留 1 点</b>
+ * ——理由见方法里的注释：中毒与凋零每跳只有 1 点，抹平就等于白送一个免疫。</p>
  */
 @Mixin(PlayerEntity.class)
 public abstract class PlayerDamageMixin {
@@ -77,15 +78,23 @@ public abstract class PlayerDamageMixin {
         // 便条只取一次：这一击打在哪儿，肩甲与胸甲片共用这一份
         BodyPart part = RecentBodyPartHit.consume(player);
 
-        float blocked = ShoulderGuardEffect.reductionFor(player, part)
-                + ChestplatePlateEffect.reductionFor(player, part);
-
-        // 魔法伤害没有「打中哪儿」可算，只要胸甲上缝着会挡魔法的胸甲片就减
-        if (ChestplatePlateEffect.isMagicDamage(source)) {
-            blocked += ChestplatePlateEffect.magicReductionFor(player);
-        }
+        // 按部位的减伤：胸甲上缝着的护具各减几点，**可以扣到 0**——挡下轻击本来就是护具的本事
+        float blocked = ChestGuardEffect.reductionFor(player, part);
 
         float guarded = Math.max(0.0F, amount - blocked);
+
+        // 魔法减伤另算，而且**至少给对方留 1 点**。
+        //
+        // 为什么单独放宽这一条：中毒与凋零的伤害是每跳 1 点，而这里也是减 1 点——
+        // 若照"扣到 0 为止"，这 1 点会被整个抹平，等于白送一个「免疫中毒与凋零」，
+        // 比「受到的魔法伤害减少 1 点」这句话强得多。因此这一条只削不灭。
+        // 末尾再与扣之前取较小值：万一原始伤害本来就不足 1 点，不能被这条抬高。
+        if (ChestGuardEffect.isMagicDamage(source)) {
+            float magic = ChestGuardEffect.magicReductionFor(player);
+            if (magic > 0.0F) {
+                guarded = Math.min(guarded, Math.max(1.0F, guarded - magic));
+            }
+        }
 
         // 临时调试输出：把「原版算完后多少、护具减完多少」打在聊天栏里（见 BodyPartHitReport）。
         // 它只读这几个数字、不参与结算，与那段调试代码一并删除即可

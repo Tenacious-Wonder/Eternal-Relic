@@ -93,6 +93,8 @@
   "item.eternal_relic.mithril_chestplate_plate.desc": "本身没有效果；附着于胸甲时，盔甲韧性 +1。被近战或远程打中正胸时，那一击少掉 3 点伤害（最低减到 0）；若来的是远程攻击，另有 30% 的概率被整个弹开；受到的魔法伤害减少 1 点。它只护正胸，后背受到的伤害不受影响。同一件胸甲上只能附着一片胸甲片。",
   "item.eternal_relic.copper_chestplate_plate": "铜胸甲片",
   "item.eternal_relic.copper_chestplate_plate.desc": "本身没有效果；附着于胸甲时，移动速度降低 3%。被近战或远程打中正胸时，那一击少掉 1.5 点伤害（最低减到 0）；若来的是远程攻击，另有 15% 的概率被整个弹开。它只护正胸，后背受到的伤害不受影响。同一件胸甲上只能附着一片胸甲片。",
+  "item.eternal_relic.nightwatch_cloak": "巡夜斗篷",
+  "item.eternal_relic.nightwatch_cloak.desc": "携带于背包时：夜晚且所处亮度低于 7 时，移动速度提升 10%。附着于胸甲时：额外获得盔甲韧性 +0.5，且后背受到的伤害固定减少 1 点（最低减到 0）。韧性与护背不看时段；下界与末地没有昼夜，那里的移速加成不生效。",
   "item.eternal_relic.armadillo_scute": "犰狳鳞甲",
   "itemGroup.eternal_relic.relic_group": "TW 的永恒遗物",
   "itemGroup.eternal_relic.armor_fitting_group": "盔甲配件",
@@ -146,6 +148,7 @@
   "item.eternal_relic.copper_shoulder_guard_pair.lore": "附着了铜板的硬质皮革，由于沉重会降低活动能力，但可以在混乱的战斗中为你的肩部抵挡一些伤害。",
   "item.eternal_relic.mithril_chestplate_plate.lore": "坚硬而轻盈的材质。附着在胸甲前应该能弹开一些射来的箭矢。",
   "item.eternal_relic.copper_chestplate_plate.lore": "最普通，最常规的胸甲片。适合新手。",
+  "item.eternal_relic.nightwatch_cloak.lore": "这斗篷不知使用了什么方式的药草处理，能让人在晚上也保持清醒，也许正是因为这苦味？",
   "item.eternal_relic.aota_branch.flavor": "永恒辉树会庇佑光辉下的每一位生灵。",
   "item.eternal_relic.echo_ring.flavor": "一支小巧的金属环，光洁无暇，中心有一小块紫晶缓缓转动。",
   "item.eternal_relic.echo_ring_drained.flavor": "一支小巧的金属环，光洁无暇，环中心空无一物",
@@ -189,6 +192,7 @@
   "item.eternal_relic.copper_shoulder_guard_pair.flavor": "两块缝着铜板的皮革甲片连成一体，沉甸甸地左右各护一侧。",
   "item.eternal_relic.mithril_chestplate_plate.flavor": "一块未知的神秘金属制成的圆形甲片，分量很轻。",
   "item.eternal_relic.copper_chestplate_plate.flavor": "一块铜制成的圆形甲片，分量很重。",
+  "item.eternal_relic.nightwatch_cloak.flavor": "一件略有厚度的乌黑斗篷，穿在身上总有股淡淡的苦味。",
   "item.eternal_relic.relic_sample_debris": "品阶样本·碎屑",
   "item.eternal_relic.relic_sample_debris.desc": "测试用遗物，没有任何效果，仅用于检查「碎屑」档位的界面显示。",
   "item.eternal_relic.relic_sample_debris.lore": "残破的碎片，连名字都早已被遗忘。",
@@ -221,5 +225,9 @@
   "item.eternal_relic.soul_lantern.cooling": "冷却中：%s 秒",
   "key.eternal_relic.cast_soul_lantern": "释放魂火",
   "category.eternal_relic": "TW 的永恒遗物",
-  "message.eternal_relic.soul_lantern_unavailable": "引魂燃灯现在放不出来：还没有攒到魂火，或者仍在冷却。"
+  "message.eternal_relic.soul_lantern_unavailable": "引魂燃灯现在放不出来：还没有攒到魂火，或者仍在冷却。",
+  "item.eternal_relic.shepherd_bell": "牧羊人铃铛",
+  "item.eternal_relic.shepherd_bell.desc": "拿在主手右键摇响：以自身为中心，把 40 格内的羊吸引过来，持续 20 秒。冷却 30 秒。",
+  "item.eternal_relic.shepherd_bell.lore": "也许它原本并不是用来赶羊的。",
+  "item.eternal_relic.shepherd_bell.flavor": "一只磨得光亮的黄铜铃铛，铁环间残存的皮革条上刻有呼唤的祷文。"
 }

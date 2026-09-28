@@ -170,7 +170,7 @@ public final class AttachableRelics {
                 AttachTarget.CHESTPLATE);
 
         // 龟壳肩甲（左 / 右 / 一套）：与前两档同一路登记——配线、只缝胸甲、只认附着份。
-        // 「会弹开远程」那一条不在这里，它登记在肩甲表（registry/ShoulderGuards）
+        // 「会弹开远程」那一条不在这里，它登记在胸甲护具表（registry/ChestGuards）
         RelicAttachment.registerFitting(
                 ModItems.TURTLE_SHELL_SHOULDER_GUARD_LEFT,
                 FittingCategory.SHOULDER_LEFT,
@@ -254,6 +254,14 @@ public final class AttachableRelics {
                 ModItems.COPPER_CHESTPLATE_PLATE,
                 FittingCategory.CHESTPLATE_PLATE,
                 Items.IRON_NUGGET,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        // 巡夜斗篷：披在胸甲外的布制斗篷，配线；只缝胸甲，自成一类（一件胸甲上只能有一件斗篷）
+        RelicAttachment.registerFitting(
+                ModItems.NIGHTWATCH_CLOAK,
+                FittingCategory.CLOAK,
+                Items.STRING,
                 RelicAttachment.Stacking.NONE,
                 AttachTarget.CHESTPLATE);
 
