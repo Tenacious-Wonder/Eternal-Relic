@@ -268,6 +268,186 @@ public final class ModRelics {
             MaterialRarity.ROUGH_STONE);
 
     /**
+     * 荆棘之誓 —— 带在身上时，把挨打时<b>实际掉的那部分血</b>的五分之一扎回给打你的人（最多 20 点）。
+     *
+     * <p>它<b>没有任何属性加成</b>，也不替玩家挡伤害：价值全在「动手的人也要付代价」上，
+     * 由 {@link org.eternalrelic.capability.carried.ThornsOathEffect} 出手——
+     * 取值的那一刻在 {@code mixin/PlayerDamageMixin} 里（护甲与保护附魔都算完之后），
+     * 因此穿好甲的人反得少、裸着挨打的人反得多，这是制作者指定的口径。</p>
+     *
+     * <p><b>反伤不会再被反伤</b>：两个各带一枚的人互砍，不会一直弹到某一方死掉
+     * （做法是让反伤走原版「荆棘」那个伤害类型，理由见那个类的文档）。</p>
+     *
+     * <p>固有稀有度为珍品：一件能把交手结果往回收一点的东西，够得上这一档。</p>
+     */
+    public static final RelicDefinition THORNS_OATH = define(
+            ModItems.THORNS_OATH,
+            MaterialRarity.TREASURE);
+
+    /**
+     * 无声软靴 —— 带在身上时，潜行状态下不再发出振动，也更不容易被怪物发现。
+     *
+     * <p>它<b>没有任何属性加成</b>：改动落在两处游戏内部——「振动要不要发出去」与
+     * 「被怪物发现的距离」，判断都由
+     * {@link org.eternalrelic.capability.carried.SilentBootsEffect} 给出。</p>
+     *
+     * <p><b>不潜行就等于没戴</b>，这是刻意的：软靴护的是「蹑手蹑脚」这件事，玩家自己一眼就懂。</p>
+     *
+     * <p>固有稀有度为精萃：它不改任何数值，改的是「别人能不能察觉到你」。</p>
+     */
+    public static final RelicDefinition SILENT_BOOTS = define(
+            ModItems.SILENT_BOOTS,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 拾荒符石（物品 id 仍是 {@code scavenger_magnet}）—— 带在身上时，身边三格内的掉落物自己进到身上。
+     *
+     * <p>它<b>没有任何属性加成</b>：价值全在「走过去捡」这个动作被省掉上，由
+     * {@link org.eternalrelic.capability.carried.ScavengerMagnetEffect} 每 5 刻清扫一次。</p>
+     *
+     * <p><b>与拾荒口袋配套</b>：身上带着一口装了它的口袋时，吸过来的东西优先塞进那口口袋，
+     * 不占玩家自己的背包；没有这样的口袋就照常进背包。两条路用的是同一份判断
+     * （见 {@link org.eternalrelic.relic.PocketStorage#insertIntoMagnetPocket}）。</p>
+     *
+     * <p>固有稀有度为成材：一件省事的家什，谈不上稀罕，但用过就回不去。</p>
+     */
+    public static final RelicDefinition SCAVENGER_MAGNET = define(
+            ModItems.SCAVENGER_MAGNET,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 拾荒口袋 —— 一口 54 格的便携背包，主手右键打开。
+     *
+     * <p>它<b>本身就是一件普通容器</b>：里面装了什么与「有没有带着磁石」无关，
+     * 因此这里没有效果可登记，只登记身份与成色。内容怎么存、怎么在拾取时优先收货，
+     * 都写在 {@link org.eternalrelic.relic.PocketStorage} 里。</p>
+     *
+     * <p>固有稀有度为成材：与磁石同一档。</p>
+     */
+    public static final RelicDefinition SCAVENGER_POCKET = define(
+            ModItems.SCAVENGER_POCKET,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 风行披风 —— 缝在胸甲上：跑得更快、人在空中还能再蹬一次，并且护住后背。
+     *
+     * <p><b>只认附着份</b>：它是「装备配件」，放背包里完全没有用（与肩甲、内衬、斗篷同一口径）。
+     * 两样本事各走各的路：<b>二段跳</b>由
+     * {@link org.eternalrelic.capability.attached.WindCloakEffect} 负责（按键在客户端读、
+     * 出手在服务端），<b>护后背</b>登记在 {@link ChestGuards 胸甲护具表} 里——
+     * 护具那套「按部位减伤」的机制是现成的，这一件只是多了一行登记。</p>
+     *
+     * <p>固有稀有度为精萃：它不改任何数值，改的是玩家在空中的行动方式，够得上这一档。</p>
+     */
+    public static final RelicDefinition WIND_CLOAK = defineAttachmentOnly(
+            ModItems.WIND_CLOAK,
+            MaterialRarity.ESSENCE,
+            new RelicEffect(RelicAttribute.MOVEMENT_SPEED, 0.15D, 0.0D, 1));
+
+    /**
+     * 褪色的护身符 —— 带在身上时生命上限多出半颗心。
+     *
+     * <p>它<b>没有任何额外的本事</b>：价值全在那一点生命上限上，因此这里登记一条固定值加成即可，
+     * 连能力类都不必写。固定值而不是百分比——半颗心就该是半颗心，不随别的加成一起放大。</p>
+     *
+     * <p>固有稀有度为碎屑：一件褪了色的旧护符，护住的是"再挨一下"的余地。</p>
+     */
+    public static final RelicDefinition FADED_CHARM = define(
+            ModItems.FADED_CHARM,
+            MaterialRarity.DEBRIS,
+            RelicEffect.flat(RelicAttribute.MAX_HEALTH, 1.0D));
+
+    /**
+     * 磕碰的罗盘 —— 拿在手上右键，在聊天栏报出坐标与朝向。
+     *
+     * <p>它<b>什么都不改</b>：既不加属性也不出手，只是把玩家本来要点 F3 才看得到的两样东西
+     * 说出来（判定见 {@link org.eternalrelic.item.CrackedCompassItem}），因此这里只登记身份与成色。</p>
+     *
+     * <p>固有稀有度为碎屑：一件磕出了裂的旧罗盘，指针还转，只是转得不太准。</p>
+     */
+    public static final RelicDefinition CRACKED_COMPASS = define(
+            ModItems.CRACKED_COMPASS,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 干枯的四叶草 —— 带在身上时幸运 +1。
+     *
+     * <p>幸运是原版属性，由服务端在跑掉落表与钓鱼时读取，因此这一件也只需要登记一行。</p>
+     *
+     * <p>固有稀有度为碎屑：压干了的四叶草，据说能带来一点好运。</p>
+     */
+    public static final RelicDefinition DRIED_CLOVER = define(
+            ModItems.DRIED_CLOVER,
+            MaterialRarity.DEBRIS,
+            RelicEffect.flat(RelicAttribute.LUCK, 1.0D));
+
+    /**
+     * 戴克森应急制氧球 —— 右键换来五分钟的水下呼吸，之后十分钟不能再点。
+     *
+     * <p>它<b>没有携带效果</b>：要点一下才生效，因此价值不在属性上。施加与冷却都由
+     * {@link org.eternalrelic.item.DaiksonOxygenOrbItem} 负责。</p>
+     *
+     * <p>固有稀有度为粗石：一件做工扎实的小装置，用得上，但谈不上稀罕。</p>
+     */
+    public static final RelicDefinition DAIKSON_OXYGEN_ORB = define(
+            ModItems.DAIKSON_OXYGEN_ORB,
+            MaterialRarity.LUMBER);
+
+    /**
+     * 平凡的自然符石（物品 id 仍是 {@code natural_rune}）—— 踩在自然地面上时走得快一点。
+     *
+     * <p>它<b>没有任何属性登记</b>：加成的条件是"脚下是不是自然地面"，会随走动不停变化，
+     * 没法写死在遗物表里，因此由 {@link org.eternalrelic.capability.carried.NaturalRuneEffect}
+     * 每 5 刻核对一次、按需挂上或摘掉（与巡夜斗篷同一套做法）。</p>
+     *
+     * <p>固有稀有度为粗石。</p>
+     */
+    public static final RelicDefinition NATURAL_RUNE = define(
+            ModItems.NATURAL_RUNE,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 古旧弓油 —— 涂在弓弩上，让射出去的箭更有杀伤。
+     *
+     * <p><b>只认附着份，且只认弓与弩</b>：放在背包里没有任何用，必须涂在正拿着的弓弩上。
+     * 加伤不能走属性（箭的伤害与玩家的攻击力无关），因此由
+     * {@link org.eternalrelic.capability.attached.BowOilEffect} 配一处注入来加。</p>
+     *
+     * <p>固有稀有度为粗石。</p>
+     */
+    public static final RelicDefinition OLD_BOW_OIL = defineAttachmentOnly(
+            ModItems.OLD_BOW_OIL,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 古旧剑带 —— 缠在近战武器上，挥砍更有力。
+     *
+     * <p><b>只认附着份，且只认剑 / 斧 / 三叉戟</b>。加的是玩家自己的「攻击力」属性，
+     * 因此这里登记一行固定值即可，不必写能力类——近战伤害本来就照着这个属性算。</p>
+     *
+     * <p>固有稀有度为粗石。</p>
+     */
+    public static final RelicDefinition OLD_SWORD_BAND = defineAttachmentOnly(
+            ModItems.OLD_SWORD_BAND,
+            MaterialRarity.DEBRIS,
+            RelicEffect.flatPerCopy(RelicAttribute.ATTACK_DAMAGE, 0.5D, 1));
+
+    /**
+     * 颠倒吊坠 —— 带在身上时，受伤偶尔会反过来：不掉血、改成回等量的血，代价是等量的经验点数。
+     *
+     * <p>它<b>没有任何属性加成</b>：价值全在"那一下被反过来"上，由
+     * {@link org.eternalrelic.capability.carried.ReversalPendantEffect} 在伤害结算的中段出手。</p>
+     *
+     * <p><b>算的是最终值</b>（护甲与附魔都算完之后真正会扣掉的血），因此它的代价随"你有多耐打"变化：
+     * 穿好甲的人省经验、裸着挨打的人费经验。经验不够时这一下照常挨——它不保证救命。</p>
+     *
+     * <p>固有稀有度为粗石。</p>
+     */
+    public static final RelicDefinition REVERSAL_PENDANT = define(
+            ModItems.REVERSAL_PENDANT,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
      * 永恒纹章 —— 钉在一件物品上，使那件物品不会被火烧、岩浆、爆炸、仙人掌与虚空毁掉，
      * 并视同带有「经验修补」。
      *

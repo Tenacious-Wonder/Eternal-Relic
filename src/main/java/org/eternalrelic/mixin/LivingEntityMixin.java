@@ -2,6 +2,7 @@ package org.eternalrelic.mixin;
 
 import java.util.function.Consumer;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -17,13 +18,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 import org.eternalrelic.capability.carried.BeeswaxPendantEffect;
 import org.eternalrelic.capability.carried.HunterBadgeEffect;
+import org.eternalrelic.capability.carried.SilentBootsEffect;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * 生物身上的两处加料：状态效果即将生效、以及死亡时的掉落。
+ * 生物身上的三处加料：状态效果即将生效、死亡时的掉落，以及「被怪物发现的距离」。
  *
  * <p><b>蜂蜡吊坠为什么挂在这里</b>：蜜蜂蜇人分两步走——先结算伤害，再把中毒单独挂到目标身上。
  * 第二步是本模组唯一能插手的时机，而游戏没有提供「状态效果即将生效」的事件，
@@ -35,6 +37,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * 可以监听的事件，因此守在「跑掉落表」那一次调用上。用的是
  * {@code @WrapOperation}（包一层）而不是把它顶掉——那一步别的模组也可能动，
  * 包一层可以多家并存，顶掉则会在启动时报错。</p>
+ *
+ * <p><b>无声软靴为什么挂在这里</b>：隐蔽效果在 1.20.1 里没有给模组任何口子，
+ * 而 {@code getAttackDistanceScalingFactor} 是潜行 / 隐身 / 头颅伪装三种效果的唯一汇聚点，
+ * 改这一处即可覆盖普通怪与走 Brain 的怪（详见那个方法上的注释）。</p>
  */
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
@@ -86,5 +92,32 @@ public abstract class LivingEntityMixin {
         HunterBadgeEffect.Collector collector = new HunterBadgeEffect.Collector(consumer);
         original.call(lootTable, parameters, seed, collector);
         HunterBadgeEffect.dropExtraItem(hunter, collector.collected(), consumer);
+    }
+
+    /**
+     * 带着无声软靴潜行时，怪物「发现」这名玩家的距离再压一档。
+     *
+     * <p><b>为什么挂在这里</b>：游戏与 Fabric 都<b>没有「谁发现了谁」这类事件</b>
+     * （已把 Fabric API 的全部源码包搜过一遍，零命中）。而
+     * {@code LivingEntity#getAttackDistanceScalingFactor} 是潜行、隐身与「戴着对应生物的头颅」
+     * 三种隐蔽效果的<b>唯一汇聚点</b>——它返回的那个倍率会被索敌的距离比较乘上去，
+     * 于是普通怪（{@code ActiveTargetGoal} 那一套）与走 Brain 的怪（猪灵、监守者）一并覆盖。</p>
+     *
+     * <p><b>为什么不改 {@code MobEntity} 或 {@code getFollowRange}</b>：前者挂上去会漏掉所有走 Brain 的
+     * 怪物，后者那里拿不到「被索敌的是谁」，一改就会把所有玩家、所有怪一起改掉。
+     * 这一处是源码里唯一合适的口子，而且全项目只有这一个方法用到它。</p>
+     *
+     * <p>用「包一层」而不是顶掉：别的模组若也想在这一处加隐蔽效果，两层会叠加，不会互相作废。</p>
+     *
+     * @param original 游戏原本算出的倍率
+     * @return 带着软靴潜行时压过一档的倍率，否则原样返回
+     */
+    @ModifyReturnValue(method = "getAttackDistanceScalingFactor", at = @At("RETURN"))
+    private double eternal_relic$silentBootsMoreHidden(double original) {
+        if (!((Object) this instanceof ServerPlayerEntity player)) {
+            return original;
+        }
+
+        return SilentBootsEffect.hidesFromSenses(player) ? SilentBootsEffect.moreHidden(original) : original;
     }
 }

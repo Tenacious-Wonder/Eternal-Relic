@@ -54,6 +54,19 @@ public enum AttachTarget {
     /** 用来打人的东西。 */
     WEAPON("武器"),
 
+    /**
+     * 贴上去近身打人的东西：剑、斧、三叉戟。
+     *
+     * <p>与 {@link #RANGED_WEAPON} 合起来正好是 {@link #WEAPON} 的全部内容——
+     * 「武器」是那一大类，这两个是它按打法分出来的两半。之所以要分，
+     * 是因为有的东西只对其中一半有意义：涂在弓弩上的油加的是<b>箭的伤害</b>，
+     * 缠在剑柄上的带子加的是<b>挥砍的伤害</b>，两者换过来都毫无作用。</p>
+     */
+    MELEE_WEAPON("近战武器"),
+
+    /** 用来远程打人的东西：弓与弩。 */
+    RANGED_WEAPON("远程武器"),
+
     /** 用来干活的东西。 */
     TOOL("工具");
 
@@ -91,6 +104,10 @@ public enum AttachTarget {
                     || item instanceof TridentItem
                     || item instanceof BowItem
                     || item instanceof CrossbowItem;
+            case MELEE_WEAPON -> item instanceof SwordItem
+                    || item instanceof AxeItem
+                    || item instanceof TridentItem;
+            case RANGED_WEAPON -> item instanceof BowItem || item instanceof CrossbowItem;
             case TOOL -> item instanceof MiningToolItem
                     || item instanceof HoeItem
                     || item instanceof FishingRodItem

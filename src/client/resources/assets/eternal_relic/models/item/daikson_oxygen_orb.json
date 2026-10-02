@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "eternal_relic:item/daikson_oxygen_orb"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "eternal_relic:active": 1
+      },
+      "model": "eternal_relic:item/daikson_oxygen_orb_active"
+    }
+  ]
+}

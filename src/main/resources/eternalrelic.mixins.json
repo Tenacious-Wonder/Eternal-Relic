@@ -11,9 +11,11 @@
     "ItemEntityMixin",
     "ItemStackDurabilityMixin",
     "LivingEntityMixin",
+    "PersistentProjectileEntityMixin",
     "PlayerDamageMixin",
     "PlayerEntityMixin",
     "ProjectileEntityMixin",
+    "ServerWorldMixin",
     "SitGoalMixin",
     "WolfAweMixin",
     "WolfTamingMixin"
