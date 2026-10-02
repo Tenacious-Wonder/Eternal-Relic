@@ -265,6 +265,15 @@ public final class AttachableRelics {
                 RelicAttachment.Stacking.NONE,
                 AttachTarget.CHESTPLATE);
 
+        // 风行披风：同样是布制的披风，同样配线、只缝胸甲，也填「斗篷」这一类——
+        // 因此它与巡夜斗篷互斥：一件胸甲上只能披一件斗篷
+        RelicAttachment.registerFitting(
+                ModItems.WIND_CLOAK,
+                FittingCategory.CLOAK,
+                Items.STRING,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
         // 太阳纹章：蜡制的，配蜜脾；能缝在四个部位的防具与盾牌上（用户指定「装备和盾牌」）。
         // 纹章不填类别，可以叠着钉
         RelicAttachment.register(
@@ -279,5 +288,22 @@ public final class AttachableRelics {
                 Items.HONEYCOMB,
                 RelicAttachment.Stacking.NONE,
                 AttachTarget.ARMOR);
+
+        // 古旧弓油：黏糊糊的一层油，配黏液球；只涂在弓弩上。
+        // ★ 登记为**普通遗物**而不是「装备配件」：配件那一套（分类别、只能在胸甲台上装）
+        // 是给盔甲配件准备的；油与带子是缝在**武器**上的，走遗物这条路——
+        // 于是它们在**遗物装卸台与锻造台**两个入口都能装，不必再添一个新方块
+        RelicAttachment.register(
+                ModItems.OLD_BOW_OIL,
+                Items.SLIME_BALL,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.RANGED_WEAPON);
+
+        // 古旧剑带：皮制的带子，配皮革；只缠在近战武器上。同样是「普通遗物」这条路
+        RelicAttachment.register(
+                ModItems.OLD_SWORD_BAND,
+                Items.LEATHER,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.MELEE_WEAPON);
     }
 }

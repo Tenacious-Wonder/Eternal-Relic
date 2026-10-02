@@ -16,11 +16,14 @@ import net.minecraft.text.Text;
 
 import org.eternalrelic.EternalRelic;
 import org.eternalrelic.item.AotaBranchItem;
+import org.eternalrelic.item.CrackedCompassItem;
+import org.eternalrelic.item.DaiksonOxygenOrbItem;
 import org.eternalrelic.item.EchoRingItem;
 import org.eternalrelic.item.EnchantedRabbitFootItem;
 import org.eternalrelic.item.NightwatchEyeItem;
 import org.eternalrelic.item.RelicItem;
 import org.eternalrelic.item.RoundCakeItem;
+import org.eternalrelic.item.ScavengerPocketItem;
 import org.eternalrelic.item.ShepherdBellItem;
 import org.eternalrelic.item.SoulLanternItem;
 import org.eternalrelic.relic.NightwatchEye;
@@ -179,6 +182,127 @@ public final class ModItems {
      */
     public static final Item ROUND_CAKE = register("round_cake",
             new RoundCakeItem(new Item.Settings().food(FoodComponents.PUMPKIN_PIE)));
+
+    /**
+     * 荆棘之誓 —— 带在身上时，把挨打实际掉的那部分血的五分之一扎回给打你的人（最多 20 点）。
+     *
+     * <p>它<b>不替玩家挡伤害</b>：这一击照常挨，只是让动手的人也要付一点代价。
+     * 判定与出手时机见 {@link org.eternalrelic.capability.carried.ThornsOathEffect}。</p>
+     */
+    public static final Item THORNS_OATH = register("thorns_oath",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 无声软靴 —— 带在身上时，潜行状态下不发出振动，也更不容易被怪物发现。
+     *
+     * <p>两条效果都要动游戏内部代码（振动源头与索敌倍率），判断集中在
+     * {@link org.eternalrelic.capability.carried.SilentBootsEffect}。</p>
+     */
+    public static final Item SILENT_BOOTS = register("silent_boots",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 拾荒符石 —— 带在身上时，身边三格内的掉落物自己进到身上。
+     *
+     * <p><b>往哪儿进由口袋决定</b>：身上带着一口装了它的拾荒口袋时，东西优先塞进那口口袋；
+     * 没有这样的口袋才照常进玩家背包。判定见
+     * {@link org.eternalrelic.capability.carried.ScavengerMagnetEffect}。</p>
+     */
+    public static final Item SCAVENGER_MAGNET = register("scavenger_magnet",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 拾荒口袋 —— 拿在主手右键打开的一口 54 格便携背包（界面直接用原版大箱子那一套）。
+     *
+     * <p><b>它是本模组第一件「物品自己装东西」的东西</b>：内容记在口袋自己的数据里，
+     * 丢出去、放进箱子、交给别人都跟着走（见 {@link org.eternalrelic.relic.PocketStorage}）。
+     * 口袋里放一枚拾荒符石，捡到的东西就会优先往口袋里走。</p>
+     */
+    public static final Item SCAVENGER_POCKET = register("scavenger_pocket",
+            new ScavengerPocketItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 风行披风 —— 缝在胸甲上的一件披风：人在空中还能再蹬一次，并且护住后背。
+     *
+     * <p><b>它是第一件管到「怎么动」的遗物</b>：此前所有遗物改的都是数值、物品数据或挨打的结果，
+     * 这一件改的是玩家在空中的动作。二段跳的判定与服务端出手见
+     * {@link org.eternalrelic.capability.attached.WindCloakEffect}，
+     * 护后背那一半登记在 {@link ChestGuards 胸甲护具表}（与巡夜斗篷同一路）。</p>
+     */
+    public static final Item WIND_CLOAK = register("wind_cloak",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 颠倒吊坠 —— 带在身上时，受伤偶尔会反过来：不掉血、改成回血，代价是等量的经验点数。
+     *
+     * <p>判定见 {@link org.eternalrelic.capability.carried.ReversalPendantEffect}，
+     * 出手点与荆棘之誓同一处（护甲与附魔都算完之后）。</p>
+     */
+    public static final Item REVERSAL_PENDANT = register("reversal_pendant",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    // ==================== 碎屑档的小东西 ====================
+
+    /**
+     * 褪色的护身符 —— 带在身上时生命上限多出半颗心（1 点）。
+     */
+    public static final Item FADED_CHARM = register("faded_charm",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 磕碰的罗盘 —— 拿在手上右键，在聊天栏报出坐标与朝向。
+     *
+     * <p>它不给任何数值，只把玩家本来要点 F3 才看得到的两样东西说出来，判定见
+     * {@link CrackedCompassItem}。</p>
+     */
+    public static final Item CRACKED_COMPASS = register("cracked_compass",
+            new CrackedCompassItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 干枯的四叶草 —— 带在身上时幸运 +1。
+     *
+     * <p>幸运是原版属性（{@code generic.luck}），只由服务端在跑掉落表与钓鱼时读取。</p>
+     */
+    public static final Item DRIED_CLOVER = register("dried_clover",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 戴克森应急制氧球 —— 右键换来五分钟水下呼吸，之后十分钟不能再点。
+     *
+     * <p>借的是原版「水下呼吸」效果，因此氧气条的表现与游戏各处完全一致，判定见
+     * {@link DaiksonOxygenOrbItem}。</p>
+     */
+    public static final Item DAIKSON_OXYGEN_ORB = register("daikson_oxygen_orb",
+            new DaiksonOxygenOrbItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 平凡的自然符石 —— 踩在自然地面（草 / 土 / 沙 / 石 / 雪）上时走得快一点。
+     *
+     * <p>它是第二件「条件性属性加成」，条件由
+     * {@link org.eternalrelic.capability.carried.NaturalRuneEffect} 每 5 刻核对一次。</p>
+     */
+    public static final Item NATURAL_RUNE = register("natural_rune",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    // ==================== 缝在武器上的两件 ====================
+
+    /**
+     * 古旧弓油 —— 涂在弓弩上，让射出去的箭更有杀伤。
+     *
+     * <p>只认附着份，且只认弓与弩：箭的伤害与玩家的攻击力无关，
+     * 因此它由 {@link org.eternalrelic.capability.attached.BowOilEffect} 配一处注入来加。</p>
+     */
+    public static final Item OLD_BOW_OIL = register("old_bow_oil",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 古旧剑带 —— 缠在近战武器上，挥砍更有力。
+     *
+     * <p>只认附着份，且只认剑 / 斧 / 三叉戟。它加的是玩家自己的「攻击力」属性，
+     * 因此只要在遗物表里登记一行即可，不必另写能力类。</p>
+     */
+    public static final Item OLD_SWORD_BAND = register("old_sword_band",
+            new RelicItem(new Item.Settings().maxCount(1)));
 
     /**
      * 永恒纹章 —— 钉在任意防具、武器或工具上，使那件东西不再被毁掉，并视同带有经验修补。
@@ -610,6 +734,25 @@ public final class ModItems {
             entries.add(HUNTER_BADGE);
             entries.add(SHEPHERD_BELL);
             entries.add(ROUND_CAKE);
+            entries.add(THORNS_OATH);
+            entries.add(SILENT_BOOTS);
+            entries.add(SCAVENGER_MAGNET);
+            entries.add(SCAVENGER_POCKET);
+            // 风行披风：它虽然缝在胸甲上（是个「斗篷」配件），但制作者要求它出现在主物品栏这一页。
+            // （巡夜斗篷则是两页都有——那一件是制作者先前定的，未动）
+            entries.add(WIND_CLOAK);
+
+            // 碎屑与粗石档的一批小东西：它们都靠"带着"或"右键"生效，不属于盔甲配件
+            entries.add(FADED_CHARM);
+            entries.add(CRACKED_COMPASS);
+            entries.add(DRIED_CLOVER);
+            entries.add(DAIKSON_OXYGEN_ORB);
+            entries.add(NATURAL_RUNE);
+            // 缝在武器上的两件：它们走的是「遗物」这条路（不是盔甲配件），
+            // 因此在遗物装卸台与锻造台都能装
+            entries.add(OLD_BOW_OIL);
+            entries.add(OLD_SWORD_BAND);
+            entries.add(REVERSAL_PENDANT);
             // 巡夜斗篷：它放在背包里就有用（夜里的移速），所以与遗物并排放在这一页；
             // 同时它也是一个「胸甲护具」，在「盔甲配件」那一页另有一份
             entries.add(NIGHTWATCH_CLOAK);
