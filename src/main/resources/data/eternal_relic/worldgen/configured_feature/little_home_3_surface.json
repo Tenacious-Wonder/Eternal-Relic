@@ -1,0 +1,36 @@
+{
+  "type": "eternal_relic:little_home",
+  "config": {
+    "variants": [
+      "little_home_3_01",
+      "little_home_3_02",
+      "little_home_3_03",
+      "little_home_3_04",
+      "little_home_3_05",
+      "little_home_3_06",
+      "little_home_3_07",
+      "little_home_3_08",
+      "little_home_3_09",
+      "little_home_3_10"
+    ],
+    "loot_table": "eternal_relic:chests/little_home_3",
+    "exclusive_loot_tables": {
+      "little_home_3_01": "eternal_relic:chests/little_home_3_01",
+      "little_home_3_02": "eternal_relic:chests/little_home_3_02",
+      "little_home_3_03": "eternal_relic:chests/little_home_3_03",
+      "little_home_3_05": "eternal_relic:chests/little_home_3_05",
+      "little_home_3_07": "eternal_relic:chests/little_home_3_07",
+      "little_home_3_09": "eternal_relic:chests/little_home_3_07"
+    },
+    "exclusive_loot_chance": 0.5,
+    "no_burrow_variants": [ "little_home_3_06" ],
+    "strip_ground": true,
+    "keep_floors": true,
+    "require_open_space": false,
+    "hole_chance": 0.5,
+    "burrow_chance": 0.1,
+    "slab_chance": 0.55,
+    "worn_slab_chance": 0.2,
+    "weathering_scale": 1.0
+  }
+}

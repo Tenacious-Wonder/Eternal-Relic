@@ -1,0 +1,49 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "eternal_relic:leather_lining",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "eternal_relic:leather_shoulder_guard_pair",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "eternal_relic:leather_shoulder_guard_left",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "eternal_relic:leather_shoulder_guard_right",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "eternal_relic:copper_chestplate_plate",
+          "weight": 8
+        },
+        {
+          "type": "minecraft:item",
+          "name": "eternal_relic:mottled_copper_plate",
+          "weight": 8
+        },
+        {
+          "type": "minecraft:item",
+          "name": "eternal_relic:armadillo_scute",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 79
+        }
+      ]
+    }
+  ]
+}
