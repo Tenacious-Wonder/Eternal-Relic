@@ -586,6 +586,14 @@ public final class ModItems {
         ItemGroupEvents.modifyEntriesEvent(RELIC_GROUP_KEY).register(entries -> {
             entries.add(ModBlocks.RELIC_STATION_ITEM);
             entries.add(ModBlocks.CHESTPLATE_STATION_ITEM);
+            // 四个埋藏块：长得和原版方块一样，拿刷子刷能刷出东西
+            entries.add(ModBlocks.RELIC_GRASS_ITEM);
+            entries.add(ModBlocks.RELIC_SAND_ITEM);
+            entries.add(ModBlocks.RELIC_GRAVEL_ITEM);
+            entries.add(ModBlocks.RELIC_PODZOL_ITEM);
+            // 裂石砖的台阶与楼梯：1.20.1 原版没有这对，遗迹做旧要用
+            entries.add(ModBlocks.CRACKED_STONE_BRICK_SLAB_ITEM);
+            entries.add(ModBlocks.CRACKED_STONE_BRICK_STAIRS_ITEM);
             entries.add(HAMMER);
             entries.add(SMALL_HAMMER);
             entries.add(AOTA_BRANCH);

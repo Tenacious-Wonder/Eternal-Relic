@@ -1,0 +1,12 @@
+{
+  "feature": "eternal_relic:little_home_cluster",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 1
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

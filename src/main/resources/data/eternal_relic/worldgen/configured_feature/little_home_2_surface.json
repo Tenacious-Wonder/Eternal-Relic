@@ -1,0 +1,25 @@
+{
+  "type": "eternal_relic:little_home",
+  "config": {
+    "variants": [
+      "little_home_2_01",
+      "little_home_2_02",
+      "little_home_2_03",
+      "little_home_2_04",
+      "little_home_2_05",
+      "little_home_2_06",
+      "little_home_2_07",
+      "little_home_2_08",
+      "little_home_2_09",
+      "little_home_2_10"
+    ],
+    "loot_table": "eternal_relic:chests/little_home_2",
+    "strip_ground": true,
+    "require_open_space": false,
+    "hole_chance": 0.5,
+    "burrow_chance": 0.1,
+    "slab_chance": 0.55,
+    "worn_slab_chance": 0.2,
+    "weathering_scale": 1.0
+  }
+}

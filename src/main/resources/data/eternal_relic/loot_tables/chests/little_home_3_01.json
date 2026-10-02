@@ -1,0 +1,172 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3.0,
+        "max": 7.0
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:bread",
+          "weight": 2,
+          "functions": [
+            { "function": "minecraft:set_count", "add": false,
+              "count": { "type": "minecraft:uniform", "min": 1.0, "max": 2.0 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:wheat",
+          "weight": 10,
+          "functions": [
+            { "function": "minecraft:set_count", "add": false,
+              "count": { "type": "minecraft:uniform", "min": 1.0, "max": 3.0 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:coal",
+          "weight": 5,
+          "functions": [
+            { "function": "minecraft:set_count", "add": false,
+              "count": { "type": "minecraft:uniform", "min": 1.0, "max": 4.0 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:arrow",
+          "weight": 10,
+          "functions": [
+            { "function": "minecraft:set_count", "add": false,
+              "count": { "type": "minecraft:uniform", "min": 3.0, "max": 8.0 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:torch",
+          "weight": 8,
+          "functions": [
+            { "function": "minecraft:set_count", "add": false,
+              "count": { "type": "minecraft:uniform", "min": 1.0, "max": 4.0 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:string",
+          "weight": 8,
+          "functions": [
+            { "function": "minecraft:set_count", "add": false,
+              "count": { "type": "minecraft:uniform", "min": 1.0, "max": 4.0 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:leather",
+          "weight": 8,
+          "functions": [
+            { "function": "minecraft:set_count", "add": false,
+              "count": { "type": "minecraft:uniform", "min": 1.0, "max": 2.0 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:bone",
+          "weight": 8,
+          "functions": [
+            { "function": "minecraft:set_count", "add": false,
+              "count": { "type": "minecraft:uniform", "min": 1.0, "max": 3.0 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_nugget",
+          "weight": 8,
+          "functions": [
+            { "function": "minecraft:set_count", "add": false,
+              "count": { "type": "minecraft:uniform", "min": 2.0, "max": 5.0 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_ingot",
+          "weight": 8
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:gold_ingot",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:emerald",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:stick",
+          "weight": 5,
+          "functions": [
+            { "function": "minecraft:set_count", "add": false,
+              "count": { "type": "minecraft:uniform", "min": 1.0, "max": 2.0 } }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "weight": 8,
+          "name": "eternal_relic:chests/little_home_planks"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:loot_table", "name": "eternal_relic:chests/little_home_3_01_extras" }
+      ]
+    },
+    {
+      "rolls": { "type": "minecraft:binomial", "n": 1.0, "p": 0.3 },
+      "entries": [
+        { "type": "minecraft:loot_table", "name": "eternal_relic:chests/little_home_3_01_extras" }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:item", "name": "eternal_relic:beeswax_pendant", "weight": 2 },
+        { "type": "minecraft:item", "name": "eternal_relic:enchanted_rabbit_foot", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:dreadful_wolf_fang_pendant", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:traveler_pendant", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:scholar_monocle", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:cast_iron_thumb_ring", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:hunter_badge", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:shepherd_bell", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:round_cake", "weight": 1 },
+        { "type": "minecraft:empty", "weight": 240 }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:item", "name": "eternal_relic:hardened_iron_plate", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:scute_lining", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:turtle_shell_lining", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:scute_shoulder_guard_pair", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:scute_shoulder_guard_left", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:scute_shoulder_guard_right", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:turtle_shell_shoulder_guard_pair", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:turtle_shell_shoulder_guard_left", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:turtle_shell_shoulder_guard_right", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:iron_shoulder_guard_pair", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:iron_shoulder_guard_left", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:iron_shoulder_guard_right", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:copper_shoulder_guard_pair", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:copper_shoulder_guard_left", "weight": 1 },
+        { "type": "minecraft:item", "name": "eternal_relic:copper_shoulder_guard_right", "weight": 1 },
+        { "type": "minecraft:empty", "weight": 1110 }
+      ]
+    }
+  ]
+}

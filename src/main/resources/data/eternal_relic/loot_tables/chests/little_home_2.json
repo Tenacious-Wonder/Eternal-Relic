@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "name": "eternal_relic:chests/little_home",
+          "weight": 70
+        },
+        {
+          "type": "minecraft:loot_table",
+          "name": "eternal_relic:chests/little_home_2_smith",
+          "weight": 30
+        }
+      ]
+    }
+  ]
+}

@@ -4,6 +4,12 @@
 
   "block.eternal_relic.relic_station": "遗物装卸台",
   "block.eternal_relic.chestplate_station": "胸甲台",
+  "block.eternal_relic.relic_grass": "可疑的草地",
+  "block.eternal_relic.relic_sand": "可疑的沙子",
+  "block.eternal_relic.relic_gravel": "可疑的沙砾",
+  "block.eternal_relic.relic_podzol": "可疑的灰化土",
+  "block.eternal_relic.cracked_stone_brick_slab": "裂石砖台阶",
+  "block.eternal_relic.cracked_stone_brick_stairs": "裂石砖楼梯",
   "container.eternal_relic.chestplate_station": "胸甲台",
   "item.eternal_relic.hammer": "铁锤",
   "item.eternal_relic.small_hammer": "小铁锤",
