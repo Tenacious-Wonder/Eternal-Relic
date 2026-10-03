@@ -50,6 +50,13 @@ import org.eternalrelic.network.SoulLanternNetwork;
  *   <li>{@link org.eternalrelic.capability.carried.SnowGripStudsEffect} —— 「踩冰不滑」能力：
  *       带着雪地靴钉的人踩在冰面上与踩在石头地上一样稳（实际动手处见
  *       {@link org.eternalrelic.mixin.SnowGripStudsMixin}）。</li>
+ *   <li>{@link org.eternalrelic.capability.carried.EmberPendantEffect} —— 「余烬反扑」能力：
+ *       带着余烬吊坠的人血量低于四成半时再挨打，就在身周五格内炸开一圈，点着敌对生物，
+ *       并给自己一层抗火；每炸一次耗一点耐久，用尽变「黯淡」，可由附魔之瓶修复。</li>
+ *   <li>{@link org.eternalrelic.capability.carried.HomestoneEffect} —— 「记下归途」能力：
+ *       拿着归乡石右键记下脚下这一处，再右键一次人立刻回去。</li>
+ *   <li>{@link org.eternalrelic.capability.attached.BloomEmblemEffect} —— 「繁花绽放」能力：
+ *       带着（或缝着）繁花纹章挨近战打之后，随机给一条 1 级增益。</li>
  *   <li>{@link WolfAweEffect} —— 「野狼慑服」能力：身边的野狼被狼王气息镇住而坐下，走开即恢复。</li>
  *   <li>{@link WolfTamingEffect} —— 「喂骨头更容易认主」能力：把驯服狼的机会从三分之一抬到六分之五。</li>
  *   <li>{@link WornRelicEffect} —— 「装入生效」能力：把守夜之瞳装进眼中，并让代价跟随玩家。</li>

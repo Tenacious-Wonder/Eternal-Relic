@@ -927,6 +927,66 @@ public final class ModRelics {
             ModItems.MOON_EMBLEM,
             MaterialRarity.LUMBER);
 
+    /**
+     * 繁花纹章 —— 缝在胸甲上，穿着它挨<b>近战</b>打之后随机得到一条 1 级增益，持续 10 秒。
+     *
+     * <p>它<b>没有任何属性加成</b>，也不在挨打时挡伤害：价值全在「挨一下、换一条随机的增益」上，
+     * 由 {@link org.eternalrelic.capability.attached.BloomEmblemEffect} 负责。
+     * 抽的是哪十一条、以及怎么做到「不与原有 buff 叠加」，都写在那一个类里。</p>
+     *
+     * <p><b>放在背包里就生效</b>，缝在胸甲上也算。若要缝上去，只能走遗物装卸台、
+     * 而且只能缝胸甲（见 {@link AttachableRelics} 里那一行）——那两条管的是「怎么附上去」。
+     * 因此它没有打开 {@code attachmentOnly}（那一栏管的是属性加成从哪儿算，而这件纹章没有属性加成），
+     * 生效与否由能力类自己问。</p>
+     *
+     * <p>固有稀有度为成材：与勇气、川流、太阳、月亮四枚同一档的蜡制纹章。</p>
+     */
+    public static final RelicDefinition BLOOM_EMBLEM = define(
+            ModItems.BLOOM_EMBLEM,
+            MaterialRarity.LUMBER);
+
+    /**
+     * 余烬吊坠 —— 血量低于三成时再挨打，在身周炸开一圈，把凑上来的敌人一起掀开。
+     *
+     * <p>它没有属性加成，<b>也不是「守护」</b>——这一击照常挨，只是挨完之后反扑一次。
+     * 守护那一栏（{@link DamageWard}）管的是「把这一击整个挡下、或改成给金心」，
+     * 与这里要的「挨了再还手」是两件事，所以它没有登记守护，而是自己挂挨打判定
+     * （见 {@link org.eternalrelic.capability.carried.EmberPendantEffect}）。</p>
+     *
+     * <p>固有稀有度为精萃：一次能救命的临场反扑，但只有命悬一线时才轮得到它。</p>
+     */
+    public static final RelicDefinition EMBER_PENDANT = define(
+            ModItems.EMBER_PENDANT,
+            MaterialRarity.ESSENCE);
+
+    /**
+     * 黯淡的余烬吊坠 —— 用尽 21 次之后的余烬吊坠，里头已经烧空。
+     *
+     * <p>它自身没有任何效果，登记进遗物表只为一件事：<b>效果说明只有遗物界面会显示，
+     * 而界面要求物品在遗物表里</b>。不进遗物表的话，语言文件里那句「已经烧尽、用附魔之瓶
+     * 在工作台上修一修就能再用」玩家永远看不到，提示框里也会少一行稀有度与
+     * 「按左 Shift」的指路——回响之环的碎裂形态走的是同一条路。</p>
+     *
+     * <p>稀有度沿用本体（精萃）：烧空了只是它此刻的状态，成色不该随状态变化。</p>
+     */
+    public static final RelicDefinition EMBER_PENDANT_DULL = define(
+            ModItems.EMBER_PENDANT_DULL,
+            MaterialRarity.ESSENCE);
+
+    /**
+     * 归乡石 —— 拿在手上右键记下脚下这一处，再右键一次立刻回到那里
+     * （代价是一个经验等级，之后冷却三分钟）。
+     *
+     * <p>它没有属性加成，也不在挨打时出手：价值全在「把位置存下来、之后再兑现」上，
+     * 由 {@link org.eternalrelic.capability.carried.HomestoneEffect} 负责；
+     * 位置与冷却都写在石头自己的数据里，因此身上带着两块时各记各的、各冷各的。</p>
+     *
+     * <p>固有稀有度为精萃：一件随时抽身的器物，但跨维度不行——那一条是刻意的取舍。</p>
+     */
+    public static final RelicDefinition HOMESTONE = define(
+            ModItems.HOMESTONE,
+            MaterialRarity.ESSENCE);
+
     // ==================== 品阶样本（测试用） ====================
 
     /**

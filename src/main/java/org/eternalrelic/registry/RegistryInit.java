@@ -1,6 +1,7 @@
 package org.eternalrelic.registry;
 
 import org.eternalrelic.bodypart.MeleeBodyPartDetector;
+import org.eternalrelic.capability.attached.BloomEmblemEffect;
 import org.eternalrelic.capability.attached.ChestGuardEffect;
 import org.eternalrelic.capability.attached.WindCloakEffect;
 import org.eternalrelic.capability.carried.*;
@@ -26,6 +27,7 @@ public class RegistryInit {
         MeleeBodyPartDetector.register();
         CarriedRelicEffect.register();
         DamageWardEffect.register();
+        EmberPendantEffect.register();
         EnchantedRabbitFootEffect.register();
         TravelerPendantEffect.register();
         ShepherdBellEffect.register();
@@ -34,6 +36,7 @@ public class RegistryInit {
         NaturalRuneEffect.register();
         ScavengerMagnetEffect.register();
         ChestGuardEffect.register();
+        BloomEmblemEffect.register();
         WindCloakEffect.register();
         SoulLanternEffect.register();
         CourageEmblemEffect.register();

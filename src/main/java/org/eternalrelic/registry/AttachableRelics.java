@@ -305,5 +305,14 @@ public final class AttachableRelics {
                 Items.LEATHER,
                 RelicAttachment.Stacking.NONE,
                 AttachTarget.MELEE_WEAPON);
+
+        // 繁花纹章：蜡制的，配蜜脾；**只缝胸甲**，而且**只能走遗物装卸台** ——
+        // 锻造台那条流水线不受理它（制作者指定的做法，见 registerStationOnly）。
+        // 纹章不填类别，因此它可以与别的纹章、以及肩甲内衬那类配件同时待在一件胸甲上
+        RelicAttachment.registerStationOnly(
+                ModItems.BLOOM_EMBLEM,
+                Items.HONEYCOMB,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
     }
 }

@@ -23,6 +23,7 @@ import org.eternalrelic.item.EchoConchItem;
 import org.eternalrelic.item.EchoRingItem;
 import org.eternalrelic.item.EchoStoneItem;
 import org.eternalrelic.item.EnchantedRabbitFootItem;
+import org.eternalrelic.item.HomestoneItem;
 import org.eternalrelic.item.NightwatchEyeItem;
 import org.eternalrelic.item.PocketWatchItem;
 import org.eternalrelic.item.RelicItem;
@@ -258,6 +259,39 @@ public final class ModItems {
     public static final Item REVERSAL_PENDANT = register("reversal_pendant",
             new RelicItem(new Item.Settings().maxCount(1)));
 
+    /**
+     * 余烬吊坠 —— 带在身上时，血量低于三成再挨打，就在身周炸开一圈，
+     * 把凑上来的敌人一起掀开。
+     *
+     * <p>它<b>不替玩家挡伤害</b>：这一击照常挨，只是让围着打的人也要付一点代价。与回响之环、
+     * 荆棘之誓合起来是本模组三种「挨打时出手」——<b>环挡、荆棘还、余烬炸</b>。
+     * 判定与出手见 {@link org.eternalrelic.capability.carried.EmberPendantEffect}。</p>
+     */
+    /**
+     * 余烬吊坠总共能用几次 —— 每引爆一次耗掉一点耐久，用尽之后变成「黯淡」形态。
+     *
+     * <p>这个数同时管着三件事：物品上耐久条的长度、能炸几次、以及工作台上「修 33%」
+     * 会补回几点（21 的三分之一正好是 7，见
+     * {@link org.eternalrelic.recipe.EmberPendantRepairRecipe}）。
+     * 因此它写在这里、挨着物品，而不是散在能力类里再复制一遍。</p>
+     */
+    private static final int EMBER_PENDANT_USES = 21;
+
+    public static final Item EMBER_PENDANT = register("ember_pendant",
+            new RelicItem(new Item.Settings().maxCount(1).maxDamage(EMBER_PENDANT_USES)));
+
+    /**
+     * 黯淡的余烬吊坠 —— 余烬吊坠用尽之后的样子：还是那块吊坠，里头却已经烧空了。
+     *
+     * <p>它没有任何效果，但<b>不会消失</b>：在工作台上与附魔之瓶合成一次，就能补回
+     * 三分之一耐久重新烧起来（见 {@link org.eternalrelic.recipe.EmberPendantRepairRecipe}）。
+     * 这与回响之环的「碎裂」、守夜之瞳的「耗尽」是同一条思路——
+     * <b>不让玩家白丢一件遗物</b>，只是这一件把"还剩几次"做成了看得见的耐久条，
+     * 因此它在彻底用尽时才换形态，而不像那两个是出手一次就换。</p>
+     */
+    public static final Item EMBER_PENDANT_DULL = register("ember_pendant_dull",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
     // ==================== 会报信的四件小东西 ====================
 
     /**
@@ -315,6 +349,18 @@ public final class ModItems {
      */
     public static final Item ECHO_STONE = register("echo_stone",
             new EchoStoneItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 归乡石 —— 拿在手上右键：第一次记下脚下这一处，再右键一次人立刻回到那里。
+     *
+     * <p><b>它是本模组第一件「把位置存起来、之后再兑现」的遗物。</b>此前与地点有关的只有
+     * 蜡封手账，但它只报方位与距离，路还得自己走。位置记在石头自己的数据里，因此丢进箱子、
+     * 交给队友、带过维度都跟着走；跨维度一律拒绝，回去一次要付一个经验等级，之后冷却三分钟。
+     * 判定见 {@link org.eternalrelic.capability.carried.HomestoneEffect}，
+     * 右键那一层见 {@link HomestoneItem}。</p>
+     */
+    public static final Item HOMESTONE = register("homestone",
+            new HomestoneItem(new Item.Settings().maxCount(1)));
 
     // ==================== 踩冰不滑的那一件 ====================
 
@@ -422,6 +468,18 @@ public final class ModItems {
      * 月亮纹章 —— 带在身上时，夜晚持续给「生命恢复」与「速度」。
      */
     public static final Item MOON_EMBLEM = register("moon_emblem",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 繁花纹章 —— 带着它挨<b>近战</b>打之后，随机得到一条 1 级增益，持续 10 秒。
+     *
+     * <p><b>放在背包里就生效</b>，缝在胸甲上也算。若要缝上去，只能走遗物装卸台、
+     * 而且只能缝胸甲——锻造台那条入口不受理它（见
+     * {@link org.eternalrelic.relic.RelicAttachment#registerStationOnly}）。
+     * 抽的是哪十一条、以及怎么做到「不与原有 buff 叠加」，见
+     * {@link org.eternalrelic.capability.attached.BloomEmblemEffect}。</p>
+     */
+    public static final Item BLOOM_EMBLEM = register("bloom_emblem",
             new RelicItem(new Item.Settings().maxCount(1)));
 
     /**
@@ -810,6 +868,8 @@ public final class ModItems {
             entries.add(TRAVELER_PENDANT);           // 旅人吊坠（粗石）
             entries.add(DREADFUL_WOLF_FANG_PENDANT); // 可怕狼牙吊坠（粗石）
             entries.add(REVERSAL_PENDANT);           // 颠倒吊坠（粗石）
+            entries.add(EMBER_PENDANT);              // 余烬吊坠（精萃）
+            entries.add(EMBER_PENDANT_DULL);         // 黯淡的余烬吊坠（精萃）
 
             // 护符
             entries.add(FADED_CHARM);                // 褪色的护身符（碎屑）
@@ -838,6 +898,7 @@ public final class ModItems {
             entries.add(SUN_EMBLEM);             // 太阳纹章
             entries.add(MOON_EMBLEM);            // 月亮纹章
             entries.add(STREAM_EMBLEM);          // 川流纹章
+            entries.add(BLOOM_EMBLEM);           // 繁花纹章
 
             // 至宝
             entries.add(ETERNAL_EMBLEM);         // 永恒纹章
@@ -859,6 +920,7 @@ public final class ModItems {
             entries.add(SOUL_LANTERN);           // 引魂燃灯（珍品）
 
             // 护身器物
+            entries.add(HOMESTONE);              // 归乡石（精萃）
             entries.add(AOTA_BRANCH);            // 奥塔的枝叶（珍品）
             entries.add(ECHO_RING);              // 回响之环（珍品）
             entries.add(ECHO_RING_DRAINED);      // 回响之环（碎裂）
