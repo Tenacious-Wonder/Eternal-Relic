@@ -16,16 +16,22 @@ import net.minecraft.text.Text;
 
 import org.eternalrelic.EternalRelic;
 import org.eternalrelic.item.AotaBranchItem;
+import org.eternalrelic.item.BeastWhistleItem;
 import org.eternalrelic.item.CrackedCompassItem;
 import org.eternalrelic.item.DaiksonOxygenOrbItem;
+import org.eternalrelic.item.EchoConchItem;
 import org.eternalrelic.item.EchoRingItem;
+import org.eternalrelic.item.EchoStoneItem;
 import org.eternalrelic.item.EnchantedRabbitFootItem;
 import org.eternalrelic.item.NightwatchEyeItem;
+import org.eternalrelic.item.PocketWatchItem;
 import org.eternalrelic.item.RelicItem;
 import org.eternalrelic.item.RoundCakeItem;
 import org.eternalrelic.item.ScavengerPocketItem;
 import org.eternalrelic.item.ShepherdBellItem;
 import org.eternalrelic.item.SoulLanternItem;
+import org.eternalrelic.item.WaxSealedJournalItem;
+import org.eternalrelic.item.WeatherBottleItem;
 import org.eternalrelic.relic.NightwatchEye;
 
 /**
@@ -38,22 +44,33 @@ import org.eternalrelic.relic.NightwatchEye;
  */
 public final class ModItems {
 
-    /** 本模组在创造模式物品栏中的专属分类的注册名。 */
-    private static final RegistryKey<ItemGroup> RELIC_GROUP_KEY =
-            RegistryKey.of(RegistryKeys.ITEM_GROUP, EternalRelic.id("relic_group"));
-
     /**
-     * 盔甲配件在创造模式物品栏里独占的那一页。
+     * 本模组在创造模式物品栏里的六个分类。
      *
-     * <p>肩甲、内衬、甲片、胸甲片都属于「装备配件」——它们能缝在装备上，而且同类只能缝一件
-     * （见 {@link org.eternalrelic.relic.FittingCategory}）。数量已经有二十二件，
-     * 再混在遗物那一页里会越来越难找，因此单开一页。</p>
+     * <p><b>按「这东西是什么」分页，每页内部再按稀有度从低到高排</b>
+     * （碎屑 → 粗石 → 成材 → 精萃 → 珍品 → 至宝 → 源质）—— 这是制作者定的规矩，
+     * 为的是在创造模式里翻两下就能找到东西。六页各自装什么，见 {@link #register()} 里那六段登记。</p>
      *
-     * <p><b>纹章一类不在这里</b>：它们虽然也能钉在装备上，但不属于任何配件类别，
-     * 是本模组的「遗物」，仍旧留在遗物那一页。</p>
+     * <p>⚠️ <b>新增物品时必须挑一页登记进去</b>，否则它虽然做出来了，却不会出现在任何一个分类里。
+     * <b>一件东西可以同时出现在多页</b>（巡夜斗篷既是佩饰、也是缝在胸甲上的配件），
+     * 但同一页里只能有一份。</p>
      */
-    private static final RegistryKey<ItemGroup> ARMOR_FITTING_GROUP_KEY =
-            RegistryKey.of(RegistryKeys.ITEM_GROUP, EternalRelic.id("armor_fitting_group"));
+    private static final RegistryKey<ItemGroup> PENDANT_GROUP_KEY = relicGroup("pendant_group");
+
+    /** 纹章那一页：五枚可以叠着钉在装备或武器上的纹章。 */
+    private static final RegistryKey<ItemGroup> EMBLEM_GROUP_KEY = relicGroup("emblem_group");
+
+    /** 装备配件那一页：缝在装备与武器上的东西（配件与涂装）。 */
+    private static final RegistryKey<ItemGroup> ARMOR_FITTING_GROUP_KEY = relicGroup("armor_fitting_group");
+
+    /** 器物那一页：灯、环、义眼、口袋、钟表、螺壳这类随身器物。 */
+    private static final RegistryKey<ItemGroup> VESSEL_GROUP_KEY = relicGroup("vessel_group");
+
+    /** 消耗品那一页：用掉就没的东西。 */
+    private static final RegistryKey<ItemGroup> CONSUMABLE_GROUP_KEY = relicGroup("consumable_group");
+
+    /** 材料与工具那一页：做遗物用的材料、工具与工作方块。 */
+    private static final RegistryKey<ItemGroup> MATERIAL_GROUP_KEY = relicGroup("material_group");
 
     /**
      * 奥塔的枝叶 —— 携带在背包中时提升生命上限的遗物。
@@ -239,6 +256,77 @@ public final class ModItems {
      * 出手点与荆棘之誓同一处（护甲与附魔都算完之后）。</p>
      */
     public static final Item REVERSAL_PENDANT = register("reversal_pendant",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    // ==================== 会报信的四件小东西 ====================
+
+    /**
+     * 旧怀表 —— 拿在手上右键，报出此刻的钟点，以及距天黑 / 天亮还有多久。
+     *
+     * <p>它与磕碰的罗盘是同一路数：自己什么都不改，只把玩家本来要靠估摸的东西报成一个数。
+     * 报的是世界时间，因此阴天下雨也照常走针。判定见 {@link PocketWatchItem}。</p>
+     */
+    public static final Item POCKET_WATCH = register("pocket_watch",
+            new PocketWatchItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 气象瓶 —— 拿在手上右键，报出接下来的天气，以及大约还有多久变天。
+     *
+     * <p><b>它读的是世界自己的天气计时器</b>，因此不是猜：原版的天气到点就翻面，
+     * 那个「还有多少刻变天」的数本来就存在。判定见 {@link WeatherBottleItem}。</p>
+     */
+    public static final Item WEATHER_BOTTLE = register("weather_bottle",
+            new WeatherBottleItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 回声螺壳 —— 拿在手上右键，报出四周活物的数量，以及最近那只敌对生物的方向与距离。
+     *
+     * <p>它只报「有几只、在哪个方向」，不报具体位置：墙后面的东西一样只算个数。
+     * 判定见 {@link EchoConchItem}。</p>
+     */
+    public static final Item ECHO_CONCH = register("echo_conch",
+            new EchoConchItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 蜡封手账 —— 蹲下右键记下脚下的地点，平时右键报出那个地点在哪个方向、离多远。
+     *
+     * <p><b>它记在物品自己身上</b>（与拾荒口袋、装备附件同一条道理）：手账被丢进箱子、
+     * 交给队友、带过维度，记下的那一页都跟着它走。判定见 {@link WaxSealedJournalItem}。</p>
+     */
+    public static final Item WAX_SEALED_JOURNAL = register("wax_sealed_journal",
+            new WaxSealedJournalItem(new Item.Settings().maxCount(1)));
+
+    // ==================== 招呼别的东西的两件 ====================
+
+    /**
+     * 驯兽哨 —— 拿在手上右键，把 30 格内自己的宠物叫到身边。
+     *
+     * <p>只认「认你为主」的那些：队友的狗、野生的狼都不会理你；跨维度的也不招呼。
+     * 判定见 {@link BeastWhistleItem}。</p>
+     */
+    public static final Item BEAST_WHISTLE = register("beast_whistle",
+            new BeastWhistleItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 回音石 —— 拿在手上右键，把 20 格内的怪物引向自己。
+     *
+     * <p><b>这是一件双刃剑</b>：它不伤害任何东西，只是让怪当场认定「你在那里」——
+     * 引开、聚堆、或者自找麻烦，用法由玩家定。判定见 {@link EchoStoneItem}。</p>
+     */
+    public static final Item ECHO_STONE = register("echo_stone",
+            new EchoStoneItem(new Item.Settings().maxCount(1)));
+
+    // ==================== 踩冰不滑的那一件 ====================
+
+    /**
+     * 雪地靴钉 —— 带在身上时，踩在冰面上不再打滑。
+     *
+     * <p><b>它补的是原版的一处「说不上是缺陷的缺陷」</b>：冰与浮冰的摩擦系数是 0.98
+     * （普通地面只有 0.6），踩上去刹不住。判定见
+     * {@link org.eternalrelic.capability.carried.SnowGripStudsEffect}，
+     * 动手的位置在 {@code mixin/SnowGripStudsMixin}。</p>
+     */
+    public static final Item SNOW_GRIP_STUDS = register("snow_grip_studs",
             new RelicItem(new Item.Settings().maxCount(1)));
 
     // ==================== 碎屑档的小东西 ====================
@@ -662,29 +750,28 @@ public final class ModItems {
         VanillaMaterialRarities.register();
         VanillaItemGrades.register();
 
-        Registry.register(Registries.ITEM_GROUP, RELIC_GROUP_KEY, FabricItemGroup.builder()
-                .icon(() -> new ItemStack(AOTA_BRANCH))
-                .displayName(Text.translatable("itemGroup.eternal_relic.relic_group"))
-                .build());
+        // 六个分类：图标各挑一件代表物；显示名走语言文件，键名由分类 id 拼出来（见 registerGroup）
+        registerGroup(PENDANT_GROUP_KEY, TRAVELER_PENDANT);
+        registerGroup(EMBLEM_GROUP_KEY, COURAGE_EMBLEM);
+        registerGroup(ARMOR_FITTING_GROUP_KEY, MITHRIL_CHESTPLATE_PLATE);
+        registerGroup(VESSEL_GROUP_KEY, SOUL_LANTERN);
+        registerGroup(CONSUMABLE_GROUP_KEY, ROUND_CAKE);
+        registerGroup(MATERIAL_GROUP_KEY, HAMMER);
 
-        Registry.register(Registries.ITEM_GROUP, ARMOR_FITTING_GROUP_KEY, FabricItemGroup.builder()
-                .icon(() -> new ItemStack(MITHRIL_CHESTPLATE_PLATE))
-                .displayName(Text.translatable("itemGroup.eternal_relic.armor_fitting_group"))
-                .build());
-
-        // 盔甲配件那一页：按「甲片 → 内衬 → 肩甲（由薄到厚）→ 胸甲片」的顺序摆，
-        // 同一档的左 / 右 / 一套连在一起，翻起来一眼看得出有几档、每档有哪三件
+        // ==================== 装备配件（缝在装备与武器上）====================
+        // 排序：先按小类聚拢（甲片 → 内衬 → 肩甲 → 胸甲片 → 斗篷 → 武器涂装），
+        // 每个小类内部再按稀有度从低到高；肩甲内部按 左 / 右 / 整套 挨着排
         ItemGroupEvents.modifyEntriesEvent(ARMOR_FITTING_GROUP_KEY).register(entries -> {
-            // 甲片：缝在四个部位防具上的金属片
-            entries.add(MOTTLED_COPPER_PLATE);
-            entries.add(HARDENED_IRON_PLATE);
+            // 甲片
+            entries.add(MOTTLED_COPPER_PLATE);             // 斑驳的铜甲片（粗石）
+            entries.add(HARDENED_IRON_PLATE);              // 坚铁甲片（成材）
 
-            // 内衬：缝在防具内侧的衬里
-            entries.add(LEATHER_LINING);
-            entries.add(SCUTE_LINING);
-            entries.add(TURTLE_SHELL_LINING);
+            // 内衬
+            entries.add(LEATHER_LINING);                   // 皮革内衬（粗石）
+            entries.add(SCUTE_LINING);                     // 鳞甲内衬（成材）
+            entries.add(TURTLE_SHELL_LINING);              // 龟壳内衬（成材）
 
-            // 肩甲：皮革 → 鳞片 → 龟壳 → 铁片 → 铜片
+            // 肩甲：皮革（粗石）→ 鳞片 → 龟壳 → 铁片 → 铜片（成材）
             entries.add(LEATHER_SHOULDER_GUARD_LEFT);
             entries.add(LEATHER_SHOULDER_GUARD_RIGHT);
             entries.add(LEATHER_SHOULDER_GUARD_PAIR);
@@ -701,74 +788,133 @@ public final class ModItems {
             entries.add(COPPER_SHOULDER_GUARD_RIGHT);
             entries.add(COPPER_SHOULDER_GUARD_PAIR);
 
-            // 胸甲片：贴在胸甲正面的圆甲片
-            entries.add(COPPER_CHESTPLATE_PLATE);
-            entries.add(MITHRIL_CHESTPLATE_PLATE);
-            entries.add(NIGHTWATCH_CLOAK);
+            // 胸甲片
+            entries.add(COPPER_CHESTPLATE_PLATE);          // 铜胸甲片（碎屑）
+            entries.add(MITHRIL_CHESTPLATE_PLATE);         // 秘银胸甲片（珍品）
+
+            // 斗篷
+            entries.add(NIGHTWATCH_CLOAK);                 // 巡夜斗篷（成材）
+            entries.add(WIND_CLOAK);                       // 风行披风（精萃）
+
+            // 武器涂装
+            entries.add(OLD_BOW_OIL);                      // 古旧弓油（碎屑，涂在弓弩上）
+            entries.add(OLD_SWORD_BAND);                   // 古旧剑带（碎屑，缠在近战武器上）
         });
 
-        ItemGroupEvents.modifyEntriesEvent(RELIC_GROUP_KEY).register(entries -> {
-            entries.add(ModBlocks.RELIC_STATION_ITEM);
-            entries.add(ModBlocks.CHESTPLATE_STATION_ITEM);
+        // ==================== 佩饰（挂在身上、随身携带的小件）====================
+        // 排序：先按小类聚拢（吊坠 → 护符 → 符石 → 戒指 → 眼镜 → 徽章 → 草药），
+        // 每个小类内部再按稀有度从低到高
+        ItemGroupEvents.modifyEntriesEvent(PENDANT_GROUP_KEY).register(entries -> {
+            // 吊坠
+            entries.add(BEESWAX_PENDANT);            // 蜂蜡吊坠（碎屑）
+            entries.add(TRAVELER_PENDANT);           // 旅人吊坠（粗石）
+            entries.add(DREADFUL_WOLF_FANG_PENDANT); // 可怕狼牙吊坠（粗石）
+            entries.add(REVERSAL_PENDANT);           // 颠倒吊坠（粗石）
+
+            // 护符
+            entries.add(FADED_CHARM);                // 褪色的护身符（碎屑）
+
+            // 符石
+            entries.add(NATURAL_RUNE);               // 平凡的自然符石（碎屑）
+            entries.add(SCAVENGER_MAGNET);           // 拾荒符石（碎屑）
+
+            // 戒指
+            entries.add(CAST_IRON_THUMB_RING);       // 铸铁拇指戒（粗石）
+
+            // 眼镜
+            entries.add(SCHOLAR_MONOCLE);            // 学者单片眼镜（粗石）
+
+            // 徽章
+            entries.add(HUNTER_BADGE);               // 猎人徽章（粗石）
+
+            // 草药
+            entries.add(DRIED_CLOVER);               // 干枯的四叶草（碎屑）
+        });
+
+        // ==================== 纹章（可以叠着钉在装备与武器上）====================
+        ItemGroupEvents.modifyEntriesEvent(EMBLEM_GROUP_KEY).register(entries -> {
+            // 成材
+            entries.add(COURAGE_EMBLEM);         // 勇气纹章
+            entries.add(SUN_EMBLEM);             // 太阳纹章
+            entries.add(MOON_EMBLEM);            // 月亮纹章
+            entries.add(STREAM_EMBLEM);          // 川流纹章
+
+            // 至宝
+            entries.add(ETERNAL_EMBLEM);         // 永恒纹章
+        });
+
+        // ==================== 器物（随身带着的各种器物）====================
+        // 排序：先按小类聚拢（报信小物 → 收纳与照明 → 护身器物 → 义眼 → 招呼生物 →
+        // 身上小件 → 装置），每个小类内部再按稀有度从低到高
+        ItemGroupEvents.modifyEntriesEvent(VESSEL_GROUP_KEY).register(entries -> {
+            // 报信小物：看一眼就收起来的那几件
+            entries.add(CRACKED_COMPASS);        // 磕碰的罗盘（碎屑）
+            entries.add(POCKET_WATCH);           // 旧怀表（碎屑）
+            entries.add(WEATHER_BOTTLE);         // 气象瓶（碎屑）
+            entries.add(ECHO_CONCH);             // 回声螺壳（碎屑）
+            entries.add(WAX_SEALED_JOURNAL);     // 蜡封手账（碎屑）
+
+            // 收纳与照明
+            entries.add(SCAVENGER_POCKET);       // 拾荒口袋（碎屑）
+            entries.add(SOUL_LANTERN);           // 引魂燃灯（珍品）
+
+            // 护身器物
+            entries.add(AOTA_BRANCH);            // 奥塔的枝叶（珍品）
+            entries.add(ECHO_RING);              // 回响之环（珍品）
+            entries.add(ECHO_RING_DRAINED);      // 回响之环（碎裂）
+            entries.add(THORNS_OATH);            // 荆棘之誓（珍品）
+
+            // 义眼
+            entries.add(NIGHTWATCH_EYE_LEFT);           // 守夜之瞳·左眼（精萃）
+            entries.add(NIGHTWATCH_EYE_RIGHT);          // 守夜之瞳·右眼（精萃）
+            entries.add(NIGHTWATCH_EYE_LEFT_DRAINED);   // 左眼（耗尽）
+            entries.add(NIGHTWATCH_EYE_RIGHT_DRAINED);  // 右眼（耗尽）
+
+            // 招呼生物
+            entries.add(SHEPHERD_BELL);          // 牧羊人铃铛（粗石）
+            entries.add(BEAST_WHISTLE);          // 驯兽哨（粗石）
+            entries.add(ECHO_STONE);             // 回音石（粗石）
+
+            // 身上小件
+            entries.add(SNOW_GRIP_STUDS);        // 雪地靴钉（碎屑）
+            entries.add(ENCHANTED_RABBIT_FOOT);  // 附魔兔脚（粗石）
+            entries.add(SILENT_BOOTS);           // 无声软靴（粗石）
+
+            // 装置
+            entries.add(DAIKSON_OXYGEN_ORB);     // 戴克森应急制氧球（成材）
+        });
+
+        // ==================== 消耗品（用掉就没的东西）====================
+        // ⚠️ 目前只有一件。以后做吃的、一次性用的遗物都往这一页加
+        ItemGroupEvents.modifyEntriesEvent(CONSUMABLE_GROUP_KEY).register(entries -> {
+            entries.add(ROUND_CAKE);             // 一个圆形的饼
+        });
+
+        // ==================== 材料与工具 ====================
+        ItemGroupEvents.modifyEntriesEvent(MATERIAL_GROUP_KEY).register(entries -> {
+            // 材料
+            entries.add(LEATHER_LINING_UNFINISHED);          // 皮革内衬（半成品）
+            entries.add(ARMADILLO_SCUTE);                    // 犰狳鳞甲
+
+            // 工具
+            entries.add(HAMMER);                             // 铁锤
+            entries.add(SMALL_HAMMER);                       // 小铁锤
+
+            // 工作方块
+            entries.add(ModBlocks.RELIC_STATION_ITEM);       // 遗物装卸台
+            entries.add(ModBlocks.CHESTPLATE_STATION_ITEM);  // 胸甲台
+
             // 四个埋藏块：长得和原版方块一样，拿刷子刷能刷出东西
             entries.add(ModBlocks.RELIC_GRASS_ITEM);
             entries.add(ModBlocks.RELIC_SAND_ITEM);
             entries.add(ModBlocks.RELIC_GRAVEL_ITEM);
             entries.add(ModBlocks.RELIC_PODZOL_ITEM);
+
             // 裂石砖的台阶与楼梯：1.20.1 原版没有这对，遗迹做旧要用
             entries.add(ModBlocks.CRACKED_STONE_BRICK_SLAB_ITEM);
             entries.add(ModBlocks.CRACKED_STONE_BRICK_STAIRS_ITEM);
-            entries.add(HAMMER);
-            entries.add(SMALL_HAMMER);
-            entries.add(AOTA_BRANCH);
-            entries.add(ECHO_RING);
-            entries.add(ECHO_RING_DRAINED);
-            entries.add(SOUL_LANTERN);
-            entries.add(COURAGE_EMBLEM);
-            entries.add(ENCHANTED_RABBIT_FOOT);
-            entries.add(BEESWAX_PENDANT);
-            entries.add(DREADFUL_WOLF_FANG_PENDANT);
-            entries.add(TRAVELER_PENDANT);
-            entries.add(SCHOLAR_MONOCLE);
-            entries.add(CAST_IRON_THUMB_RING);
-            entries.add(HUNTER_BADGE);
-            entries.add(SHEPHERD_BELL);
-            entries.add(ROUND_CAKE);
-            entries.add(THORNS_OATH);
-            entries.add(SILENT_BOOTS);
-            entries.add(SCAVENGER_MAGNET);
-            entries.add(SCAVENGER_POCKET);
-            // 风行披风：它虽然缝在胸甲上（是个「斗篷」配件），但制作者要求它出现在主物品栏这一页。
-            // （巡夜斗篷则是两页都有——那一件是制作者先前定的，未动）
-            entries.add(WIND_CLOAK);
 
-            // 碎屑与粗石档的一批小东西：它们都靠"带着"或"右键"生效，不属于盔甲配件
-            entries.add(FADED_CHARM);
-            entries.add(CRACKED_COMPASS);
-            entries.add(DRIED_CLOVER);
-            entries.add(DAIKSON_OXYGEN_ORB);
-            entries.add(NATURAL_RUNE);
-            // 缝在武器上的两件：它们走的是「遗物」这条路（不是盔甲配件），
-            // 因此在遗物装卸台与锻造台都能装
-            entries.add(OLD_BOW_OIL);
-            entries.add(OLD_SWORD_BAND);
-            entries.add(REVERSAL_PENDANT);
-            // 巡夜斗篷：它放在背包里就有用（夜里的移速），所以与遗物并排放在这一页；
-            // 同时它也是一个「胸甲护具」，在「盔甲配件」那一页另有一份
-            entries.add(NIGHTWATCH_CLOAK);
-            entries.add(ETERNAL_EMBLEM);
-            entries.add(STREAM_EMBLEM);
-            entries.add(SUN_EMBLEM);
-            entries.add(MOON_EMBLEM);
-            // 盔甲配件（甲片 / 内衬 / 肩甲 / 胸甲片）已挪到专属分类「盔甲配件」那一页。
-            // 半成品皮革内衬是材料、不是配件，仍旧留在这里
-            entries.add(LEATHER_LINING_UNFINISHED);
-            entries.add(ARMADILLO_SCUTE);
-            entries.add(NIGHTWATCH_EYE_LEFT);
-            entries.add(NIGHTWATCH_EYE_RIGHT);
-            entries.add(NIGHTWATCH_EYE_LEFT_DRAINED);
-            entries.add(NIGHTWATCH_EYE_RIGHT_DRAINED);
-
+            // ⚠️ 品阶样本：测试用。正式发布前要连同物品注册、贴图与语言条目一起删掉
             entries.add(RELIC_SAMPLE_DEBRIS);
             entries.add(RELIC_SAMPLE_ROUGH);
             entries.add(RELIC_SAMPLE_LUMBER);
@@ -777,6 +923,29 @@ public final class ModItems {
             entries.add(RELIC_SAMPLE_SUPREME);
             entries.add(RELIC_SAMPLE_SOURCE);
         });
+    }
+
+    /**
+     * 拼出一个创造模式分类的注册名。
+     *
+     * @param name 分类的短名（同时也是语言键 {@code itemGroup.eternal_relic.<name>} 的后半段）
+     * @return 该分类的注册名
+     */
+    private static RegistryKey<ItemGroup> relicGroup(String name) {
+        return RegistryKey.of(RegistryKeys.ITEM_GROUP, EternalRelic.id(name));
+    }
+
+    /**
+     * 注册一个创造模式分类 —— 图标用一件代表物，显示名由分类 id 到语言文件里取。
+     *
+     * @param key  分类的注册名
+     * @param icon 这一页的代表物，拿来当图标
+     */
+    private static void registerGroup(RegistryKey<ItemGroup> key, Item icon) {
+        Registry.register(Registries.ITEM_GROUP, key, FabricItemGroup.builder()
+                .icon(() -> new ItemStack(icon))
+                .displayName(Text.translatable("itemGroup.eternal_relic." + key.getValue().getPath()))
+                .build());
     }
 
     private static Item register(String name, Item item) {

@@ -47,6 +47,9 @@ import org.eternalrelic.network.SoulLanternNetwork;
  *   <li>{@link HunterBadgeEffect} —— 「猎人收获」能力：击杀生物时，偶尔多掉一件战利品。</li>
  *   <li>{@link CastIronThumbRingEffect} —— 「保住耐久」能力：用工具与武器时，偶尔一点耐久都不掉。</li>
  *   <li>{@link RoundCakeEffect} —— 「一口还乡」能力：吃下那块饼，人当场回到重生点并飞快回血。</li>
+ *   <li>{@link org.eternalrelic.capability.carried.SnowGripStudsEffect} —— 「踩冰不滑」能力：
+ *       带着雪地靴钉的人踩在冰面上与踩在石头地上一样稳（实际动手处见
+ *       {@link org.eternalrelic.mixin.SnowGripStudsMixin}）。</li>
  *   <li>{@link WolfAweEffect} —— 「野狼慑服」能力：身边的野狼被狼王气息镇住而坐下，走开即恢复。</li>
  *   <li>{@link WolfTamingEffect} —— 「喂骨头更容易认主」能力：把驯服狼的机会从三分之一抬到六分之五。</li>
  *   <li>{@link WornRelicEffect} —— 「装入生效」能力：把守夜之瞳装进眼中，并让代价跟随玩家。</li>

@@ -58,6 +58,17 @@ public class RelicScreen extends Screen {
     /** 正文区从面板顶部往下多少像素开始。位置紧跟分隔线（贴图里在 y54~58）。 */
     private static final int TEXT_TOP = 76;
 
+    /**
+     * 描述页的题记在正文区基础上再往下多少像素。
+     *
+     * <p>题记比效果正文略低一点，读起来更像"题在纸上的句子"，而不是说明书的第一条。
+     * 这个数由制作者定过两次：最初是 {@code 14}，后来要求整块往上挪 <b>1.5 个字</b>——
+     * 原版一个字高 9 像素，1.5 个字约 13 像素，于是落到 {@code 1}。</p>
+     *
+     * <p><b>想让整块描述上下移动，改这一个数就够</b>（数值变大＝往下，变小＝往上）。</p>
+     */
+    private static final int LORE_TOP_SHIFT = 1;
+
     /** 正文区的下边界。改行数或改起始高度时它会跟着算，不必手工同步。 */
     private static final int TEXT_BOTTOM = TEXT_TOP + LINES_PER_PAGE * LINE_HEIGHT;
 
@@ -338,6 +349,11 @@ public class RelicScreen extends Screen {
      *
      * <p>描述是讲来历的短句，逐行居中排布，读起来更像题记而不是说明书。</p>
      *
+     * <p><b>行距与效果页相同（{@link #LINE_HEIGHT}）</b>：描述原先比正文松 2 像素，
+     * 那是照「一句话的题记」配的。制作者后来给几件遗物写了更长的描述，
+     * 松行距下只放得下 6 行——第 7 行会压到页脚的页码上；收紧之后与效果页一样是 7 行，
+     * 两页的行距也随之统一。</p>
+     *
      * @param context 绘制上下文
      * @param alpha   不透明度
      */
@@ -345,12 +361,12 @@ public class RelicScreen extends Screen {
         List<OrderedText> lines = this.loreLines;
 
         int centerX = this.panelX + PANEL_WIDTH / 2;
-        int y = this.panelY + TEXT_TOP + 14;
+        int y = this.panelY + TEXT_TOP + LORE_TOP_SHIFT;
 
         for (OrderedText line : lines) {
             context.drawText(this.textRenderer, line, centerX - this.textRenderer.getWidth(line) / 2, y,
                     withAlpha(LORE_COLOR, alpha), false);
-            y += LINE_HEIGHT + 2;
+            y += LINE_HEIGHT;
         }
     }
 

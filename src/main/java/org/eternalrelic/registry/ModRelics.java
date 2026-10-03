@@ -447,6 +447,96 @@ public final class ModRelics {
             ModItems.REVERSAL_PENDANT,
             MaterialRarity.ROUGH_STONE);
 
+    // ==================== 会报信的四件小东西 ====================
+
+    /**
+     * 旧怀表 —— 拿在手上右键，报出此刻的钟点与距天黑 / 天亮还有多久。
+     *
+     * <p>它<b>什么都不改</b>：既不加属性也不出手，只是把世界时间折算成一句人话
+     * （判定见 {@link org.eternalrelic.item.PocketWatchItem}），因此这里只登记身份与成色。</p>
+     *
+     * <p>固有稀有度为碎屑：一只走得还算准的旧表，值不了几个钱。</p>
+     */
+    public static final RelicDefinition POCKET_WATCH = define(
+            ModItems.POCKET_WATCH,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 气象瓶 —— 拿在手上右键，报出接下来的天气与大约还有多久变天。
+     *
+     * <p>读的是世界自己的天气计时器，因此这里同样只登记身份与成色，
+     * 判定见 {@link org.eternalrelic.item.WeatherBottleItem}。</p>
+     *
+     * <p>固有稀有度为碎屑。</p>
+     */
+    public static final RelicDefinition WEATHER_BOTTLE = define(
+            ModItems.WEATHER_BOTTLE,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 回声螺壳 —— 拿在手上右键，报出四周活物的数量与最近那只敌对生物的方向。
+     *
+     * <p>判定见 {@link org.eternalrelic.item.EchoConchItem}。</p>
+     *
+     * <p>固有稀有度为碎屑。</p>
+     */
+    public static final RelicDefinition ECHO_CONCH = define(
+            ModItems.ECHO_CONCH,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 蜡封手账 —— 蹲下右键记下脚下的地点，平时右键报出那个地点在哪个方向、离多远。
+     *
+     * <p>记下的那一页写在物品自己的数据里，判定见
+     * {@link org.eternalrelic.item.WaxSealedJournalItem}。</p>
+     *
+     * <p>固有稀有度为碎屑。</p>
+     */
+    public static final RelicDefinition WAX_SEALED_JOURNAL = define(
+            ModItems.WAX_SEALED_JOURNAL,
+            MaterialRarity.DEBRIS);
+
+    // ==================== 招呼别的东西的两件 ====================
+
+    /**
+     * 驯兽哨 —— 拿在手上右键，把 30 格内自己的宠物叫到身边。
+     *
+     * <p><b>它是本模组第一件「把生物搬过来」的遗物</b>：牧羊人铃铛只是让羊自己走过去，
+     * 这一件是真的把伙伴传送到你脚边，判定见 {@link org.eternalrelic.item.BeastWhistleItem}。</p>
+     *
+     * <p>固有稀有度为粗石：走丢的伙伴能叫回来，这份便利值这一档。</p>
+     */
+    public static final RelicDefinition BEAST_WHISTLE = define(
+            ModItems.BEAST_WHISTLE,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 回音石 —— 拿在手上右键，把 20 格内的怪物引向自己。
+     *
+     * <p><b>它是一件双刃剑</b>：不伤害任何东西，只是让怪认定「你在那里」，
+     * 判定见 {@link org.eternalrelic.item.EchoStoneItem}。</p>
+     *
+     * <p>固有稀有度为粗石。</p>
+     */
+    public static final RelicDefinition ECHO_STONE = define(
+            ModItems.ECHO_STONE,
+            MaterialRarity.ROUGH_STONE);
+
+    // ==================== 踩冰不滑的那一件 ====================
+
+    /**
+     * 雪地靴钉 —— 带在身上时，踩在冰面上不再打滑。
+     *
+     * <p>它<b>没有属性可登记</b>：改的是脚下方块的摩擦系数，由
+     * {@link org.eternalrelic.capability.carried.SnowGripStudsEffect} 判断、
+     * {@code mixin/SnowGripStudsMixin} 动手。</p>
+     *
+     * <p>固有稀有度为碎屑（制作者定的）：一套套在鞋上的防滑钉，做工简单、值不了几个钱。</p>
+     */
+    public static final RelicDefinition SNOW_GRIP_STUDS = define(
+            ModItems.SNOW_GRIP_STUDS,
+            MaterialRarity.DEBRIS);
+
     /**
      * 永恒纹章 —— 钉在一件物品上，使那件物品不会被火烧、岩浆、爆炸、仙人掌与虚空毁掉，
      * 并视同带有「经验修补」。

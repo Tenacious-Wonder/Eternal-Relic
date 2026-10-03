@@ -17,6 +17,7 @@
     "ProjectileEntityMixin",
     "ServerWorldMixin",
     "SitGoalMixin",
+    "SnowGripStudsMixin",
     "WolfAweMixin",
     "WolfTamingMixin"
   ],
