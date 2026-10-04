@@ -30,6 +30,7 @@ public class RegistryInit {
         EmberPendantEffect.register();
         EnchantedRabbitFootEffect.register();
         TravelerPendantEffect.register();
+        LightweightShieldBadgeEffect.register();
         ShepherdBellEffect.register();
         DayNightEmblemEffect.register();
         NightWatchCloakEffect.register();

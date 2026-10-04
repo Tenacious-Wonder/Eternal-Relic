@@ -18,6 +18,7 @@ import org.eternalrelic.EternalRelic;
 import org.eternalrelic.item.AotaBranchItem;
 import org.eternalrelic.item.BeastWhistleItem;
 import org.eternalrelic.item.CrackedCompassItem;
+import org.eternalrelic.item.CuratorLensItem;
 import org.eternalrelic.item.DaiksonOxygenOrbItem;
 import org.eternalrelic.item.EchoConchItem;
 import org.eternalrelic.item.EchoRingItem;
@@ -26,6 +27,7 @@ import org.eternalrelic.item.EnchantedRabbitFootItem;
 import org.eternalrelic.item.HomestoneItem;
 import org.eternalrelic.item.NightwatchEyeItem;
 import org.eternalrelic.item.PocketWatchItem;
+import org.eternalrelic.item.RedClayWaxItem;
 import org.eternalrelic.item.RelicItem;
 import org.eternalrelic.item.RoundCakeItem;
 import org.eternalrelic.item.ScavengerPocketItem;
@@ -158,6 +160,16 @@ public final class ModItems {
             new RelicItem(new Item.Settings().maxCount(1)));
 
     /**
+     * 馆藏透镜 —— 举起来看时，十三格内的箱子正中心浮起一枚淡黄光斑，隔着方块也看得见。
+     *
+     * <p><b>它是本模组第一件「拿在手上用」而不是「放在背包里就生效」的遗物</b>：按住右键举起
+     * 才作数，松手即散。行为逐条照搬原版望远镜——举镜姿势、边框遮罩、两记声响都跟原版走，
+     * 只有放大倍率改成了两倍，见 {@link CuratorLensItem}。</p>
+     */
+    public static final Item CURATOR_LENS = register("curator_lens",
+            new CuratorLensItem(new Item.Settings().maxCount(1)));
+
+    /**
      * 铸铁拇指戒 —— 带在身上时，用的工具与武器偶尔不掉耐久。
      *
      * <p><b>它是本模组第一件「改变耐久损耗」的遗物</b>：耐久是在游戏内部扣的，
@@ -175,6 +187,17 @@ public final class ModItems {
      * {@link org.eternalrelic.mixin.LivingEntityMixin}。</p>
      */
     public static final Item HUNTER_BADGE = register("hunter_badge",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 轻巧盾徽 —— 带在身上时，举着盾牌的那段时间走得更快；钉在盾牌上另外给两点护甲。
+     *
+     * <p><b>它是本模组第一件「换个带法就换一份好处」的遗物</b>：放在背包里，管的是举盾时的脚步
+     * （见 {@link org.eternalrelic.capability.carried.LightweightShieldBadgeEffect}）；
+     * 钉在盾牌上，则按附着遗物的老规矩另外给两点护甲（见
+     * {@link org.eternalrelic.relic.RelicAttachment}）。两条各管各的，互不冲突。</p>
+     */
+    public static final Item LIGHTWEIGHT_SHIELD_BADGE = register("lightweight_shield_badge",
             new RelicItem(new Item.Settings().maxCount(1)));
 
     /**
@@ -200,6 +223,19 @@ public final class ModItems {
      */
     public static final Item ROUND_CAKE = register("round_cake",
             new RoundCakeItem(new Item.Settings().food(FoodComponents.PUMPKIN_PIE)));
+
+    /**
+     * 红土蜡块 —— 拿在主手右键，把副手那件东西补回一段耐久的消耗品。
+     *
+     * <p><b>它是本模组第二件消耗品</b>，与「一个圆形的饼」同属「用掉才生效」那一类：效果发生在
+     * 它消失的那一刻，因此行为写在 {@link RedClayWaxItem} 里，接的是游戏留给右键的那个口子，
+     * 不必改动游戏内部代码。</p>
+     *
+     * <p>能补哪些东西交给附着分类表判定（武器 / 工具 / 装备），因此别的模组将来加了新武器，
+     * 这块蜡块会自动认它，不必回来补名单。</p>
+     */
+    public static final Item RED_CLAY_WAX = register("red_clay_wax",
+            new RedClayWaxItem(new Item.Settings()));
 
     /**
      * 荆棘之誓 —— 带在身上时，把挨打实际掉的那部分血的五分之一扎回给打你的人（最多 20 点）。
@@ -886,6 +922,7 @@ public final class ModItems {
 
             // 徽章
             entries.add(HUNTER_BADGE);               // 猎人徽章（粗石）
+            entries.add(LIGHTWEIGHT_SHIELD_BADGE);   // 轻巧盾徽（成材）
 
             // 草药
             entries.add(DRIED_CLOVER);               // 干枯的四叶草（碎屑）
@@ -905,15 +942,16 @@ public final class ModItems {
         });
 
         // ==================== 器物（随身带着的各种器物）====================
-        // 排序：先按小类聚拢（报信小物 → 收纳与照明 → 护身器物 → 义眼 → 招呼生物 →
+        // 排序：先按小类聚拢（报信与观察小物 → 收纳与照明 → 护身器物 → 义眼 → 招呼生物 →
         // 身上小件 → 装置），每个小类内部再按稀有度从低到高
         ItemGroupEvents.modifyEntriesEvent(VESSEL_GROUP_KEY).register(entries -> {
-            // 报信小物：看一眼就收起来的那几件
+            // 报信与观察小物：拿起来看一眼就收起来的那几件
             entries.add(CRACKED_COMPASS);        // 磕碰的罗盘（碎屑）
             entries.add(POCKET_WATCH);           // 旧怀表（碎屑）
             entries.add(WEATHER_BOTTLE);         // 气象瓶（碎屑）
             entries.add(ECHO_CONCH);             // 回声螺壳（碎屑）
             entries.add(WAX_SEALED_JOURNAL);     // 蜡封手账（碎屑）
+            entries.add(CURATOR_LENS);           // 馆藏透镜（粗石）
 
             // 收纳与照明
             entries.add(SCAVENGER_POCKET);       // 拾荒口袋（碎屑）
@@ -947,9 +985,9 @@ public final class ModItems {
         });
 
         // ==================== 消耗品（用掉就没的东西）====================
-        // ⚠️ 目前只有一件。以后做吃的、一次性用的遗物都往这一页加
         ItemGroupEvents.modifyEntriesEvent(CONSUMABLE_GROUP_KEY).register(entries -> {
             entries.add(ROUND_CAKE);             // 一个圆形的饼
+            entries.add(RED_CLAY_WAX);           // 红土蜡块（粗石）
         });
 
         // ==================== 材料与工具 ====================

@@ -201,6 +201,23 @@ public final class ModRelics {
             MaterialRarity.ROUGH_STONE);
 
     /**
+     * 馆藏透镜 —— 举起来看时，十三格内的箱子正中心浮起一枚淡黄光斑，隔着方块也看得见。
+     *
+     * <p><b>它是本模组第一件「拿在手上用」而不是「放在背包里就生效」的遗物</b>：效果只在按住
+     * 右键举镜的那段时间里存在，松手即散。因此这里只登记身份与成色，真正的判定由
+     * {@link org.eternalrelic.capability.using.CuratorLensEffect} 负责，画面由客户端的
+     * {@code ChestMarkRenderer} 负责。</p>
+     *
+     * <p><b>借的是原版望远镜的全套表现</b>：举起时画面放大、手上摆出举镜姿势、边框遮罩与那两记
+     * 声响都照原版走，只有放大倍率改成了两倍。</p>
+     *
+     * <p>固有稀有度为粗石：一副做工讲究的观察镜，顶用，但谈不上稀罕。</p>
+     */
+    public static final RelicDefinition CURATOR_LENS = define(
+            ModItems.CURATOR_LENS,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
      * 铸铁拇指戒 —— 带在身上时，用的工具与武器有 5% 的机会不掉耐久。
      *
      * <p>它<b>没有任何属性加成</b>：耐久是在物品自己身上一点点扣掉的，既不是玩家的属性，
@@ -236,6 +253,23 @@ public final class ModRelics {
             MaterialRarity.ROUGH_STONE);
 
     /**
+     * 轻巧盾徽 —— 带在身上时，举着盾牌的那段时间走得更快；钉在盾牌上另外给两点护甲。
+     *
+     * <p><b>它的两条好处走的是两条不同的路。</b>举盾加速是<b>有条件</b>的——盾一放下就该没，
+     * 而这张表登记的属性只能表达「带着就算数」，因此那一条不进这张表，由
+     * {@link org.eternalrelic.capability.carried.LightweightShieldBadgeEffect} 每 5 刻自己核对。</p>
+     *
+     * <p>这里登记的<b>只有护甲那一条</b>，而且走的是「只认附着份」——放在背包里不给护甲，
+     * 必须真的钉在盾牌上才算数。两条各管各的，因此钉上去之后是「举盾更快 + 两点护甲」两样都有。</p>
+     *
+     * <p>固有稀有度为成材：一块正经做出来的木雕，配得上它给的那点分量。</p>
+     */
+    public static final RelicDefinition LIGHTWEIGHT_SHIELD_BADGE = defineAttachmentOnly(
+            ModItems.LIGHTWEIGHT_SHIELD_BADGE,
+            MaterialRarity.LUMBER,
+            RelicEffect.flat(RelicAttribute.ARMOR, 2.0D));
+
+    /**
      * 牧羊人铃铛 —— 拿在主手右键摇响，四十格内的羊会朝摇铃的人走过来，持续二十秒。
      *
      * <p>它<b>没有任何属性加成</b>：铃声不改变玩家的任何数值，改的是羊的行走目标，
@@ -265,6 +299,22 @@ public final class ModRelics {
      */
     public static final RelicDefinition ROUND_CAKE = define(
             ModItems.ROUND_CAKE,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 红土蜡块 —— 拿在主手右键，把副手那件东西补回一段耐久的消耗品。
+     *
+     * <p><b>它和「一个圆形的饼」是同一路东西</b>：用掉才生效，效果发生在它消失的那一刻，此后
+     * 什么都不剩。因此这里既没有携带效果、也不在挨打时出手，只登记身份与成色；真正那件事由
+     * {@link org.eternalrelic.capability.consumed.RedClayWaxEffect} 在右键时执行。</p>
+     *
+     * <p>它除了当消耗品，本身还是可用的遗物素材——这一层写在那段说明文字里就够了，
+     * 表里不必另外登记什么。</p>
+     *
+     * <p>固有稀有度为粗石：从恶地深处挖出来的粘土，算不上稀罕物件。</p>
+     */
+    public static final RelicDefinition RED_CLAY_WAX = define(
+            ModItems.RED_CLAY_WAX,
             MaterialRarity.ROUGH_STONE);
 
     /**
