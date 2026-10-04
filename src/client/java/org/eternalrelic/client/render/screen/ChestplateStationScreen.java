@@ -1,4 +1,4 @@
-package org.eternalrelic.client.screen;
+package org.eternalrelic.client.render.screen;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
