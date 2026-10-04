@@ -53,8 +53,21 @@ import org.eternalrelic.block.entity.ChestplateStationBlockEntity;
 @Environment(EnvType.CLIENT)
 public class ChestplateStationBlockEntityRenderer implements BlockEntityRenderer<ChestplateStationBlockEntity> {
 
-    /** 玩家贴图的尺寸，造模型时用来算贴图坐标。 */
-    private static final int PLAYER_TEXTURE_SIZE = 64;
+    /**
+     * 盔甲贴图的宽度（像素），造模型时用来算贴图坐标。
+     *
+     * <p><b>宽与高必须分开写，而且要跟贴图的实际尺寸对上。</b>游戏自带的盔甲贴图一律是
+     * 64 × 32——比玩家皮肤（64 × 64）矮一半；游戏自己给盔甲各层指定的也正是 {@code (64, 32)}
+     * （见 {@code EntityModels} 里的盔甲层定义）。</p>
+     *
+     * <p><b>改之前先读这段。</b>这里曾经只留一个数、宽高同用，于是无论填哪个值都有一头是错的：
+     * 填 64 时高度按 64 算，纵向花纹错位；填 32 时宽度按 32 算，横向直接串位。
+     * 两个数各自独立，别再合并回去。</p>
+     */
+    private static final int ARMOR_TEXTURE_WIDTH = 64;
+
+    /** 盔甲贴图的高度（像素）。为什么不能与宽度共用一个数，见上。 */
+    private static final int ARMOR_TEXTURE_HEIGHT = 32;
 
     /**
      * 玩家模型的脚底落在方块坐标系里的高度（单位：格）。
@@ -78,7 +91,7 @@ public class ChestplateStationBlockEntityRenderer implements BlockEntityRenderer
         this.outerArmor = new ArmorEntityModel<>(ArmorEntityModel
                 .getModelData(new Dilation(1.0F))
                 .getRoot()
-                .createPart(PLAYER_TEXTURE_SIZE, PLAYER_TEXTURE_SIZE));
+                .createPart(ARMOR_TEXTURE_WIDTH, ARMOR_TEXTURE_HEIGHT));
     }
 
     /**
