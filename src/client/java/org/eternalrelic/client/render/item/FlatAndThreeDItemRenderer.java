@@ -1,4 +1,4 @@
-package org.eternalrelic.client.render;
+package org.eternalrelic.client.render.item;
 
 import java.util.function.DoubleSupplier;
 
@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
@@ -18,6 +17,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 
 import org.eternalrelic.EternalRelic;
+import org.eternalrelic.client.render.ShepherdBellSwing;
 import org.eternalrelic.registry.ModItems;
 
 /**

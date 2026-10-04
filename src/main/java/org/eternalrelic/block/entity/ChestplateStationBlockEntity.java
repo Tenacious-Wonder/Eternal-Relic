@@ -7,31 +7,32 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 import org.eternalrelic.registry.ModBlockEntityTypes;
 
 /**
- * 胸甲台上摆着的那一件胸甲。
+ * <h1>台上摆着的那件胸甲</h1>
  *
- * <p><b>台子必须自己记住它。</b>玩家放好胸甲就走开、退出游戏、服务器重启之后，那件东西都得还在台上——
- * 这台子既能当工作台也能当展示台，东西不能只在界面开着的时候存在。这一份记录因此同时承担三件事：
- * 存档、下发给客户端渲染、以及方块被拆掉时把胸甲还给玩家（最后一件由 {@code ChestplateStationBlock} 负责）。</p>
+ * <p>
+ * 保存台面上的胸甲，负责存档与下发给客户端渲染，是台子得以跨会话记住内容的部分。
+ * 胸甲身上已装的配件不属于本类的数据，它们跟着那件胸甲走（见 {@code relic.RelicAttachment}）。
+ * </p>
  *
- * <p><b>胸甲身上已经装了哪些配件，不记在这里</b>：那属于那件胸甲自己的数据
- * （见 {@code relic.RelicAttachment}），跟着胸甲走。这里只管"台上摆着的是哪一件"。</p>
+ * <h2>写入约定</h2>
+ * <p>
+ * 台面上的胸甲只能经 {@link #setChestplate} 更换，它同时完成存档与下发；
+ * {@link #getChestplate()} 交出的是副本，改动副本不会影响台面，改完必须写回。
+ * 台上那件被就地改动过（例如装上或拆下一枚配件）时，同样是改写后的那一件写回来。
+ * </p>
  *
- * <p><b>为什么每次变动都要主动通知客户端</b>：方块实体的数据不会自动同步。胸甲换了却不告诉客户端，
- * 玩家会看到台上还摆着上一件——渲染在客户端做，它读的就是这里下发的这一份。</p>
+ * @see org.eternalrelic.block.ChestplateStationBlock
  */
 public class ChestplateStationBlockEntity extends BlockEntity {
-
-    /** 存档里存放那件胸甲的标签名。 */
     private static final String CHESTPLATE_KEY = "Chestplate";
 
-    /** 台上摆着的胸甲；空着时表示台上没东西。 */
+    /** 台上摆着的胸甲；空堆表示台面空着。 */
     private ItemStack chestplate = ItemStack.EMPTY;
 
     public ChestplateStationBlockEntity(BlockPos pos, BlockState state) {
@@ -39,53 +40,34 @@ public class ChestplateStationBlockEntity extends BlockEntity {
     }
 
     /**
-     * @return 台上摆着的那一件胸甲；台上空着时返回空堆
+     * @return 台上那件胸甲的副本；台面空着时返回空堆
      */
     public ItemStack getChestplate() {
-        return this.chestplate;
+        return this.chestplate.copy();
     }
 
     /**
-     * 换上台上的胸甲，并把这一变化记进存档、发给客户端。
+     * 换上台上的胸甲，并存入存档、下发客户端。
      *
-     * @param stack 要摆上去的胸甲；空堆表示把台子腾空
+     * @param stack 要摆上去的胸甲；空堆表示把台面腾空
      */
     public void setChestplate(ItemStack stack) {
         this.chestplate = stack;
-
-        markChanged();
+        markDirty();
     }
 
     /**
-     * 把台上的胸甲取下来，台子随之腾空。
+     * 取走台上的胸甲，台面随之腾空；界面取出与按住 Shift 右键取回都走这里。
      *
-     * <p>界面上从正中那一格把胸甲拖走，走的就是这里——与对着台子按住 Shift 右键是同一件事，
-     * 两条路都会把台子清空并存给客户端。</p>
-     *
-     * @return 取下来的那件胸甲；台上本来就空着时返回空堆
+     * @return 取下的那件胸甲；台面本来就空着时返回空堆
      */
     public ItemStack takeChestplate() {
         ItemStack taken = this.chestplate;
 
-        if (!taken.isEmpty()) {
-            setChestplate(ItemStack.EMPTY);
-        }
+        // 台面空着也照样写一次：服务端以为空、客户端还留着旧内容时，只有再发一次同步才能纠正过来
+        setChestplate(ItemStack.EMPTY);
 
         return taken;
-    }
-
-    /**
-     * 台上那件胸甲**被就地改动过**时调用 —— 例如在它身上装上了一枚配件、或者拆下了一枚。
-     *
-     * <p>与 {@link #setChestplate} 的区别只在于"换的是不是另一件东西"：装拆配件改的是同一件胸甲身上的
-     * 记录，物品本身没换，但改动同样要落盘、同样要发给客户端（否则台子上显示的配件数不会变）。</p>
-     */
-    public void markChanged() {
-        markDirty();
-
-        if (this.world instanceof ServerWorld serverWorld) {
-            serverWorld.getChunkManager().markForUpdate(this.pos);
-        }
     }
 
     @Override
@@ -106,19 +88,20 @@ public class ChestplateStationBlockEntity extends BlockEntity {
         }
     }
 
-    /**
-     * 玩家走进视野、区块刚加载时，随区块数据一并发给客户端的那一份。
-     *
-     * <p>与存档内容相同即可——渲染要用的正是台上那件胸甲。</p>
-     */
+    @Override
+    public void markDirty() {
+        super.markDirty();
+
+        if (world != null) {
+            world.updateListeners(pos, getCachedState(), getCachedState(), 3);
+        }
+    }
+
     @Override
     public NbtCompound toInitialChunkDataNbt() {
         return this.createNbt();
     }
 
-    /**
-     * 台上胸甲变化时单独补发的那一份。
-     */
     @Nullable
     @Override
     public Packet<ClientPlayPacketListener> toUpdatePacket() {

@@ -8,12 +8,12 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 
 import org.eternalrelic.client.network.SoulFlameClientNetwork;
 import org.eternalrelic.client.particle.ModParticleFactories;
-import org.eternalrelic.client.render.FlatAndThreeDItemRenderer;
+import org.eternalrelic.client.render.item.FlatAndThreeDItemRenderer;
 import org.eternalrelic.client.render.ShepherdBellSwing;
-import org.eternalrelic.client.render.block.blockentity.ChestplateStationBlockEntityRenderer;
-import org.eternalrelic.client.screen.ChestplateStationScreen;
-import org.eternalrelic.client.screen.RelicScreenOpener;
-import org.eternalrelic.client.screen.RelicStationScreen;
+import org.eternalrelic.client.render.blockentity.ChestplateStationBlockEntityRenderer;
+import org.eternalrelic.client.render.screen.ChestplateStationScreen;
+import org.eternalrelic.client.render.screen.RelicScreenOpener;
+import org.eternalrelic.client.render.screen.RelicStationScreen;
 import org.eternalrelic.registry.ModBlockEntityTypes;
 import org.eternalrelic.registry.ModBlocks;
 import org.eternalrelic.registry.ModScreens;

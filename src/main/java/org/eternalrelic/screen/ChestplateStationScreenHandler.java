@@ -19,51 +19,51 @@ import org.eternalrelic.relic.RelicAttachment;
 import org.eternalrelic.relic.RelicAttachRule;
 
 /**
- * 胸甲台的界面容器 —— 摆格子、接住箭头那一下。
+ * <h1>胸甲台界面</h1>
  *
- * <p><b>界面上一共九格</b>，位置与制作者画的那张底图一一对应：</p>
+ * <p>
+ * 摆格子，并接住箭头那一下。界面上一共九格，位置与界面底图一一对应。
  *
- * <pre>
- *        配件槽  配件槽            正中是「台上的胸甲」
- *        配件槽  配件槽            两侧各三个配件槽，围着它排开
- *        配件槽  配件槽
+ * <h2>装配的入口</h2>
+ * <p>
+ * 只有点箭头一条路：玩家把配件放进配件格、辅料放进配料格，点一下箭头，
+ * 台上的胸甲、配件与辅料凑成一次装配。判定与成品都不在这里，而是问 {@link RelicAttachRule}
+ * ——它与遗物装卸台共用同一套裁决。
+ * </p>
  *
- *               [ ↑ 箭头 ]
- *               配件格
- *               配料格
- * </pre>
+ * <h2>拆卸的入口</h2>
+ * <p>
+ * 同样只有一条：从配件槽里拿走一枚。那六格是台上胸甲的实时视图
+ * （见 {@link ChestplateStationAttachments}），拿走即拆下。
+ * </p>
  *
- * <p><b>「装」只有一个入口：点箭头。</b>玩家把配件放进配件格、辅料放进配料格，点一下箭头，
- * 三样（台上的胸甲 + 配件 + 辅料）就凑成一次装配。装配的判定与成品<b>不在这里</b>，
- * 而是问 {@link RelicAttachRule}——与锻造台、遗物装卸台共用同一套裁决，
- * 免得两条路的判定慢慢分叉。</p>
+ * <h2>六格不参与通用搬运</h2>
+ * <p>
+ * 六格必须排除在一切"通用搬运"之外（见 {@link #quickMove}）：原版搬运逻辑里有一段"合并同款物品"，
+ * 它不检查能否放置，只比对物品是否相同就把玩家手里那叠清零，落到只读视图上就是玩家的物品凭空消失。
+ * </p>
  *
- * <p><b>「拆」也只有一个入口：从配件槽里拿走一枚。</b>那六格是台上胸甲的实时视图
- * （见 {@link ChestplateStationAttachments}），拿走即拆下。</p>
- *
- * <p><b>⚠️ 六格必须排除在一切"通用搬运"之外</b>（见 {@link #quickMove}）：原版搬运逻辑里有一段
- * "合并同款物品"，它<b>不检查能不能放</b>，只比对物品是否相同就把玩家手里那叠东西清零、
- * 去改一个临时对象——落到只读视图上就是玩家东西凭空消失。遗物装卸台那边已经踩过这个坑。</p>
- *
- * <p><b>台子本身什么也不存</b>（除了台上那件胸甲）：配件格与配料格是随这次界面会话而生的原料盘，
- * 关掉界面就退还玩家（见 {@link #onClosed}）。</p>
+ * <p>
+ * 台子本身什么也不存（台上那件胸甲除外）：配件格与配料格是随这次界面会话而生的原料盘，
+ * 关掉界面就退还玩家（见 {@link #onClosed}）。
+ * </p>
  */
 public class ChestplateStationScreenHandler extends ScreenHandler {
-
     /** 点箭头：把配料格与配件格的东西装到台上的胸甲上。 */
     public static final int BUTTON_APPLY = 0;
 
     /** 台子这边一共有几格：装备格 + 六格配件槽 + 配件格 + 配料格。 */
     public static final int STATION_SLOTS = 1 + RelicAttachment.MAX_FITTINGS + ChestplateStationInventory.SIZE;
 
-    // ---- 槽位坐标。**按制作者那张界面底图上画的位置摆**，改这几个数只影响"格子画在哪" ----
+    // ==================== 槽位坐标 ====================
 
     /**
      * 槽位坐标的统一偏移。
      *
-     * <p>底图上画的格子填充范围是：配件槽 x 31~46 与 x 129~144、装备格与两个原料格 x 80~95；
-     * 而物品图标是按槽位左上角画的，与底图上画的格子对不齐。这里统一补回来，
-     * 以后要微调也只动这一个数——这个值是制作者看着实际画面定的。</p>
+     * <p>
+     * 底图上画的格子填充范围是：配件槽 x 31~46 与 x 129~144、装备格与两个原料格 x 80~95；
+     * 物品图标按槽位左上角绘制，与底图上画的格子对不齐，这里统一补回来。这个值是看着实际画面定的。
+     * </p>
      */
     private static final int SLOT_SHIFT = 1;
 
@@ -93,23 +93,15 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     /** 六个配件槽的来源：台上那件胸甲的实时视图。 */
     private final Inventory attachments;
 
-    /** 台上那件胸甲 —— 装配与拆卸动的就是它。 */
+    /** 台上那件胸甲 */
     private final ChestplateStationBlockEntity station;
 
-    /** 玩家背包 —— 退还原料、播放敲击声都要经过它。 */
+    /** 玩家背包。*/
     private final PlayerInventory playerInventory;
 
     /** 台子的位置；界面远端时可能为 {@code null}。 */
     private final BlockPos origin;
 
-    /**
-     * 服务端与客户端共用的构造函数 —— 两端都从世界里取出那个方块实体，
-     * 区别只在位置是怎么来的（服务端由方块给出，客户端由打开界面时下发的那份数据给出）。
-     *
-     * @param syncId          同步编号
-     * @param playerInventory 玩家背包
-     * @param pos             台子的位置
-     */
     public ChestplateStationScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos pos) {
         super(ModScreens.CHESTPLATE_STATION, syncId);
 
@@ -132,11 +124,13 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     // ==================== 摆格子 ====================
 
     /**
-     * 装备格 —— 正中被六个配件槽围着的那一格，显示台上那件胸甲。
+     * 装备格：正中被六个配件槽围着的那一格，显示台上那件胸甲。
      *
-     * <p><b>能拿走，不能放。</b>从这里把胸甲拖走，等于把它从台子上取下来——与对着台子按住 Shift
-     * 右键是同一件事，两条路都收口到方块实体那一处。但<b>往这一格里放东西会被拒绝</b>：
-     * 放装备请右键台子；留这条口子会让"台上现在放着什么"出现两个说法。</p>
+     * <p>
+     * 能拿走、不能放：从这里把胸甲拖走等于把它从台子上取下来，与按住 Shift 右键取回是同一件事，
+     * 两条路都收口到方块实体那一处；往这一格里放东西则被拒绝，放装备请右键台子，
+     * 否则"台上现在放着什么"会出现两个说法。
+     * </p>
      */
     private void addChestplateSlot() {
         this.addSlot(new Slot(new DisplayedChestplate(this.station), 0, CHESTPLATE_X, CHESTPLATE_Y) {
@@ -148,7 +142,7 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     }
 
     /**
-     * 六个配件槽 —— 台上那件胸甲已装配件的实时视图，拿走一枚即拆下。
+     * 六个配件槽：台上那件胸甲已装配件的实时视图，拿走一枚即拆下。
      *
      * <p>取出由视图自己负责（见 {@link ChestplateStationAttachments}），这里只摆位置。</p>
      */
@@ -159,15 +153,18 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     }
 
     /**
-     * 配件格 —— 只收"能装到台上那件胸甲上的<b>装备配件</b>"。
+     * 配件格：只收"能装到台上那件胸甲上的装备配件"。
      *
-     * <p>判断分两问：先问它是不是配件（{@link RelicAttachment#isFitting}），再问
-     * {@link RelicAttachRule#canAttach}——后者一并管了"登记过没有、是不是同一类目标、
-     * 有没有重复、这一桶满了没有"，因此这里不必再抄一遍规矩。</p>
+     * <p>
+     * 判断分两问：先问它是不是配件（{@link RelicAttachment#isFitting}），再问
+     * {@link RelicAttachRule#canAttach}——后者一并管了"登记过没有、是不是同一类目标、有没有重复、
+     * 这一桶满了没有"，这里不必再抄一遍规矩。
+     * </p>
      *
-     * <p><b>为什么要先问"是不是配件"</b>：纹章一类也能钉在胸甲上，但它们归遗物装卸台管。
-     * 若这里放行，玩家会在胸甲台钉上一枚纹章，而旁边六个配件槽<b>根本不会显示它</b>
-     * （那些格子只列配件），看上去就像白钉了。所以从入口就分开。</p>
+     * <p>
+     * 先问"是不是配件"这一步不能省：纹章一类也能钉在胸甲上，但它们归遗物装卸台管。
+     * 若这里放行，玩家会在胸甲台钉上一枚纹章，而旁边六个配件槽根本不显示它（那些格子只列配件）。
+     * </p>
      */
     private void addFittingSlot() {
         this.addSlot(new Slot(this.contents, ChestplateStationInventory.SLOT_FITTING, FITTING_X, FITTING_Y) {
@@ -179,7 +176,7 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
         });
     }
 
-    /** 配料格 —— 只收某件配件指定的那种辅料，与遗物装卸台同一条规矩。 */
+    /** 配料格：只收某件配件指定的那种辅料，与遗物装卸台同一条规矩。 */
     private void addMaterialSlot() {
         this.addSlot(new Slot(this.contents, ChestplateStationInventory.SLOT_MATERIAL, MATERIAL_X, MATERIAL_Y) {
             @Override
@@ -213,10 +210,10 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     /**
      * 箭头被点了一下。
      *
-     * <p>客户端点箭头只是发一个包过来（见 {@code client.screen.ChestplateStationScreen}），
-     * 原版把它转发到服务端才调到这里，因此"扣原料、改胸甲"都发生在说了算的那一边。</p>
-     *
-     * @return 是否受理了这次点击；不认识的按钮交回父类
+     * <p>
+     * 客户端点箭头只是发一个包过来（见 {@code client.render.screen.ChestplateStationScreen}），
+     * 原版把它转发到服务端才调到这里，因此"扣原料、改胸甲"都发生在说了算的那一边。
+     * </p>
      */
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
@@ -229,11 +226,13 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     }
 
     /**
-     * 把配料格与配件格的东西装到台上的胸甲上 —— <b>这一步才真正扣原料</b>。
+     * 把配料格与配件格的东西装到台上的胸甲上，这一步才真正扣原料。
      *
-     * <p>判定与成品都问 {@link RelicAttachRule}：它给出的是"胸甲的一份副本，只是数据里多记了一枚配件"，
-     * 因此原胸甲上的附魔、耐久、自定义名字都跟着走。凑不齐或规则不允许时它返回空，这里就什么也不做
-     * ——原料原样留在格子里，玩家可以继续调整。</p>
+     * <p>
+     * 判定与成品都问 {@link RelicAttachRule}：它给出的是"胸甲的一份副本，数据里多记了一枚配件"，
+     * 原胸甲上的附魔、耐久、自定义名字都跟着走。凑不齐或规则不允许时它返回空，这里什么也不做，
+     * 原料原样留在格子里。
+     * </p>
      */
     private void applyFitting() {
         ItemStack produced = RelicAttachRule.previewOf(
@@ -264,10 +263,12 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     /**
      * 界面关掉时，把两个原料格里属于玩家的东西还给他。
      *
-     * <p><b>为什么要还</b>：这两格只活在这一次会话里，不还就等于凭空吞掉玩家的配件与辅料——
-     * 这正是原版工作台的规矩。台上那件胸甲不在此列：它在方块实体里，本来就还在台子上。</p>
+     * <p>
+     * 这两格只活在这一次会话里，不还就等于吞掉玩家的配件与辅料，这正是原版工作台的规矩；
+     * 台上那件胸甲不在此列，它在方块实体里，本来就还在台子上。
+     * </p>
      *
-     * <p>只在服务端做：客户端也会收到这次关闭，若两边各退一次，玩家会先看到背包里多一份。</p>
+     * <p>只在服务端做：客户端也会收到这次关闭，两边各退一次会让玩家看到背包里多出一份。</p>
      */
     @Override
     public void onClosed(PlayerEntity player) {
@@ -286,7 +287,7 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
      * 把一份东西塞回玩家背包；塞不下的丢在他脚边。
      *
      * @param player 收东西的玩家
-     * @param stack  要还回去的东西；空则什么也不做
+     * @param stack  要还回去的东西；空堆时什么也不做
      */
     private static void giveBack(PlayerEntity player, ItemStack stack) {
         if (stack.isEmpty()) {
@@ -301,7 +302,7 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     // ==================== 敲击声 ====================
 
     /**
-     * 在台子那一格的位置敲一下 —— 装上或拆下一枚配件时各响一次。
+     * 在台子那一格的位置敲一下：装上或拆下一枚配件时各响一次。
      *
      * <p>由服务端发声，附近的人才能同时听到同一个声音。</p>
      */
@@ -325,19 +326,20 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     /**
      * Shift+点击时把东西在台子与背包之间挪。
      *
-     * <p><b>六格必须单独处理，而且必须从"塞到玩家背包"那条路上被排除在外。</b>
-     * 理由见类文档：原版那段"合并同款"不检查能不能放，落在只读视图上会把玩家手里的东西清零。因此：</p>
+     * <p>
+     * 六格必须单独处理，而且必须从"塞到玩家背包"那条路上排除在外（理由见类文档）：
+     * </p>
      *
      * <ul>
-     *   <li>点的是六格 → 走视图自己的取出（等于拆下），再塞进背包；塞不下就丢在玩家脚边，绝不留一半；</li>
-     *   <li>点的是装备格 → 拿不走（那一格只读），直接返回；</li>
-     *   <li>点的是两个原料格 → 挪回背包；</li>
-     *   <li>点的是背包 → 只往那两个原料格放，<b>范围不含六格与装备格</b>。</li>
+     *     <li>点的是六格 —— 走视图自己的取出（等于拆下），再塞进背包；塞不下就丢在玩家脚边，绝不留一半；</li>
+     *     <li>点的是装备格 —— 那一格只读，直接返回；</li>
+     *     <li>点的是两个原料格 —— 挪回背包；</li>
+     *     <li>点的是背包 —— 只往那两个原料格放，范围不含六格与装备格。</li>
      * </ul>
      *
      * @param player 操作的玩家
      * @param index  被点击的格子
-     * @return 没能搬走、留在原格的东西（搬空了返回空）
+     * @return 没能搬走、留在原格的东西；搬空了返回空堆
      */
     @Override
     public ItemStack quickMove(PlayerEntity player, int index) {
@@ -367,8 +369,8 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
                 return ItemStack.EMPTY;
             }
         } else {
-            // 从背包挪上台子：**只到配件格与配料格为止**，六格与装备格不在范围内。
-            // 这条边界是防"吞东西"的关键，改动它之前请先读类文档。
+            // 从背包挪上台子：只到配件格与配料格为止，六格与装备格不在范围内。
+            // 这条边界是防"吞东西"的关键，改动它之前请先读类文档
             if (!this.insertItem(stack, 0, STATION_SLOTS, false)) {
                 return ItemStack.EMPTY;
             }
@@ -384,10 +386,8 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     }
 
     /**
-     * 这一格是不是六个配件槽之一。
-     *
      * @param index 格子编号
-     * @return 是六格之一时返回 {@code true}
+     * @return 该格是不是六个配件槽之一
      */
     private static boolean isAttachmentSlot(int index) {
         return index >= 1 && index <= RelicAttachment.MAX_FITTINGS;
@@ -396,13 +396,9 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     /**
      * Shift+点击配件槽：拆下一枚、塞进背包。
      *
-     * <p>拆下来的配件如果背包塞不下，就丢在玩家脚边——<b>绝不返回"没搬走"的非空堆</b>。
-     * 原版的 Shift+点击是一个循环（"只要源格还是原来那件就再来一次"），而六格拆掉一枚之后
-     * 后面一枚会顶上来；如果这里返回非空堆而又没真的搬走，那个循环可能一直转下去。</p>
-     *
      * @param player 玩家
      * @param index  六格里的第几格
-     * @return 恒为空
+     * @return 恒为空堆
      */
     private ItemStack quickMoveAttachment(PlayerEntity player, int index) {
         ItemStack detached = this.attachments.removeStack(index - 1, 1);
@@ -417,12 +413,6 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
         return ItemStack.EMPTY;
     }
 
-    /**
-     * 界面还能不能用：台子还在原地、而且玩家没走远。
-     *
-     * <p>照原版工作台的尺度 —— 距离超过 8 格（平方 64）就作废。台子被拆掉时这一条也会失效，
-     * 服务端随即关闭界面，而关闭会把原料退还玩家（见 {@link #onClosed}），东西不会丢。</p>
-     */
     @Override
     public boolean canUse(PlayerEntity player) {
         if (this.origin == null) {
@@ -435,20 +425,16 @@ public class ChestplateStationScreenHandler extends ScreenHandler {
     }
 
     /**
-     * 装备格的内容 —— 台上那件胸甲的只读视图。
+     * 装备格的内容：台上那件胸甲的只读视图。
      *
-     * <p>它与六个配件槽一样是"视图"而不是"库房"：读的就是方块实体里那一份，因此台上换了胸甲，
-     * 界面里跟着就换。写入一律忽略、也拿不走——要取下胸甲请对着台子按住 Shift 右键。</p>
+     * <p>
+     * 它与六个配件槽一样是"视图"而不是"库房"：读的就是方块实体里那一份，台上换了胸甲，
+     * 界面里跟着就换。写入一律忽略，也拿不走——取回胸甲请对着台子按住 Shift 右键。
+     * </p>
+     *
+     * @param station 台上那件胸甲的来源；界面远端拿不到方块实体时为 {@code null}
      */
-    private static final class DisplayedChestplate implements Inventory {
-
-        /** 台上那件胸甲的来源；界面远端拿不到方块实体时为 {@code null}。 */
-        private final ChestplateStationBlockEntity station;
-
-        private DisplayedChestplate(ChestplateStationBlockEntity station) {
-            this.station = station;
-        }
-
+    private record DisplayedChestplate(ChestplateStationBlockEntity station) implements Inventory {
         @Override
         public int size() {
             return 1;

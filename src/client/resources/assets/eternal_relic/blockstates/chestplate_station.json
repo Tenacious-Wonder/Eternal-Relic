@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
+      "model": "eternal_relic:block/chestplate_station",
+      "y": 180
+    },
+    "facing=south": {
       "model": "eternal_relic:block/chestplate_station"
+    },
+    "facing=east": {
+      "model": "eternal_relic:block/chestplate_station",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "eternal_relic:block/chestplate_station",
+      "y": 90
     }
   }
 }

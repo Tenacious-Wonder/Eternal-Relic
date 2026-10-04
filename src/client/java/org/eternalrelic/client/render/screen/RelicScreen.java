@@ -1,4 +1,4 @@
-package org.eternalrelic.client.screen;
+package org.eternalrelic.client.render.screen;
 
 import java.util.List;
 

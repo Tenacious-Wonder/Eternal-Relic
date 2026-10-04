@@ -1,4 +1,4 @@
-package org.eternalrelic.client.screen;
+package org.eternalrelic.client.render.screen;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
