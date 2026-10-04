@@ -1,0 +1,112 @@
+{
+  "type": "eternal_relic:little_home_cluster",
+  "config": {
+    "grid": 400,
+    "classes": [
+      { "code": "B", "cell_step": 4, "min_homes": 10, "max_homes": 13 },
+      { "code": "M", "cell_step": 2, "min_homes": 6, "max_homes": 9 },
+      { "code": "S", "cell_step": 1, "min_homes": 3, "max_homes": 5 }
+    ],
+    "homes": [
+      {
+        "weight": 25,
+        "home": {
+          "variants": [
+            "little_home_01", "little_home_02", "little_home_03", "little_home_04", "little_home_05",
+            "little_home_06", "little_home_07", "little_home_08", "little_home_09", "little_home_10"
+          ],
+          "loot_table": "eternal_relic:chests/little_home",
+          "strip_ground": true,
+          "hole_chance": 0.5,
+          "burrow_chance": 0.1,
+          "slab_chance": 0.55,
+          "worn_slab_chance": 0.2,
+          "weathering_scale": 1.0
+        }
+      },
+      {
+        "weight": 15,
+        "home": {
+          "variants": [
+            "little_home_2_01", "little_home_2_02", "little_home_2_03", "little_home_2_04", "little_home_2_05",
+            "little_home_2_06", "little_home_2_07", "little_home_2_08", "little_home_2_09", "little_home_2_10"
+          ],
+          "loot_table": "eternal_relic:chests/little_home_2",
+          "strip_ground": true,
+          "hole_chance": 0.5,
+          "burrow_chance": 0.1,
+          "slab_chance": 0.55,
+          "worn_slab_chance": 0.2,
+          "weathering_scale": 1.0
+        }
+      },
+      {
+        "weight": 20,
+        "home": {
+          "variants": [
+            "little_home_3_01", "little_home_3_04", "little_home_3_06", "little_home_3_07", "little_home_3_08",
+            "little_home_3_09", "little_home_3_10"
+          ],
+          "loot_table": "eternal_relic:chests/little_home_3",
+          "exclusive_loot_tables": {
+            "little_home_3_01": "eternal_relic:chests/little_home_3_01",
+            "little_home_3_07": "eternal_relic:chests/little_home_3_07",
+            "little_home_3_09": "eternal_relic:chests/little_home_3_07"
+          },
+          "exclusive_loot_chance": 0.5,
+          "no_burrow_variants": [ "little_home_3_06" ],
+          "strip_ground": true,
+          "keep_floors": true,
+          "hole_chance": 0.5,
+          "burrow_chance": 0.1,
+          "slab_chance": 0.55,
+          "worn_slab_chance": 0.2,
+          "weathering_scale": 1.0
+        }
+      },
+      {
+        "weight": 6,
+        "min_cluster_size": 5,
+        "home": {
+          "variants": [
+            "little_home_3_02", "little_home_3_03", "little_home_3_05"
+          ],
+          "loot_table": "eternal_relic:chests/little_home_3",
+          "exclusive_loot_tables": {
+            "little_home_3_02": "eternal_relic:chests/little_home_3_02",
+            "little_home_3_03": "eternal_relic:chests/little_home_3_03",
+            "little_home_3_05": "eternal_relic:chests/little_home_3_05"
+          },
+          "exclusive_loot_chance": 0.5,
+          "strip_ground": true,
+          "keep_floors": true,
+          "hole_chance": 0.5,
+          "burrow_chance": 0.1,
+          "slab_chance": 0.55,
+          "worn_slab_chance": 0.2,
+          "weathering_scale": 1.0
+        }
+      },
+      {
+        "weight": 40,
+        "home": {
+          "variants": [
+            "little_home_5_01", "little_home_5_02", "little_home_5_03", "little_home_5_04", "little_home_5_05",
+            "little_home_5_06", "little_home_5_07", "little_home_5_08", "little_home_5_09", "little_home_5_10"
+          ],
+          "loot_table": "eternal_relic:chests/little_home",
+          "no_burrow_variants": [ "little_home_5_06" ],
+          "strip_ground": true,
+          "keep_floors": true,
+          "hole_chance": 0.5,
+          "burrow_chance": 0.1,
+          "slab_chance": 0.55,
+          "worn_slab_chance": 0.2,
+          "weathering_scale": 1.0
+        }
+      }
+    ],
+    "min_distance": 23,
+    "min_distance_max": 27
+  }
+}

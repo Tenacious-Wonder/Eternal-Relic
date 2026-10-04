@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "dusted=0": { "model": "eternal_relic:block/relic_gravel" },
+    "dusted=1": { "model": "eternal_relic:block/relic_gravel" },
+    "dusted=2": { "model": "eternal_relic:block/relic_gravel" },
+    "dusted=3": { "model": "eternal_relic:block/relic_gravel" }
+  }
+}

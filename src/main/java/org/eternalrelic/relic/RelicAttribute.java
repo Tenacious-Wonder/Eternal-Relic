@@ -33,7 +33,15 @@ public enum RelicAttribute {
      * {@code registry/ModRelics}）。登记的是负的百分比，因此换什么武器都是「慢掉同样的比例」，
      * 而不是「固定的点数」——后者会让本来攻速就低的武器慢得不成比例。</p>
      */
-    ATTACK_SPEED(EntityAttributes.GENERIC_ATTACK_SPEED);
+    ATTACK_SPEED(EntityAttributes.GENERIC_ATTACK_SPEED),
+
+    /**
+     * 幸运 —— 影响战利品与钓鱼的收获。
+     *
+     * <p>原版属性（{@code generic.luck}），由服务端在跑掉落表时读；因此它<b>只在服务端有意义</b>，
+     * 客户端那份改了也不作数，这与其它属性一样由属性系统自己处理，不必额外写代码。</p>
+     */
+    LUCK(EntityAttributes.GENERIC_LUCK);
 
     private final EntityAttribute attribute;
 

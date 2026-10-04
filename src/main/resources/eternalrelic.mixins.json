@@ -4,14 +4,18 @@
   "package": "org.eternalrelic.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "BlockEntityTypeAccessor",
+    "ChunkRegionAccessor",
     "EnchantmentHelperMixin",
     "EntityMixin",
     "ItemEntityMixin",
     "ItemStackDurabilityMixin",
     "LivingEntityMixin",
+    "PersistentProjectileEntityMixin",
     "PlayerDamageMixin",
     "PlayerEntityMixin",
     "ProjectileEntityMixin",
+    "ServerWorldMixin",
     "SitGoalMixin",
     "WolfAweMixin",
     "WolfTamingMixin"

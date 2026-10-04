@@ -140,6 +140,13 @@ public final class ChestGuards {
         // 不是「挨打那一刻」的事，分别由 NightWatchCloakEffect 与遗物表负责
         register(ModItems.NIGHTWATCH_CLOAK, CLOAK_REDUCTION, NO_DEFLECT,
                 NO_MAGIC_REDUCTION, BodyPart.BACK);
+
+        // 风行披风：与巡夜斗篷同一路——同样只护后背、同样减 1 点。
+        // 它的另一半本事（二段跳）不是「挨打那一刻」的事，由 WindCloakEffect 负责。
+        // 注意两件斗篷同属配件类别「斗篷」，因此一件胸甲上只能披一件（它们也护同一块，
+        // 即便能同时缝上，护后背那一条也只会取最狠的那件，等于白缝）
+        register(ModItems.WIND_CLOAK, CLOAK_REDUCTION, NO_DEFLECT,
+                NO_MAGIC_REDUCTION, BodyPart.BACK);
     }
 
     /**
