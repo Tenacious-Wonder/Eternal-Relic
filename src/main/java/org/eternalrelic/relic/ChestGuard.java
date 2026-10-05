@@ -2,7 +2,7 @@ package org.eternalrelic.relic;
 
 import java.util.Set;
 
-import org.eternalrelic.bodypart.BodyPart;
+import org.twcore.api.bodypart.BodyPart;
 
 /**
  * 一件「缝在胸甲上的护具」的配置 —— 胸甲护具表（{@code registry/ChestGuards}）里的一行。
@@ -13,12 +13,12 @@ import org.eternalrelic.bodypart.BodyPart;
  * 加第三类时合并成了这一套（见交接文档）。</p>
  *
  * <p><b>护哪些部位是明写的</b>：肩甲护左右两侧肩膀，胸甲片护正胸，斗篷护后背。
- * 部位取自 {@link BodyPart}，判定那一侧会如实按它比较（见 {@code bodypart} 包）。</p>
+ * 部位取自 TW Core 的 {@link BodyPart}，判定那一侧会如实按它比较。</p>
  *
  * <p><b>减的是原版算完之后的数字</b>：护甲与保护附魔都结算完毕，这里才从剩下的伤害里扣掉
  * {@link #reduction} 点。按部位的那一条<b>可以扣到 0</b>（挡下轻击本来就是护具的本事），
  * 而 {@link #magicReduction} 那一条在结算时<b>至少留 1 点</b>——理由见
- * {@code mixin/PlayerDamageMixin}。</p>
+ * {@link org.eternalrelic.capability.attached.ChestGuardEffect}。</p>
  *
  * <p><b>弹开与减伤是两件事</b>：弹开是「这一箭整个不算」，连伤害带插箭一起拦下；
  * 减伤只是「这一击少掉几点」。一件护具可以只有前者（{@code deflectChance} 为 0 就是不会弹），

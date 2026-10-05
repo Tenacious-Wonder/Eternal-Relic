@@ -13,6 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import org.eternalrelic.registry.DayNightEmblems;
 import org.eternalrelic.registry.ModItems;
 import org.eternalrelic.relic.RelicAttachment;
 
@@ -27,7 +28,7 @@ import org.eternalrelic.relic.RelicAttachment;
  * <ul>
  *   <li><b>移速</b>：带着斗篷（背包 / 副手，或缝在正穿着 / 拿着的装备上）、世界正在夜里、
  *       且脚下亮度低于 {@value #DARK_LIGHT_LEVEL} —— 三条同时成立才给。
- *       ⚠️ 下界与末地没有昼夜，{@code World#isNight()} 在那两处恒为 false，因此那里永远不生效；</li>
+ *       下界与末地没有昼夜，那里永远不生效（判定见 {@link DayNightEmblems.TimeOfDay#matches}）；</li>
  *   <li><b>盔甲韧性</b>：只看「<b>正穿着的那件胸甲</b>上缝着没有」，与天色无关——
  *       这是制作者定的：斗篷披在胸甲外才给这份韧性，放背包里没有。</li>
  * </ul>
@@ -89,7 +90,7 @@ public final class NightWatchCloakEffect {
         boolean carried = onChest || CarriedStacks.carries(player, ModItems.NIGHTWATCH_CLOAK);
 
         // 移速：带着斗篷、世界正在夜里、脚下又够暗，三条同时成立才给
-        boolean darkNight = carried && player.getWorld().isNight()
+        boolean darkNight = carried && DayNightEmblems.TimeOfDay.NIGHT.matches(player.getWorld())
                 && player.getWorld().getLightLevel(player.getBlockPos()) < DARK_LIGHT_LEVEL;
 
         setModifier(player, EntityAttributes.GENERIC_MOVEMENT_SPEED, SPEED_MODIFIER_ID,

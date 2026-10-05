@@ -7,6 +7,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 import org.eternalrelic.registry.ModItems;
 import org.eternalrelic.relic.AttackDamage;
+import org.twcore.api.event.PlayerDamageEvent;
+import org.twcore.api.event.TwEventPhases;
 
 /**
  * 「挨打反伤」能力：带着荆棘之誓挨打时，把<b>玩家实际掉的那部分血</b>的五分之一扎回给打你的人
@@ -19,10 +21,9 @@ import org.eternalrelic.relic.AttackDamage;
  * <h2>为什么算的是「最终值」而不是「打过来的原始伤害」</h2>
  * <p>这一条是制作者指定的口径：<b>玩家实际掉了多少血，就按那个数的五分之一扎回去</b>。
  * 于是穿着好甲的人反得少、裸着挨打的人反得多，与「你实际被打掉多少，对方就挨多少的零头」
- * 这句话对得上。因此本能力<b>不挂挨打事件</b>——那个时点上的数字是护甲与保护附魔都还没算的
- * 原始伤害，取不到最终值；真正的调用点在 {@code mixin/PlayerDamageMixin} 里，
- * 那里已经算完了护甲、保护附魔与胸甲护具，扣掉金心之后交给这里的就是游戏接下去
- * 真正会从血条上扣掉的那个数。</p>
+ * 这句话对得上。因此本能力接在伤害结算事件上——那个时点已经算完了护甲、保护附魔与胸甲护具，
+ * 减掉金心之后就是游戏接下去真正会从血条上扣掉的那个数。挨打事件里的数字则是这些全都没算的
+ * 原始伤害，取不到最终值，所以本能力不挂那一条。</p>
  *
  * <p><b>被金心完全挡下的那一下不反</b>：玩家一滴血都没掉，也就没有「承受」可言
  * （参数为 0 时直接返回）。</p>
@@ -46,6 +47,32 @@ public final class ThornsOathEffect {
     private static final float MAX_REFLECTED = 20.0F;
 
     private ThornsOathEffect() {
+    }
+
+    /**
+     * 由 {@link org.eternalrelic.registry.RegistryInit#init()} 调用，接上伤害结算事件。
+     *
+     * <p>排在默认阶段之后：它要的是胸甲护具减完之后的数值。</p>
+     */
+    public static void register() {
+        PlayerDamageEvent.PLAYER_DAMAGE.register(TwEventPhases.LOW, ThornsOathEffect::onDamage);
+    }
+
+    /**
+     * 在伤害结算处把这一击的一部分扎回去。
+     *
+     * <p>本能力从不替玩家挡伤害，因此数值原样放行。</p>
+     *
+     * @param context       本次结算的只读信息
+     * @param currentDamage 护甲、附魔、状态效果与胸甲护具都算完之后、金心抵扣之前的伤害值
+     * @return 放行结果
+     */
+    private static PlayerDamageEvent.Result onDamage(PlayerDamageEvent.Context context, float currentDamage) {
+        // 金心（吸收）抵扣发生在更后面，这里先减掉它，得到的就是游戏真正会从血条上扣掉的数
+        reflect(context.player(), context.source(),
+                currentDamage - context.player().getAbsorptionAmount());
+
+        return PlayerDamageEvent.Result.keep();
     }
 
     /**

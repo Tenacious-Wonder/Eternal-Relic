@@ -26,8 +26,8 @@ bin/
 # fabric
 run/
 
-# 本地临时文件（分析用音频、预览图等，不提交）
-.dsh-tmp/
+# 本地构建的依赖 jar
+libs/
 
 # java
 hs_err_*.log

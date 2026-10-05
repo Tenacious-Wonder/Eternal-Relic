@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "eternal_relic",
+  "id": "tw-eternal-relic",
   "version": "${version}",
-  "name": "Eternal Relic",
-  "description": "探索世界，收集散落各处的永恒遗物，让每一件遗物都赋予你独特的能力。",
+  "name": "TW's Eternal Relic",
+  "description": "Explore the world and collect the eternal relics scattered everywhere, allowing each relic to grant you a unique ability.",
   "authors": [
     "Tenacious Wonder"
   ],
@@ -34,6 +34,7 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": "*",
-    "minecraft": "${minecraft_version}"
+    "minecraft": "${minecraft_version}",
+    "tw-core": ">=1.20.1-1.0.5"
   }
 }

@@ -6,6 +6,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
 
 import org.eternalrelic.registry.ModItems;
+import org.twcore.api.event.PlayerDamageEvent;
+import org.twcore.api.event.TwEventPhases;
 
 /**
  * 「损伤颠倒」能力：带着颠倒吊坠受伤时，偶尔会把这一下<b>反过来</b>——
@@ -17,10 +19,9 @@ import org.eternalrelic.registry.ModItems;
  *
  * <h2>几条刻意的规矩</h2>
  * <ul>
- *   <li><b>算的是最终值、不是原始伤害</b>：调用方传进来的 {@code finalDamage} 是护甲、保护附魔与
- *       胸甲护具都算完之后，游戏真正会从血条上扣掉的那个数（取值点与荆棘之誓同一处）。
- *       所以它回的血刚好等于"本来会掉的那点血"，穿好甲的人省经验、裸着挨打的人费经验——
- *       而且费得更多，这正是这条代价该有的样子。</li>
+ *   <li><b>算的是最终值、不是原始伤害</b>：伤害结算事件给出的数值是护甲、保护附魔与
+ *       胸甲护具都算完之后，游戏真正会从血条上扣掉的那个数。所以它回的血刚好等于"本来会掉的那点血"，
+ *       穿好甲的人省经验、裸着挨打的人费经验——而且费得更多，这正是这条代价该有的样子。</li>
  *   <li><b>扣的是经验点数，不是等级</b>：走的是原版 {@code addExperience}，因此等级与经验条
  *       由游戏自己折算，扣到掉级也照原版的规矩来，本模组不另算一份账。</li>
  *   <li><b>经验不够就发动失败</b>：这一下照常挨。也就是说它<b>不保证</b>救命，
@@ -45,13 +46,35 @@ public final class ReversalPendantEffect {
     }
 
     /**
+     * 由 {@link org.eternalrelic.registry.RegistryInit#init()} 调用，接上伤害结算事件。
+     *
+     * <p>排在最后：它要把这一击整个接下来，应在其它挨打能力都表达过意见之后再定。</p>
+     */
+    public static void register() {
+        PlayerDamageEvent.PLAYER_DAMAGE.register(TwEventPhases.LOWEST, ReversalPendantEffect::onDamage);
+    }
+
+    /**
+     * 决定这一击要不要被颠倒过来。
+     *
+     * @param context       本次结算的只读信息
+     * @param currentDamage 前序订阅方处理之后的伤害值
+     * @return 反转成功时把这一击归零并终止后续订阅；否则放行
+     */
+    private static PlayerDamageEvent.Result onDamage(PlayerDamageEvent.Context context, float currentDamage) {
+        return reverses(context.player(), currentDamage)
+                ? PlayerDamageEvent.Result.cancel()
+                : PlayerDamageEvent.Result.keep();
+    }
+
+    /**
      * 这一击要不要被颠倒过来。
      *
-     * <p><b>会就地改玩家状态</b>（回血、扣经验、放粒子），因此调用方只在真的要反转时调它一次；
+     * <p><b>会就地改玩家状态</b>（回血、扣经验、放粒子），因此只在真的要反转时调它一次；
      * 返回真时调用方应当把这一击的伤害<b>归零</b>。</p>
      *
      * @param player      挨打的玩家
-     * @param finalDamage 玩家实际会承受的伤害（护甲与附魔都算完之后）
+     * @param finalDamage 玩家实际会承受的伤害（护甲、附魔与胸甲护具都算完之后）
      * @return 是否反转成功
      */
     public static boolean reverses(ServerPlayerEntity player, float finalDamage) {

@@ -22,7 +22,7 @@ import net.minecraft.world.World;
 
 import org.eternalrelic.block.ChestplateStationBlock;
 import org.eternalrelic.block.entity.ChestplateStationBlockEntity;
-import org.eternalrelic.client.render.armor.StaticArmorRenderer;
+import org.twcore.client.api.render.armor.StaticArmorRenderer;
 
 @Environment(EnvType.CLIENT)
 public class ChestplateStationBlockEntityRenderer implements BlockEntityRenderer<ChestplateStationBlockEntity> {

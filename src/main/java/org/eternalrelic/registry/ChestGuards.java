@@ -8,7 +8,7 @@ import java.util.Set;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 
-import org.eternalrelic.bodypart.BodyPart;
+import org.twcore.api.bodypart.BodyPart;
 import org.eternalrelic.relic.ChestGuard;
 
 /**
