@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
@@ -122,7 +123,7 @@ public final class LittleHomeTemplate {
                     continue;
                 }
                 BlockState state = palette.get(stateIndex);
-                if (state.isAir()) {
+                if (state.isAir() || isEditorBlock(state)) {
                     continue;
                 }
                 NbtList posTag = entry.getList("pos", NbtElement.INT_TYPE);
@@ -138,5 +139,21 @@ public final class LittleHomeTemplate {
         } catch (IOException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * 这是不是「编辑用方块」——存档时容易跟着一起被框进来的技术方块。
+     *
+     * <p>用结构方块存图纸时，如果框选范围里正好还有另一个结构方块，它就会被一起存下来。
+     * 这些方块不该出现在世界里：结构方块在生存里看着莫名其妙，戳一下还会开编辑界面。
+     * 所以这里<b>一律丢掉</b>——顺带也保护了以后所有会带进这类方块的存档。</p>
+     *
+     * @param state 图纸上的方块
+     * @return 是编辑用方块就返回 {@code true}，不放进清单
+     */
+    private static boolean isEditorBlock(BlockState state) {
+        return state.isOf(Blocks.STRUCTURE_BLOCK)
+                || state.isOf(Blocks.STRUCTURE_VOID)
+                || state.isOf(Blocks.JIGSAW);
     }
 }

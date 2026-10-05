@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import org.eternalrelic.EternalRelic;
 import org.eternalrelic.worldgen.LittleHomeClusterConfig;
 import org.eternalrelic.worldgen.LittleHomeClusterFeature;
+import org.eternalrelic.worldgen.SurfaceRockConfig;
+import org.eternalrelic.worldgen.SurfaceRockFeature;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.block.BlockState;
@@ -22,6 +25,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
@@ -78,29 +82,84 @@ public final class RelicCommands {
      * 由 {@link org.eternalrelic.registry.RegistryInit#init()} 调用，把指令挂进游戏。
      */
     public static void register() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-                dispatcher.register(CommandManager.literal("relic")
-                        .requires(source -> source.hasPermissionLevel(2))
-                        .then(CommandManager.literal("cluster")
-                                .then(CommandManager.literal("here")
-                                        .executes(context -> here(context.getSource())))
-                                .then(CommandManager.literal("find")
-                                        .then(CommandManager.argument("homes",
-                                                        IntegerArgumentType.integer(1, 13))
-                                                .executes(context -> find(context.getSource(),
-                                                        IntegerArgumentType.getInteger(context, "homes"),
-                                                        DEFAULT_RADIUS, 0))
-                                                .then(CommandManager.argument("radius",
-                                                                IntegerArgumentType.integer(32, MAX_RADIUS))
-                                                        .executes(context -> find(context.getSource(),
-                                                                IntegerArgumentType.getInteger(context, "homes"),
-                                                                IntegerArgumentType.getInteger(context, "radius"), 0))
-                                                        .then(CommandManager.argument("skip",
-                                                                        IntegerArgumentType.integer(0, 64))
-                                                                .executes(context -> find(context.getSource(),
-                                                                        IntegerArgumentType.getInteger(context, "homes"),
-                                                                        IntegerArgumentType.getInteger(context, "radius"),
-                                                                        IntegerArgumentType.getInteger(context, "skip"))))))))));
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            LiteralArgumentBuilder<ServerCommandSource> find = CommandManager.literal("find")
+                    .then(CommandManager.argument("homes", IntegerArgumentType.integer(1, 13))
+                            .executes(context -> find(context.getSource(),
+                                    IntegerArgumentType.getInteger(context, "homes"), DEFAULT_RADIUS, 0))
+                            .then(CommandManager.argument("radius", IntegerArgumentType.integer(32, MAX_RADIUS))
+                                    .executes(context -> find(context.getSource(),
+                                            IntegerArgumentType.getInteger(context, "homes"),
+                                            IntegerArgumentType.getInteger(context, "radius"), 0))
+                                    .then(CommandManager.argument("skip", IntegerArgumentType.integer(0, 64))
+                                            .executes(context -> find(context.getSource(),
+                                                    IntegerArgumentType.getInteger(context, "homes"),
+                                                    IntegerArgumentType.getInteger(context, "radius"),
+                                                    IntegerArgumentType.getInteger(context, "skip"))))));
+
+            LiteralArgumentBuilder<ServerCommandSource> cluster = CommandManager.literal("cluster")
+                    .then(CommandManager.literal("here")
+                            .executes(context -> here(context.getSource())))
+                    .then(find);
+
+            dispatcher.register(CommandManager.literal("relic")
+                    .requires(source -> source.hasPermissionLevel(2))
+                    .then(cluster)
+                    .then(CommandManager.literal("rock")
+                            .executes(context -> rock(context.getSource()))));
+        });
+    }
+
+    /**
+     * 在玩家脚下试着放一块岩石，并汇报结果。
+     *
+     * <p>存在的意义是「立刻验证」：岩石是随机的、散在野外的，光靠走很难判断是「真没有」还是
+     * 「密度太低」，更看不出<b>为什么</b>没放成。这条指令直接在脚下跑一遍同一套判断，
+     * 放不成会说明卡在哪一关（太不平／压着树干／附近有房子……）。</p>
+     *
+     * @param source 指令来源
+     * @return 指令执行结果（1 放成了，0 没放成）
+     */
+    private static int rock(ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        if (player == null) {
+            source.sendError(Text.literal("这条指令得由玩家来执行——总得有个知道放哪儿的人。"));
+            return 0;
+        }
+        ServerWorld world = source.getWorld();
+        SurfaceRockConfig config = rockConfig(world);
+        if (config == null) {
+            source.sendError(Text.literal("读不到岩石参数（eternal_relic:surface_rock）。"));
+            return 0;
+        }
+
+        Random random = Random.create(world.getRandom().nextLong());
+        String reason = SurfaceRockFeature.tryPlace(world, random, player.getBlockPos(), config);
+        if (reason == null) {
+            RegistryEntry<Biome> biome = world.getBiome(player.getBlockPos());
+            String name = biome.getKey().map(key -> key.getValue().getPath()).orElse("?");
+            source.sendFeedback(() -> Text.literal("在脚下放了一块岩石（群系 " + name + "）。"
+                    + "换个地方再敲一次，能连着放就说明这一带密度正常。"), false);
+            return 1;
+        }
+        source.sendFeedback(() -> Text.literal("这一处放不了：" + reason), false);
+        return 0;
+    }
+
+    /**
+     * 读出地表岩石那一套参数。
+     *
+     * @param world 世界
+     * @return 参数；读不到则 {@code null}
+     */
+    private static SurfaceRockConfig rockConfig(ServerWorld world) {
+        ConfiguredFeature<?, ?> feature = world.getRegistryManager()
+                .get(RegistryKeys.CONFIGURED_FEATURE)
+                .get(EternalRelic.id("surface_rock"));
+        if (feature != null && feature.config() instanceof SurfaceRockConfig config) {
+            return config;
+        }
+        return null;
     }
 
     /**

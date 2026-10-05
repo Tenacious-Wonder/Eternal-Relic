@@ -551,7 +551,7 @@ public class LittleHomeFeature extends Feature<LittleHomeConfig> {
      *
      * @param y 判断用的竖直位置。必须给地表高度——给 0 的话就跑到地底下去跟矿井做邻居了
      */
-    private static boolean insideOtherStructure(StructureWorldAccess world, int x, int y, int z) {
+    static boolean insideOtherStructure(StructureWorldAccess world, int x, int y, int z) {
         try {
             BlockPos pos = new BlockPos(x, y, z);
             StructureAccessor accessor = world.toServerWorld().getStructureAccessor();

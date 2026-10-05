@@ -25,6 +25,23 @@
         }
       },
       {
+        "weight": 25,
+        "home": {
+          "variants": [
+            "little_home_6_01", "little_home_6_02", "little_home_6_03", "little_home_6_04", "little_home_6_05",
+            "little_home_6_06", "little_home_6_07", "little_home_6_08", "little_home_6_09", "little_home_6_10",
+            "little_home_6_11"
+          ],
+          "loot_table": "eternal_relic:chests/little_home",
+          "strip_ground": true,
+          "hole_chance": 0.5,
+          "burrow_chance": 0.1,
+          "slab_chance": 0.55,
+          "worn_slab_chance": 0.2,
+          "weathering_scale": 1.0
+        }
+      },
+      {
         "weight": 15,
         "home": {
           "variants": [

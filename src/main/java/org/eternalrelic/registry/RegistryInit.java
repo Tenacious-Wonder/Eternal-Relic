@@ -11,6 +11,7 @@ import org.eternalrelic.command.RelicCommands;
 import org.eternalrelic.network.SoulLanternNetwork;
 import org.eternalrelic.network.WindCloakNetwork;
 import org.eternalrelic.worldgen.LittleHomeSites;
+import org.eternalrelic.worldgen.SurfaceRockSites;
 
 public class RegistryInit {
     public static void init() {
@@ -23,6 +24,7 @@ public class RegistryInit {
         ModScreens.register();
         ModFeatures.register();
         LittleHomeSites.register();
+        SurfaceRockSites.register();
         RelicCommands.register();
         MeleeBodyPartDetector.register();
         CarriedRelicEffect.register();

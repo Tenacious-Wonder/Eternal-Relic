@@ -1,0 +1,15 @@
+{
+  "type": "eternal_relic:surface_rock",
+  "config": {
+    "replace_chance": 0.05,
+    "outcrop_chance": 0.4,
+    "outcrop_chance_rocky": 0.85,
+    "slab_count": 4,
+    "outcrop_variants": [
+      "rock_1_01", "rock_1_02", "rock_1_03", "rock_1_04", "rock_1_05", "rock_1_06",
+      "rock_1_07", "rock_1_08", "rock_1_09", "rock_1_10", "rock_1_11", "rock_1_12",
+      "rock_1_13", "rock_1_14", "rock_1_15", "rock_1_16", "rock_1_17", "rock_1_18",
+      "rock_1_19", "rock_1_20", "rock_1_21", "rock_1_22", "rock_1_23", "rock_1_24"
+    ]
+  }
+}

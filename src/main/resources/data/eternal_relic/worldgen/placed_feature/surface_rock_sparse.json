@@ -1,9 +1,13 @@
 {
-  "feature": "eternal_relic:little_home_4_surface",
+  "feature": "eternal_relic:surface_rock",
   "placement": [
     {
+      "type": "minecraft:count",
+      "count": 5
+    },
+    {
       "type": "minecraft:rarity_filter",
-      "chance": 384
+      "chance": 38
     },
     {
       "type": "minecraft:in_square"

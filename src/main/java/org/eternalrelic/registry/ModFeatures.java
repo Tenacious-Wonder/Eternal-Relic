@@ -10,6 +10,8 @@ import org.eternalrelic.worldgen.LittleHomeClusterConfig;
 import org.eternalrelic.worldgen.LittleHomeClusterFeature;
 import org.eternalrelic.worldgen.LittleHomeConfig;
 import org.eternalrelic.worldgen.LittleHomeFeature;
+import org.eternalrelic.worldgen.SurfaceRockConfig;
+import org.eternalrelic.worldgen.SurfaceRockFeature;
 
 /**
  * 本模组的世界生成器注册入口。
@@ -34,6 +36,10 @@ public final class ModFeatures {
     /** 遗落小屋聚落 —— 在一处摆下若干栋，让房子能扎堆。 */
     public static final Feature<LittleHomeClusterConfig> LITTLE_HOME_CLUSTER =
             register("little_home_cluster", new LittleHomeClusterFeature(LittleHomeClusterConfig.CODEC));
+
+    /** 地表岩石 —— 散在野外的裸岩与碎石，按生物群系换样子与密度。 */
+    public static final Feature<SurfaceRockConfig> SURFACE_ROCK =
+            register("surface_rock", new SurfaceRockFeature(SurfaceRockConfig.CODEC));
 
     private ModFeatures() {
     }
