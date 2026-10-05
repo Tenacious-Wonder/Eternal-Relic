@@ -15,6 +15,7 @@
     "PlayerEntityMixin",
     "ServerWorldMixin",
     "SitGoalMixin",
+    "SnowGripStudsMixin",
     "WolfAweMixin",
     "WolfTamingMixin"
   ],

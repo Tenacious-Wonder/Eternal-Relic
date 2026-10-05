@@ -4,8 +4,10 @@
   "package": "org.eternalrelic.client.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
+    "AbstractClientPlayerEntityMixin",
     "HandledScreenAccessor",
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "MouseMixin"
   ],
   "injectors": {
     "defaultRequire": 1

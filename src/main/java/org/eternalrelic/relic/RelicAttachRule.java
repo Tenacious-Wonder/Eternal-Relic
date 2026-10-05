@@ -46,6 +46,26 @@ public final class RelicAttachRule {
     }
 
     /**
+     * 这件遗物能不能在<b>锻造台</b>那条入口附上去。
+     *
+     * <p>绝大多数遗物两条入口都收（锻造台与遗物装卸台），因此这个方法对它们一律回答「能」。
+     * 只有登记时写明「只在装卸台上附」的那几件返回 {@code false} ——差别不在怎么附、
+     * 也不在附上之后的效果，只在<b>哪条入口受理它</b>（见
+     * {@link RelicAttachment#registerStationOnly}）。</p>
+     *
+     * <p><b>为什么单独放一个方法，而不是把判断塞进 {@link #matches}</b>：{@code matches}
+     * 是两条入口共用的裁决，装卸台也调它；把「锻造台不受理」写进那里，等于把装卸台一起关掉了。
+     * 因此判定保留在共用处不动，由锻造台这一侧在调它之前多问一句。</p>
+     *
+     * @param item 待判断的遗物
+     * @return 可以在锻造台上附时返回 {@code true}；没登记过的物品一律返回 {@code false}
+     */
+    public static boolean isSmithingAllowed(Item item) {
+        RelicAttachment.Spec spec = RelicAttachment.specOf(item);
+        return spec != null && !spec.stationOnly();
+    }
+
+    /**
      * 这件物品算不算装备 / 武器 / 工具之一（也就是"能不能被附"）。
      *
      * @param item 待判断的物品

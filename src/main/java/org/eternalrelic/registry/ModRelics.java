@@ -201,6 +201,23 @@ public final class ModRelics {
             MaterialRarity.ROUGH_STONE);
 
     /**
+     * 馆藏透镜 —— 举起来看时，十三格内的箱子正中心浮起一枚淡黄光斑，隔着方块也看得见。
+     *
+     * <p><b>它是本模组第一件「拿在手上用」而不是「放在背包里就生效」的遗物</b>：效果只在按住
+     * 右键举镜的那段时间里存在，松手即散。因此这里只登记身份与成色，真正的判定由
+     * {@link org.eternalrelic.capability.using.CuratorLensEffect} 负责，画面由客户端的
+     * {@code ChestMarkRenderer} 负责。</p>
+     *
+     * <p><b>借的是原版望远镜的全套表现</b>：举起时画面放大、手上摆出举镜姿势、边框遮罩与那两记
+     * 声响都照原版走，只有放大倍率改成了两倍。</p>
+     *
+     * <p>固有稀有度为粗石：一副做工讲究的观察镜，顶用，但谈不上稀罕。</p>
+     */
+    public static final RelicDefinition CURATOR_LENS = define(
+            ModItems.CURATOR_LENS,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
      * 铸铁拇指戒 —— 带在身上时，用的工具与武器有 5% 的机会不掉耐久。
      *
      * <p>它<b>没有任何属性加成</b>：耐久是在物品自己身上一点点扣掉的，既不是玩家的属性，
@@ -236,6 +253,23 @@ public final class ModRelics {
             MaterialRarity.ROUGH_STONE);
 
     /**
+     * 轻巧盾徽 —— 带在身上时，举着盾牌的那段时间走得更快；钉在盾牌上另外给两点护甲。
+     *
+     * <p><b>它的两条好处走的是两条不同的路。</b>举盾加速是<b>有条件</b>的——盾一放下就该没，
+     * 而这张表登记的属性只能表达「带着就算数」，因此那一条不进这张表，由
+     * {@link org.eternalrelic.capability.carried.LightweightShieldBadgeEffect} 每 5 刻自己核对。</p>
+     *
+     * <p>这里登记的<b>只有护甲那一条</b>，而且走的是「只认附着份」——放在背包里不给护甲，
+     * 必须真的钉在盾牌上才算数。两条各管各的，因此钉上去之后是「举盾更快 + 两点护甲」两样都有。</p>
+     *
+     * <p>固有稀有度为成材：一块正经做出来的木雕，配得上它给的那点分量。</p>
+     */
+    public static final RelicDefinition LIGHTWEIGHT_SHIELD_BADGE = defineAttachmentOnly(
+            ModItems.LIGHTWEIGHT_SHIELD_BADGE,
+            MaterialRarity.LUMBER,
+            RelicEffect.flat(RelicAttribute.ARMOR, 2.0D));
+
+    /**
      * 牧羊人铃铛 —— 拿在主手右键摇响，四十格内的羊会朝摇铃的人走过来，持续二十秒。
      *
      * <p>它<b>没有任何属性加成</b>：铃声不改变玩家的任何数值，改的是羊的行走目标，
@@ -265,6 +299,22 @@ public final class ModRelics {
      */
     public static final RelicDefinition ROUND_CAKE = define(
             ModItems.ROUND_CAKE,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 红土蜡块 —— 拿在主手右键，把副手那件东西补回一段耐久的消耗品。
+     *
+     * <p><b>它和「一个圆形的饼」是同一路东西</b>：用掉才生效，效果发生在它消失的那一刻，此后
+     * 什么都不剩。因此这里既没有携带效果、也不在挨打时出手，只登记身份与成色；真正那件事由
+     * {@link org.eternalrelic.capability.consumed.RedClayWaxEffect} 在右键时执行。</p>
+     *
+     * <p>它除了当消耗品，本身还是可用的遗物素材——这一层写在那段说明文字里就够了，
+     * 表里不必另外登记什么。</p>
+     *
+     * <p>固有稀有度为粗石：从恶地深处挖出来的粘土，算不上稀罕物件。</p>
+     */
+    public static final RelicDefinition RED_CLAY_WAX = define(
+            ModItems.RED_CLAY_WAX,
             MaterialRarity.ROUGH_STONE);
 
     /**
@@ -446,6 +496,96 @@ public final class ModRelics {
     public static final RelicDefinition REVERSAL_PENDANT = define(
             ModItems.REVERSAL_PENDANT,
             MaterialRarity.ROUGH_STONE);
+
+    // ==================== 会报信的四件小东西 ====================
+
+    /**
+     * 旧怀表 —— 拿在手上右键，报出此刻的钟点与距天黑 / 天亮还有多久。
+     *
+     * <p>它<b>什么都不改</b>：既不加属性也不出手，只是把世界时间折算成一句人话
+     * （判定见 {@link org.eternalrelic.item.PocketWatchItem}），因此这里只登记身份与成色。</p>
+     *
+     * <p>固有稀有度为碎屑：一只走得还算准的旧表，值不了几个钱。</p>
+     */
+    public static final RelicDefinition POCKET_WATCH = define(
+            ModItems.POCKET_WATCH,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 气象瓶 —— 拿在手上右键，报出接下来的天气与大约还有多久变天。
+     *
+     * <p>读的是世界自己的天气计时器，因此这里同样只登记身份与成色，
+     * 判定见 {@link org.eternalrelic.item.WeatherBottleItem}。</p>
+     *
+     * <p>固有稀有度为碎屑。</p>
+     */
+    public static final RelicDefinition WEATHER_BOTTLE = define(
+            ModItems.WEATHER_BOTTLE,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 回声螺壳 —— 拿在手上右键，报出四周活物的数量与最近那只敌对生物的方向。
+     *
+     * <p>判定见 {@link org.eternalrelic.item.EchoConchItem}。</p>
+     *
+     * <p>固有稀有度为碎屑。</p>
+     */
+    public static final RelicDefinition ECHO_CONCH = define(
+            ModItems.ECHO_CONCH,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 蜡封手账 —— 蹲下右键记下脚下的地点，平时右键报出那个地点在哪个方向、离多远。
+     *
+     * <p>记下的那一页写在物品自己的数据里，判定见
+     * {@link org.eternalrelic.item.WaxSealedJournalItem}。</p>
+     *
+     * <p>固有稀有度为碎屑。</p>
+     */
+    public static final RelicDefinition WAX_SEALED_JOURNAL = define(
+            ModItems.WAX_SEALED_JOURNAL,
+            MaterialRarity.DEBRIS);
+
+    // ==================== 招呼别的东西的两件 ====================
+
+    /**
+     * 驯兽哨 —— 拿在手上右键，把 30 格内自己的宠物叫到身边。
+     *
+     * <p><b>它是本模组第一件「把生物搬过来」的遗物</b>：牧羊人铃铛只是让羊自己走过去，
+     * 这一件是真的把伙伴传送到你脚边，判定见 {@link org.eternalrelic.item.BeastWhistleItem}。</p>
+     *
+     * <p>固有稀有度为粗石：走丢的伙伴能叫回来，这份便利值这一档。</p>
+     */
+    public static final RelicDefinition BEAST_WHISTLE = define(
+            ModItems.BEAST_WHISTLE,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 回音石 —— 拿在手上右键，把 20 格内的怪物引向自己。
+     *
+     * <p><b>它是一件双刃剑</b>：不伤害任何东西，只是让怪认定「你在那里」，
+     * 判定见 {@link org.eternalrelic.item.EchoStoneItem}。</p>
+     *
+     * <p>固有稀有度为粗石。</p>
+     */
+    public static final RelicDefinition ECHO_STONE = define(
+            ModItems.ECHO_STONE,
+            MaterialRarity.ROUGH_STONE);
+
+    // ==================== 踩冰不滑的那一件 ====================
+
+    /**
+     * 雪地靴钉 —— 带在身上时，踩在冰面上不再打滑。
+     *
+     * <p>它<b>没有属性可登记</b>：改的是脚下方块的摩擦系数，由
+     * {@link org.eternalrelic.capability.carried.SnowGripStudsEffect} 判断、
+     * {@code mixin/SnowGripStudsMixin} 动手。</p>
+     *
+     * <p>固有稀有度为碎屑（制作者定的）：一套套在鞋上的防滑钉，做工简单、值不了几个钱。</p>
+     */
+    public static final RelicDefinition SNOW_GRIP_STUDS = define(
+            ModItems.SNOW_GRIP_STUDS,
+            MaterialRarity.DEBRIS);
 
     /**
      * 永恒纹章 —— 钉在一件物品上，使那件物品不会被火烧、岩浆、爆炸、仙人掌与虚空毁掉，
@@ -836,6 +976,66 @@ public final class ModRelics {
     public static final RelicDefinition MOON_EMBLEM = define(
             ModItems.MOON_EMBLEM,
             MaterialRarity.LUMBER);
+
+    /**
+     * 繁花纹章 —— 缝在胸甲上，穿着它挨<b>近战</b>打之后随机得到一条 1 级增益，持续 10 秒。
+     *
+     * <p>它<b>没有任何属性加成</b>，也不在挨打时挡伤害：价值全在「挨一下、换一条随机的增益」上，
+     * 由 {@link org.eternalrelic.capability.attached.BloomEmblemEffect} 负责。
+     * 抽的是哪十一条、以及怎么做到「不与原有 buff 叠加」，都写在那一个类里。</p>
+     *
+     * <p><b>放在背包里就生效</b>，缝在胸甲上也算。若要缝上去，只能走遗物装卸台、
+     * 而且只能缝胸甲（见 {@link AttachableRelics} 里那一行）——那两条管的是「怎么附上去」。
+     * 因此它没有打开 {@code attachmentOnly}（那一栏管的是属性加成从哪儿算，而这件纹章没有属性加成），
+     * 生效与否由能力类自己问。</p>
+     *
+     * <p>固有稀有度为成材：与勇气、川流、太阳、月亮四枚同一档的蜡制纹章。</p>
+     */
+    public static final RelicDefinition BLOOM_EMBLEM = define(
+            ModItems.BLOOM_EMBLEM,
+            MaterialRarity.LUMBER);
+
+    /**
+     * 余烬吊坠 —— 血量低于三成时再挨打，在身周炸开一圈，把凑上来的敌人一起掀开。
+     *
+     * <p>它没有属性加成，<b>也不是「守护」</b>——这一击照常挨，只是挨完之后反扑一次。
+     * 守护那一栏（{@link DamageWard}）管的是「把这一击整个挡下、或改成给金心」，
+     * 与这里要的「挨了再还手」是两件事，所以它没有登记守护，而是自己挂挨打判定
+     * （见 {@link org.eternalrelic.capability.carried.EmberPendantEffect}）。</p>
+     *
+     * <p>固有稀有度为精萃：一次能救命的临场反扑，但只有命悬一线时才轮得到它。</p>
+     */
+    public static final RelicDefinition EMBER_PENDANT = define(
+            ModItems.EMBER_PENDANT,
+            MaterialRarity.ESSENCE);
+
+    /**
+     * 黯淡的余烬吊坠 —— 用尽 21 次之后的余烬吊坠，里头已经烧空。
+     *
+     * <p>它自身没有任何效果，登记进遗物表只为一件事：<b>效果说明只有遗物界面会显示，
+     * 而界面要求物品在遗物表里</b>。不进遗物表的话，语言文件里那句「已经烧尽、用附魔之瓶
+     * 在工作台上修一修就能再用」玩家永远看不到，提示框里也会少一行稀有度与
+     * 「按左 Shift」的指路——回响之环的碎裂形态走的是同一条路。</p>
+     *
+     * <p>稀有度沿用本体（精萃）：烧空了只是它此刻的状态，成色不该随状态变化。</p>
+     */
+    public static final RelicDefinition EMBER_PENDANT_DULL = define(
+            ModItems.EMBER_PENDANT_DULL,
+            MaterialRarity.ESSENCE);
+
+    /**
+     * 归乡石 —— 拿在手上右键记下脚下这一处，再右键一次立刻回到那里
+     * （代价是一个经验等级，之后冷却三分钟）。
+     *
+     * <p>它没有属性加成，也不在挨打时出手：价值全在「把位置存下来、之后再兑现」上，
+     * 由 {@link org.eternalrelic.capability.carried.HomestoneEffect} 负责；
+     * 位置与冷却都写在石头自己的数据里，因此身上带着两块时各记各的、各冷各的。</p>
+     *
+     * <p>固有稀有度为精萃：一件随时抽身的器物，但跨维度不行——那一条是刻意的取舍。</p>
+     */
+    public static final RelicDefinition HOMESTONE = define(
+            ModItems.HOMESTONE,
+            MaterialRarity.ESSENCE);
 
     // ==================== 品阶样本（测试用） ====================
 

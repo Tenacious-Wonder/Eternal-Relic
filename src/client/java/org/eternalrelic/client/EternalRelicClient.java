@@ -14,6 +14,7 @@ import org.eternalrelic.client.render.blockentity.ChestplateStationBlockEntityRe
 import org.eternalrelic.client.render.screen.ChestplateStationScreen;
 import org.eternalrelic.client.render.screen.RelicScreenOpener;
 import org.eternalrelic.client.render.screen.RelicStationScreen;
+import org.eternalrelic.client.render.world.ChestMarkRenderer;
 import org.eternalrelic.registry.ModBlockEntityTypes;
 import org.eternalrelic.registry.ModBlocks;
 import org.eternalrelic.registry.ModScreens;
@@ -36,6 +37,7 @@ public class EternalRelicClient implements ClientModInitializer {
         SoulLanternGlow.register();
         SoulFlameClientNetwork.register();
         MaterialTooltip.register();
+        ChestMarkRenderer.register();
 
         // 两个工作方块的界面：各自的容器类型与画它的界面绑起来
         HandledScreens.register(ModScreens.RELIC_STATION, RelicStationScreen::new);

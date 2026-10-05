@@ -41,8 +41,12 @@ public class RelicAttachRecipe implements SmithingRecipe {
 
     @Override
     public boolean matches(Inventory inventory, World world) {
-        return RelicAttachRule.matches(
-                inventory.getStack(0), inventory.getStack(1), inventory.getStack(2));
+        ItemStack relic = inventory.getStack(2);
+
+        // 制作者指定「只在遗物装卸台上附」的那几件不走这条入口：收件之前先问一句，
+        // 否则锻造台能把装卸台才该做的事做了（见 RelicAttachRule#isSmithingAllowed）
+        return RelicAttachRule.isSmithingAllowed(relic.getItem())
+                && RelicAttachRule.matches(inventory.getStack(0), inventory.getStack(1), relic);
     }
 
     @Override
@@ -74,8 +78,9 @@ public class RelicAttachRecipe implements SmithingRecipe {
 
     @Override
     public boolean testAddition(ItemStack stack) {
-        // 第 3 格：只收登记过的可附遗物
-        return RelicAttachRule.isRelicItem(stack.getItem());
+        // 第 3 格：只收登记过的可附遗物，而且它得允许走锻造台这条入口
+        return RelicAttachRule.isRelicItem(stack.getItem())
+                && RelicAttachRule.isSmithingAllowed(stack.getItem());
     }
 
     @Override

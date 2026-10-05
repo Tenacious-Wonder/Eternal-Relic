@@ -51,6 +51,14 @@ public enum AttachTarget {
     /** 只算穿在脚上的那一件。 */
     BOOTS("靴子"),
 
+    /**
+     * 只算盾牌。
+     *
+     * <p>{@link #ARMOR} 那个大类里本来就含盾牌（凡是钉在装备上的遗物都能钉上去）。这一类是从
+     * 那堆里<b>单把盾牌挑出来</b>用的：盾徽一类的遗物只对盾牌有意义，钉在头盔或靴子上说不通。</p>
+     */
+    SHIELD("盾牌"),
+
     /** 用来打人的东西。 */
     WEAPON("武器"),
 
@@ -99,6 +107,7 @@ public enum AttachTarget {
             case HELMET -> isArmorIn(item, EquipmentSlot.HEAD);
             case CHESTPLATE -> isArmorIn(item, EquipmentSlot.CHEST);
             case BOOTS -> isArmorIn(item, EquipmentSlot.FEET);
+            case SHIELD -> item instanceof ShieldItem;
             case WEAPON -> item instanceof SwordItem
                     || item instanceof AxeItem
                     || item instanceof TridentItem

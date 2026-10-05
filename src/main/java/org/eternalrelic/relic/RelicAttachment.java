@@ -111,9 +111,11 @@ public final class RelicAttachment {
      * @param targets  能附到哪几类目标上；不能为空
      * @param material 附着时第一格要放的辅料
      * @param stacking 附着份怎么与其它来源累加
-     * @param category 作为「装备配件」时属于哪一类；纹章之类不是配件，这里为 {@code null}
+     * @param category    作为「装备配件」时属于哪一类；纹章之类不是配件，这里为 {@code null}
+     * @param stationOnly 是否**只能在遗物装卸台上附**（锻造台那条入口对它关着）
      */
-    public record Spec(Set<AttachTarget> targets, Item material, Stacking stacking, FittingCategory category) {
+    public record Spec(Set<AttachTarget> targets, Item material, Stacking stacking, FittingCategory category,
+            boolean stationOnly) {
 
         /**
          * @param target 目标类别
@@ -146,7 +148,28 @@ public final class RelicAttachment {
      * @param targets  允许附着的目标类别，至少写一个
      */
     public static void register(Item relic, Item material, Stacking stacking, AttachTarget... targets) {
-        register(relic, null, material, stacking, targets);
+        register(relic, null, material, stacking, false, targets);
+    }
+
+    /**
+     * 登记一件<b>只能在遗物装卸台上附</b>的遗物 —— 锻造台那条入口对它关着。
+     *
+     * <p>为什么会有这种要求：附着本来有两条入口（原版锻造台与遗物装卸台），两条共用同一套裁决。
+     * 制作者为某件遗物指定「只能上装卸台」时，差别<b>不在这件遗物怎么附、也不在附上之后有什么效果</b>，
+     * 而只在<b>哪条入口受理它</b>：装卸台是把东西摆在台面上、看清楚了再敲上去的，
+     * 锻造台则是三格一合的流水线。要表达这层区别，只能在登记里多记一栏，
+     * 让锻造台那条路把它筛掉（见 {@code RelicAttachRule#isSmithingAllowed}）。</p>
+     *
+     * <p>其余一切照旧：辅料、能附到哪几类目标、同不同类互斥、上限怎么算，全部与
+     * {@link #register} 完全相同。</p>
+     *
+     * @param relic    遗物本身
+     * @param material 附着时第一格要放的辅料
+     * @param stacking 附着份怎么与其它来源累加
+     * @param targets  允许附着的目标类别，至少写一个
+     */
+    public static void registerStationOnly(Item relic, Item material, Stacking stacking, AttachTarget... targets) {
+        register(relic, null, material, stacking, true, targets);
     }
 
     /**
@@ -172,11 +195,11 @@ public final class RelicAttachment {
                     "装备配件「" + Registries.ITEM.getId(fitting) + "」没有写明属于哪一类");
         }
 
-        register(fitting, category, material, stacking, targets);
+        register(fitting, category, material, stacking, false, targets);
     }
 
     private static void register(Item relic, FittingCategory category, Item material, Stacking stacking,
-            AttachTarget... targets) {
+            boolean stationOnly, AttachTarget... targets) {
         String name = Registries.ITEM.getId(relic).toString();
 
         if (targets.length == 0) {
@@ -189,7 +212,7 @@ public final class RelicAttachment {
 
         EnumSet<AttachTarget> set = EnumSet.noneOf(AttachTarget.class);
         Collections.addAll(set, targets);
-        SPECS.put(relic, new Spec(Collections.unmodifiableSet(set), material, stacking, category));
+        SPECS.put(relic, new Spec(Collections.unmodifiableSet(set), material, stacking, category, stationOnly));
     }
 
     /**

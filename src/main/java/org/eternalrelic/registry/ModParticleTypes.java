@@ -48,6 +48,18 @@ public final class ModParticleTypes {
      */
     private static final DefaultParticleType SOUL_RISE = registerSimple("soul_rise");
 
+    /**
+     * 红土蜡块揉开时溅出的蜡点 —— 橙色的小圆点，缓缓上浮后淡去。
+     *
+     * <p>它不需要携带任何参数：溅几颗、往哪飞由生成它的那一次调用给出，大小与寿命各颗自随机，
+     * 因此用简单类型即可。</p>
+     *
+     * <p>不用游戏自带的涂蜡粒子（{@code ParticleTypes.WAX_ON}）：那一颗同为橙色的圆点，
+     * 但尺寸只有本粒子的六成，渲染到屏幕上小到看不出是圆的。这里沿用它的颜色，
+     * 只把大小与寿命调成看得清的样子。</p>
+     */
+    private static final DefaultParticleType RED_WAX_SPARK = registerSimple("red_wax_spark");
+
     private ModParticleTypes() {
     }
 
@@ -97,6 +109,13 @@ public final class ModParticleTypes {
      */
     public static DefaultParticleType soulRise() {
         return SOUL_RISE;
+    }
+
+    /**
+     * @return 红土蜡块蜡点的粒子类型
+     */
+    public static DefaultParticleType redWaxSpark() {
+        return RED_WAX_SPARK;
     }
 
     private static <T extends net.minecraft.particle.ParticleEffect> ParticleType<T> register(

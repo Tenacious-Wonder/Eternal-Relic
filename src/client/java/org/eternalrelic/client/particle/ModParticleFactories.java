@@ -28,5 +28,6 @@ public final class ModParticleFactories {
         registry.register(ModParticleTypes.soulWisp(), SoulWispParticle.Factory::new);
         registry.register(ModParticleTypes.soulBurst(), SoulBurstParticle.Factory::new);
         registry.register(ModParticleTypes.soulRise(), SoulRiseParticle.Factory::new);
+        registry.register(ModParticleTypes.redWaxSpark(), RedWaxSparkParticle.Factory::new);
     }
 }

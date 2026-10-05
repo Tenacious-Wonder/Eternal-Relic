@@ -305,5 +305,24 @@ public final class AttachableRelics {
                 Items.LEATHER,
                 RelicAttachment.Stacking.NONE,
                 AttachTarget.MELEE_WEAPON);
+
+        // 繁花纹章：蜡制的，配蜜脾；**只缝胸甲**，而且**只能走遗物装卸台** ——
+        // 锻造台那条流水线不受理它（制作者指定的做法，见 registerStationOnly）。
+        // 纹章不填类别，因此它可以与别的纹章、以及肩甲内衬那类配件同时待在一件胸甲上
+        RelicAttachment.registerStationOnly(
+                ModItems.BLOOM_EMBLEM,
+                Items.HONEYCOMB,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.CHESTPLATE);
+
+        // 轻巧盾徽：木雕配细铁条，辅料用**铁锭** —— 盾牌自己的配方就是六块木板加一个铁锭，
+        // 钉盾徽用它，玩家一看就懂这枚徽章是怎么固定上去的。
+        // ★ 只钉盾牌（AttachTarget.SHIELD）：它给的两点护甲是替盾牌补的，钉在头盔或靴子上说不通。
+        // 不填类别，因此它可以与别的纹章同时待在一面盾上
+        RelicAttachment.register(
+                ModItems.LIGHTWEIGHT_SHIELD_BADGE,
+                Items.IRON_INGOT,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.SHIELD);
     }
 }
