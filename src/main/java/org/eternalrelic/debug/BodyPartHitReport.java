@@ -1,7 +1,9 @@
 package org.eternalrelic.debug;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,6 +21,10 @@ import org.eternalrelic.bodypart.ProjectileBodyPartHit;
  * 才能核对判定准不准、肩甲到底挡下了几点。<b>它不是正式功能</b>——不再需要时，把本文件连同
  * {@link org.eternalrelic.EternalRelic#onInitialize()} 里那一行调用一起删掉即可，
  * 删完不会影响任何遗物的效果（它只读、不参与结算）。</p>
+ *
+ * <p><b>默认是关的</b>：挨打是高频事件，一直开着会把聊天栏刷满，因此由玩家自己用
+ * {@code /relic debug} 打开（再敲一次关掉）。开关<b>只认执行指令的那个人</b>，
+ * 而且只记在服务器内存里 —— 下线或重启即清空，与"时段加护"那几件同一套取舍。</p>
  *
  * <p><b>为什么分两步才凑得出一行</b>：打中哪儿在伤害结算<b>之前</b>就知道（近战按站位算、
  * 弹射物算命中点），而扣了多少要到结算<b>之中</b>才算得出来，中间隔着几行游戏代码。
@@ -43,6 +49,14 @@ public final class BodyPartHitReport {
     /** 玩家 → 刚记下的那张便条。 */
     private static final Map<UUID, Pending> PENDING = new HashMap<>();
 
+    /**
+     * 要求看这份输出的玩家。
+     *
+     * <p><b>只记在服务器内存里</b>：它的寿命就是这一次游戏，下线或重启都等于"没打开过"。
+     * 写进存档反而要额外操心清理，而调试输出本来就是临时的东西。</p>
+     */
+    private static final Set<UUID> ENABLED = new HashSet<>();
+
     private BodyPartHitReport() {
     }
 
@@ -54,12 +68,46 @@ public final class BodyPartHitReport {
     }
 
     /**
+     * 打开或关掉某位玩家的部位调试输出，由 {@code /relic debug} 调用。
+     *
+     * @param player 目标玩家
+     * @return 切换之后是开着（{@code true}）还是关着（{@code false}）
+     */
+    public static boolean toggle(PlayerEntity player) {
+        UUID id = player.getUuid();
+
+        if (ENABLED.remove(id)) {
+            // 顺手把他那张没来得及用掉的便条清掉，免得关掉之后还漏出一行
+            PENDING.remove(id);
+            return false;
+        }
+
+        ENABLED.add(id);
+        return true;
+    }
+
+    /**
+     * @param player 目标玩家
+     * @return 他此刻要不要看这份输出
+     */
+    private static boolean isEnabled(PlayerEntity player) {
+        return ENABLED.contains(player.getUuid());
+    }
+
+    /**
      * 记下这一击打在哪个部位，盖掉这位玩家上一张便条。
+     *
+     * <p>没打开开关的玩家<b>连便条都不记</b>：这张表不该为不看它的人一直长下去。</p>
      *
      * @param hit 一次命中
      */
     private static void remember(BodyPartHit hit) {
         PlayerEntity player = hit.player();
+
+        if (!isEnabled(player)) {
+            return;
+        }
+
         PENDING.put(player.getUuid(), new Pending(hit, player.getWorld().getTime()));
     }
 
@@ -77,7 +125,8 @@ public final class BodyPartHitReport {
     public static void report(PlayerEntity player, float original, float afterGuard, float blocked) {
         Pending pending = PENDING.remove(player.getUuid());
 
-        if (pending == null || player.getWorld().getTime() != pending.tick()) {
+        // 开关关着时便条本来就不该有；这里再查一次，是为了挡住"开着的时候记下、随后又关掉"的那一张
+        if (!isEnabled(player) || pending == null || player.getWorld().getTime() != pending.tick()) {
             return;
         }
 
@@ -105,6 +154,10 @@ public final class BodyPartHitReport {
     public static void reportDeflected(BodyPartHit hit) {
         PlayerEntity player = hit.player();
         PENDING.remove(player.getUuid());
+
+        if (!isEnabled(player)) {
+            return;
+        }
 
         player.sendMessage(Text.literal(String.format("§e[受击] §f%s §7%s §7· §b箭被弹开了",
                 partName(hit.part()), detail(hit))), false);

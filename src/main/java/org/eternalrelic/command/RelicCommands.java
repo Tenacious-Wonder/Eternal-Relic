@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import org.eternalrelic.EternalRelic;
+import org.eternalrelic.debug.BodyPartHitReport;
 import org.eternalrelic.worldgen.LittleHomeClusterConfig;
 import org.eternalrelic.worldgen.LittleHomeClusterFeature;
 import org.eternalrelic.worldgen.SurfaceRockConfig;
@@ -49,6 +50,8 @@ import net.minecraft.world.gen.feature.ConfiguredFeature;
  *   <li>{@code /relic cluster find <几栋> [半径] [跳过前几处]} —— 找最近的一处
  *       <b>实地真盖成这么多栋</b>的聚落，并把你传送过去。不填半径默认 {@value #DEFAULT_RADIUS} 格。</li>
  *   <li>{@code /relic cluster here} —— 数一数你脚下这一片实地有几栋（想亲眼核对时用）。</li>
+ *   <li>{@code /relic rock} —— 在脚下试着放一块地表岩石，放不成会说明卡在哪一关。</li>
+ *   <li>{@code /relic debug} —— 开关<b>自己的</b>部位调试输出（默认关）。</li>
  * </ul>
  */
 public final class RelicCommands {
@@ -105,9 +108,34 @@ public final class RelicCommands {
             dispatcher.register(CommandManager.literal("relic")
                     .requires(source -> source.hasPermissionLevel(2))
                     .then(cluster)
+                    .then(CommandManager.literal("debug")
+                            .executes(context -> debug(context.getSource())))
                     .then(CommandManager.literal("rock")
                             .executes(context -> rock(context.getSource()))));
         });
+    }
+
+    /**
+     * 打开或关掉自己的部位调试输出。
+     *
+     * <p>挨打时「打中哪儿、护具挡下几点」本来都是后台算的，打开之后会逐条打在聊天栏里。
+     * <b>默认关着</b>，而且<b>只认执行这条指令的人</b> —— 联机时不会把别人的聊天栏也刷满。</p>
+     *
+     * @param source 指令来源
+     * @return 指令执行结果（1 表示打开了，0 表示关掉了或没法执行）
+     */
+    private static int debug(ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        if (player == null) {
+            source.sendError(Text.literal("这条指令得由玩家来执行——挨打的是谁，输出才发给谁。"));
+            return 0;
+        }
+
+        boolean opened = BodyPartHitReport.toggle(player);
+        source.sendFeedback(() -> Text.literal(opened
+                ? "部位调试输出已打开：挨打时会在聊天栏报出打中的部位与护具挡下的点数。再敲一次就关掉。"
+                : "部位调试输出已关闭。"), false);
+        return opened ? 1 : 0;
     }
 
     /**
