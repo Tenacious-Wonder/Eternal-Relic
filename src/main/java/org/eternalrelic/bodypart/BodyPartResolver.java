@@ -63,8 +63,16 @@ public final class BodyPartResolver {
     /** 后背：躯干<b>后半</b>整块，从腰一直到肩胛，不再分上下。 */
     private static final Box BACK_BOX = new Box(-0.3, 0.7, -0.15, 0.3, 1.5, 0.0);
 
-    /** 腿与脚：合并成一段，不再细分左右。 */
-    private static final Box LEGS_BOX = new Box(-0.2, 0.0, -0.2, 0.2, 0.7, 0.2);
+    /**
+     * 右腿与右脚：身体最下面那一段里，偏向玩家<b>右手边</b>的那一半。
+     *
+     * <p>横向从 0 起、到 0.2 止——正是原来那条整腿盒子的一半。玩家一转身，
+     * 这一半跟着转到他自己的右手边，与两侧肩膀用的是同一套坐标约定。</p>
+     */
+    private static final Box RIGHT_LEG_BOX = new Box(0.0, 0.0, -0.2, 0.2, 0.7, 0.2);
+
+    /** 左腿与左脚：同一段里偏向玩家<b>左手边</b>的那一半。 */
+    private static final Box LEFT_LEG_BOX = new Box(-0.2, 0.0, -0.2, 0.0, 0.7, 0.2);
 
     /** 站立时的身高，也是下面所有盒子高度数值的基准。 */
     private static final double STANDING_HEIGHT = 1.8;
@@ -86,7 +94,8 @@ public final class BodyPartResolver {
             new PartBox(HEAD_BOX, BodyPart.HEAD),
             new PartBox(RIGHT_SHOULDER_BOX, BodyPart.RIGHT_SHOULDER),
             new PartBox(LEFT_SHOULDER_BOX, BodyPart.LEFT_SHOULDER),
-            new PartBox(LEGS_BOX, BodyPart.LEGS),
+            new PartBox(LEFT_LEG_BOX, BodyPart.LEFT_LEG),
+            new PartBox(RIGHT_LEG_BOX, BodyPart.RIGHT_LEG),
             new PartBox(CHEST_BOX, BodyPart.CHEST),
             new PartBox(ABDOMEN_BOX, BodyPart.ABDOMEN),
             new PartBox(BACK_BOX, BodyPart.BACK));

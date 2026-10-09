@@ -32,7 +32,8 @@ import net.minecraft.item.TridentItem;
  *
  * <p><b>判定用原版的类型，不写死一份物品名单</b>：这样原版添了新东西、或别的模组加了
  * 自己的装备，都会自动被认出来，不必回来补名单。几处按用户要求做了特例：
- * <b>斧</b>既算工具又算武器，<b>盾牌</b>算装备，<b>钓鱼竿 / 剪刀 / 打火石</b>算工具。</p>
+ * <b>斧</b>既算工具又算武器，<b>盾牌</b>算装备、<b>自 2026-10-06 起也算近战武器</b>
+ * （原版盾牌已补上武器属性），<b>钓鱼竿 / 剪刀 / 打火石</b>算工具。</p>
  */
 public enum AttachTarget {
 
@@ -63,12 +64,16 @@ public enum AttachTarget {
     WEAPON("武器"),
 
     /**
-     * 贴上去近身打人的东西：剑、斧、三叉戟。
+     * 贴上去近身打人的东西：剑、斧、三叉戟、<b>盾牌</b>。
      *
      * <p>与 {@link #RANGED_WEAPON} 合起来正好是 {@link #WEAPON} 的全部内容——
      * 「武器」是那一大类，这两个是它按打法分出来的两半。之所以要分，
      * 是因为有的东西只对其中一半有意义：涂在弓弩上的油加的是<b>箭的伤害</b>，
      * 缠在剑柄上的带子加的是<b>挥砍的伤害</b>，两者换过来都毫无作用。</p>
+     *
+     * <p><b>盾牌自 2026-10-06 起也算在这一类里</b>：那一天原版盾牌被补上了武器属性
+     * （见 {@code mixin/ShieldWeaponMixin}，主手 5 点伤害 / 攻速 1.2），
+     * 于是「古旧剑带」这类只认近战武器的配件也能缠到盾上去。</p>
      */
     MELEE_WEAPON("近战武器"),
 
@@ -111,11 +116,13 @@ public enum AttachTarget {
             case WEAPON -> item instanceof SwordItem
                     || item instanceof AxeItem
                     || item instanceof TridentItem
+                    || item instanceof ShieldItem
                     || item instanceof BowItem
                     || item instanceof CrossbowItem;
             case MELEE_WEAPON -> item instanceof SwordItem
                     || item instanceof AxeItem
-                    || item instanceof TridentItem;
+                    || item instanceof TridentItem
+                    || item instanceof ShieldItem;
             case RANGED_WEAPON -> item instanceof BowItem || item instanceof CrossbowItem;
             case TOOL -> item instanceof MiningToolItem
                     || item instanceof HoeItem

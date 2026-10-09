@@ -17,6 +17,7 @@ import net.minecraft.text.Text;
 import org.eternalrelic.EternalRelic;
 import org.eternalrelic.item.AotaBranchItem;
 import org.eternalrelic.item.BeastWhistleItem;
+import org.eternalrelic.item.BreakerTomeItem;
 import org.eternalrelic.item.CrackedCompassItem;
 import org.eternalrelic.item.CuratorLensItem;
 import org.eternalrelic.item.DaiksonOxygenOrbItem;
@@ -25,6 +26,8 @@ import org.eternalrelic.item.EchoRingItem;
 import org.eternalrelic.item.EchoStoneItem;
 import org.eternalrelic.item.EnchantedRabbitFootItem;
 import org.eternalrelic.item.HomestoneItem;
+import org.eternalrelic.item.HorseWhistleItem;
+import org.eternalrelic.item.HourglassVialItem;
 import org.eternalrelic.item.NightwatchEyeItem;
 import org.eternalrelic.item.PocketWatchItem;
 import org.eternalrelic.item.RedClayWaxItem;
@@ -33,6 +36,7 @@ import org.eternalrelic.item.RoundCakeItem;
 import org.eternalrelic.item.ScavengerPocketItem;
 import org.eternalrelic.item.ShepherdBellItem;
 import org.eternalrelic.item.SoulLanternItem;
+import org.eternalrelic.item.WandererGaitersItem;
 import org.eternalrelic.item.WaxSealedJournalItem;
 import org.eternalrelic.item.WeatherBottleItem;
 import org.eternalrelic.relic.NightwatchEye;
@@ -236,6 +240,123 @@ public final class ModItems {
      */
     public static final Item RED_CLAY_WAX = register("red_clay_wax",
             new RedClayWaxItem(new Item.Settings()));
+
+    /**
+     * 镀金骰子 —— 带在背包里时运气好一点的遗物。
+     *
+     * <p>幸运是原版属性，由服务端在跑掉落表与钓鱼时读取，因此这一件只需要在遗物表里登记一行，
+     * 与「干枯的四叶草」同一条路数。</p>
+     */
+    public static final Item GILDED_DIE = register("gilded_die",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 远行绑腿 —— <b>一次性道具</b>：右键把布条缠上，换来五天的脚力（移速 +12%）。
+     *
+     * <p>它已经<b>不是</b>「带在背包里就生效」的遗物了（制作者 2026-10-06 改的）：
+     * 缠上之后物品消失，加速以「远行的祝福」这条状态效果留在身上五天，
+     * 见 {@link WandererGaitersItem}。因此它登记在创造模式的<b>「消耗品」</b>那一页，
+     * 遗物表里也不再登记任何属性加成。</p>
+     *
+     * <p>可以堆叠：它是「用掉就少一个」的东西，与红土蜡块同类，因此没有设 {@code maxCount(1)}。</p>
+     */
+    public static final Item WANDERER_GAITERS = register("wanderer_gaiters",
+            new WandererGaitersItem(new Item.Settings()));
+
+    /**
+     * 炽心纹章 —— 身上带着它时，近战打中谁，谁就烧起来；缝在防具上也一样生效。
+     *
+     * <p>点火由 {@link org.eternalrelic.capability.carried.EmberheartEmblemEffect} 负责，
+     * 走的是现成的伤害事件，没有动游戏内部代码。可缝的位置见 {@code AttachableRelics}
+     * （只缝四个部位的防具，盾牌不算）。</p>
+     */
+    public static final Item EMBERHEART_EMBLEM = register("emberheart_emblem",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 沙漏药瓶总共能用几次 —— 每延长一次耗尽一点耐久，用尽之后变成空瓶。
+     *
+     * <p>这个数同时管着两件事：物品上耐久条的长度、以及能延几次。因此它写在这里、挨着物品，
+     * 而不是散在物品类里再复制一遍（与 {@link #EMBER_PENDANT_USES} 同一套做法）。</p>
+     */
+    private static final int HOURGLASS_VIAL_USES = 3;
+
+    /**
+     * 沙漏药瓶 —— 拿在手上右键，把身上所有增益各延长 9 秒；一共三次。
+     *
+     * <p>它把「还剩几次」直接做在物品自己的耐久条上：用满三次之后变成
+     * {@link #HOURGLASS_VIAL_EMPTY}，<b>不消失，也修不回来</b>。行为写在
+     * {@link HourglassVialItem} 里，走的是游戏留给右键的那个口子。</p>
+     */
+    public static final Item HOURGLASS_VIAL = register("hourglass_vial",
+            new HourglassVialItem(new Item.Settings().maxCount(1).maxDamage(HOURGLASS_VIAL_USES)));
+
+    /**
+     * 空的沙漏药瓶 —— 三次用完之后的形态，里面那点时间已经流干了。
+     *
+     * <p>它没有任何效果，也不会消失：留着它，是为了让玩家看得见「这件东西用完了」，
+     * 而不是某天发现它凭空没了（与「黯淡的余烬吊坠」同一条思路，区别只在这一件修不回来）。</p>
+     */
+    public static final Item HOURGLASS_VIAL_EMPTY = register("hourglass_vial_empty",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 剥皮小刀作武器用时的伤害修正。
+     *
+     * <p>写成 3 而不是 6：{@code SwordItem} 的伤害是「玩家基础 1 + 传入值 + 材质加成」，
+     * 铁材质的加成是 2，因此 1 + 3 + 2 = <b>6 点</b>。与两把锤子是同一套算法
+     * （见交接文档的设计决策 38）。</p>
+     */
+    private static final int SKINNING_KNIFE_DAMAGE = 3;
+
+    /** 剥皮小刀的攻速修正。玩家基础攻速是 4.0，因此 4.0 − 1.0 = <b>3.0</b>。 */
+    private static final float SKINNING_KNIFE_ATTACK_SPEED = -1.0F;
+
+    /**
+     * 剥皮小刀的耐久。
+     *
+     * <p>原版工具都是在注册时用 {@code maxDamage} 指定的、不走材料那一套
+     * （与两把锤子同一处写法）。铁材质的默认耐久是 250，这里按制作者指定的 125 写小一半。</p>
+     */
+    private static final int SKINNING_KNIFE_DURABILITY = 125;
+
+    /**
+     * 剥皮小刀 —— <b>带在背包里</b>时，击杀<b>动物</b>有机会多掉一件；它本身也是一把能用的刀。
+     *
+     * <p>它与猎人徽章是同一件事的两个范围：徽章不限对象，小刀只认动物，两者可以一起带、
+     * 各掷各的骰子。判据与加料过程见
+     * {@link org.eternalrelic.capability.carried.SkinningKnifeEffect}。</p>
+     *
+     * <p><b>「带在背包里」与「拿它去砍」是两件事</b>：额外掉落只认「身上带着它没有」，
+     * 用别的武器、甚至用弓箭远程击杀一样算数 —— <b>不必真的拿这把刀动手</b>。
+     * 做成 {@link SwordItem} 只是让它同时是一把称手的武器
+     * （制作者指定：6 点伤害、攻速 3、125 耐久）。</p>
+     */
+    public static final Item SKINNING_KNIFE = register("skinning_knife",
+            new SwordItem(ToolMaterials.IRON, SKINNING_KNIFE_DAMAGE, SKINNING_KNIFE_ATTACK_SPEED,
+                    new Item.Settings().maxDamage(SKINNING_KNIFE_DURABILITY)));
+
+    /**
+     * 唤马哨 —— 拿在手上右键，把远处的马、驴、骡叫到身边来。
+     *
+     * <p>招呼范围三百格，做法是「<b>先搬近、再让它自己跑完最后一段</b>」：原版寻路够不着太远的目标，
+     * 因此超过十二格的先传送到主人周围的安全落点，剩下的路交给它自己走。
+     * 细节与那个绕不过去的「未加载区域叫不动」限制，见
+     * {@link org.eternalrelic.capability.carried.HorseWhistleEffect}。</p>
+     */
+    public static final Item HORSE_WHISTLE = register("horse_whistle",
+            new HorseWhistleItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 破阵之书 —— <b>一次性道具</b>：右键读一遍，学会「破阵」（举盾蓄力冲刺）。
+     *
+     * <p>它本身没有任何效果。<b>学会的技能记在玩家自己身上</b>（见 {@code skill/ShieldRushSkill}），
+     * 因此把书交给别人、或者干脆把书丢了，已经学会的本事都还在。</p>
+     *
+     * <p>可以堆叠：与红土蜡块、远行绑腿同类 —— 「读掉就少一本」的东西。</p>
+     */
+    public static final Item FORMATION_BREAKER_TOME = register("formation_breaker_tome",
+            new BreakerTomeItem(new Item.Settings()));
 
     /**
      * 荆棘之誓 —— 带在身上时，把挨打实际掉的那部分血的五分之一扎回给打你的人（最多 20 点）。
@@ -504,6 +625,71 @@ public final class ModItems {
      * 月亮纹章 —— 带在身上时，夜晚持续给「生命恢复」与「速度」。
      */
     public static final Item MOON_EMBLEM = register("moon_emblem",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 雷电纹章 —— <b>雷雨天</b>时移速 +15%、攻击 +2（普通下雨不算）。
+     *
+     * <p>它的加成<b>没有写进遗物表</b>（那一栏是空的）：条件随时会变，因此由
+     * {@link org.eternalrelic.capability.carried.ConditionalAttributeEffect} 每 5 刻核对天气，
+     * 按需挂上或摘掉，条件与数值写在 {@link ConditionalRelics} 那张表里。</p>
+     *
+     * <p><b>放在背包里就生效</b>，也可以缝在装备或盾牌上（与太阳、月亮两枚纹章同一路）。</p>
+     */
+    public static final Item THUNDER_EMBLEM = register("thunder_emblem",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 无缺吊坠 —— 血量<b>满</b>时移速 +10%、攻击 +1；<b>一受伤立刻失效</b>。
+     *
+     * <p>与雷电纹章同属"条件属性"这一族：加成由
+     * {@link org.eternalrelic.capability.carried.ConditionalAttributeEffect} 每 5 刻核对，
+     * 条件写在 {@link ConditionalRelics} 里。因此挨打这件事第一次有了"坏处之外"的分量 ——
+     * 想留住加成，就得先保住满血。</p>
+     */
+    public static final Item FLAWLESS_PENDANT = register("flawless_pendant",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 噬血护符 —— <b>亲手击杀</b>生物后，按它最大生命的 10% 回血，单次最多 4 点。
+     *
+     * <p>由 {@link org.eternalrelic.capability.carried.BloodFeastEffect} 在击杀那一刻结算
+     * （走现成的击杀事件，不需要额外注入）。<b>放在背包里就生效</b>，不参与缝制。</p>
+     */
+    public static final Item BLOOD_FEAST_CHARM = register("blood_feast_charm",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 动能器柄 —— <b>连续命中同一个目标 3 次，第 4 次命中造成 1.5 倍伤害</b>。
+     *
+     * <p>由 {@link org.eternalrelic.capability.carried.KineticHiltEffect} 记账，
+     * 并由 {@link org.eternalrelic.mixin.KineticHiltMixin} 在伤害结算的入口把那个数字换掉 ——
+     * 游戏给模组的事件只能"放行或取消"，改不了伤害，因此这是全项目<b>第一件动攻击伤害的遗物</b>。
+     * <b>放在背包里就生效</b>，不参与缝制。</p>
+     */
+    public static final Item KINETIC_HILT = register("kinetic_hilt",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 绿宝石徽章 —— 与村民交易时<b>少付 25%</b>。
+     *
+     * <p>由 {@link org.eternalrelic.capability.carried.EmeraldBadgeEffect} 在玩家坐到
+     * 交易界面前后调整报价（{@link org.eternalrelic.mixin.EmeraldBadgeMixin} 挂在
+     * "谁正在交易"被设定的那一处），走的是原版给折扣用的那个字段。
+     * <b>放在背包里就生效</b>，不参与缝制。</p>
+     */
+    public static final Item EMERALD_BADGE = register("emerald_badge",
+            new RelicItem(new Item.Settings().maxCount(1)));
+
+    /**
+     * 末影吊坠 —— <b>末影人不会因为你盯着它而发怒</b>（动手打它照样还手）。
+     *
+     * <p>由 {@link org.eternalrelic.mixin.EnderPendantMixin} 拦在
+     * "这位玩家在盯着我吗"那一处，判定写在
+     * {@link org.eternalrelic.capability.carried.EnderPendantEffect} 里。
+     * <b>放在背包里就生效</b>，不参与缝制。</p>
+     */
+    public static final Item ENDER_PENDANT = register("ender_pendant",
             new RelicItem(new Item.Settings().maxCount(1)));
 
     /**
@@ -840,6 +1026,7 @@ public final class ModItems {
         AttachableRelics.register();
         ChestGuards.register();
         DayNightEmblems.register();
+        ConditionalRelics.register();
         EnchantingRelics.register();
         VanillaMaterialRarities.register();
         VanillaItemGrades.register();
@@ -853,7 +1040,7 @@ public final class ModItems {
         registerGroup(MATERIAL_GROUP_KEY, HAMMER);
 
         // ==================== 装备配件（缝在装备与武器上）====================
-        // 排序：先按小类聚拢（甲片 → 内衬 → 肩甲 → 胸甲片 → 斗篷 → 武器涂装），
+        // 排序：先按小类聚拢（甲片 → 内衬 → 肩甲 → 胸甲片 → 斗篷 → 武器涂装 → 器柄），
         // 每个小类内部再按稀有度从低到高；肩甲内部按 左 / 右 / 整套 挨着排
         ItemGroupEvents.modifyEntriesEvent(ARMOR_FITTING_GROUP_KEY).register(entries -> {
             // 甲片
@@ -893,6 +1080,9 @@ public final class ModItems {
             // 武器涂装
             entries.add(OLD_BOW_OIL);                      // 古旧弓油（碎屑，涂在弓弩上）
             entries.add(OLD_SWORD_BAND);                   // 古旧剑带（碎屑，缠在近战武器上）
+
+            // 器柄（附在武器与工具上）
+            entries.add(KINETIC_HILT);                     // 动能器柄（粗石，附在武器或工具上）
         });
 
         // ==================== 佩饰（挂在身上、随身携带的小件）====================
@@ -904,11 +1094,14 @@ public final class ModItems {
             entries.add(TRAVELER_PENDANT);           // 旅人吊坠（粗石）
             entries.add(DREADFUL_WOLF_FANG_PENDANT); // 可怕狼牙吊坠（粗石）
             entries.add(REVERSAL_PENDANT);           // 颠倒吊坠（粗石）
+            entries.add(FLAWLESS_PENDANT);           // 无缺吊坠（粗石，满血时加成）
+            entries.add(ENDER_PENDANT);              // 末影吊坠（成材，末影人不主动攻击）
             entries.add(EMBER_PENDANT);              // 余烬吊坠（精萃）
             entries.add(EMBER_PENDANT_DULL);         // 黯淡的余烬吊坠（精萃）
 
             // 护符
             entries.add(FADED_CHARM);                // 褪色的护身符（碎屑）
+            entries.add(GILDED_DIE);                 // 镀金骰子（粗石）
 
             // 符石
             entries.add(NATURAL_RUNE);               // 平凡的自然符石（碎屑）
@@ -923,6 +1116,7 @@ public final class ModItems {
             // 徽章
             entries.add(HUNTER_BADGE);               // 猎人徽章（粗石）
             entries.add(LIGHTWEIGHT_SHIELD_BADGE);   // 轻巧盾徽（成材）
+            entries.add(EMERALD_BADGE);              // 绿宝石徽章（精萃，村民交易折扣）
 
             // 草药
             entries.add(DRIED_CLOVER);               // 干枯的四叶草（碎屑）
@@ -933,9 +1127,13 @@ public final class ModItems {
             // 成材
             entries.add(COURAGE_EMBLEM);         // 勇气纹章
             entries.add(SUN_EMBLEM);             // 太阳纹章
+            entries.add(THUNDER_EMBLEM);         // 雷电纹章（条件属性：雷雨天）
             entries.add(MOON_EMBLEM);            // 月亮纹章
             entries.add(STREAM_EMBLEM);          // 川流纹章
             entries.add(BLOOM_EMBLEM);           // 繁花纹章
+
+            // 精萃
+            entries.add(EMBERHEART_EMBLEM);      // 炽心纹章
 
             // 至宝
             entries.add(ETERNAL_EMBLEM);         // 永恒纹章
@@ -960,6 +1158,9 @@ public final class ModItems {
             // 护身器物
             entries.add(HOMESTONE);              // 归乡石（精萃）
             entries.add(AOTA_BRANCH);            // 奥塔的枝叶（珍品）
+            // ⚠️ 噬血护符（BLOOD_FEAST_CHARM）暂时下架：制作者 2026-10-07 要求"先藏起来"。
+            // 物品本身仍然注册着，把下面这一行放开就能重新上架（上架时它就排在这一组）
+            // entries.add(BLOOD_FEAST_CHARM);   // 噬血护符（粗石，击杀回血）
             entries.add(ECHO_RING);              // 回响之环（珍品）
             entries.add(ECHO_RING_DRAINED);      // 回响之环（碎裂）
             entries.add(THORNS_OATH);            // 荆棘之誓（珍品）
@@ -982,12 +1183,20 @@ public final class ModItems {
 
             // 装置
             entries.add(DAIKSON_OXYGEN_ORB);     // 戴克森应急制氧球（成材）
+            entries.add(HOURGLASS_VIAL);         // 沙漏药瓶（成材）
+            entries.add(HOURGLASS_VIAL_EMPTY);   // 空的沙漏药瓶（成材）
+
+            // 手里的小工具
+            entries.add(SKINNING_KNIFE);         // 剥皮小刀（碎屑）
+            entries.add(HORSE_WHISTLE);          // 唤马哨（碎屑）
         });
 
         // ==================== 消耗品（用掉就没的东西）====================
         ItemGroupEvents.modifyEntriesEvent(CONSUMABLE_GROUP_KEY).register(entries -> {
             entries.add(ROUND_CAKE);             // 一个圆形的饼
             entries.add(RED_CLAY_WAX);           // 红土蜡块（粗石）
+            entries.add(WANDERER_GAITERS);       // 远行绑腿（一次性道具，粗石）
+            entries.add(FORMATION_BREAKER_TOME); // 破阵之书（技能书，成材）
         });
 
         // ==================== 材料与工具 ====================

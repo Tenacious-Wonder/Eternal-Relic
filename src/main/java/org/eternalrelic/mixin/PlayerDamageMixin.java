@@ -9,6 +9,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.eternalrelic.bodypart.BodyPart;
 import org.eternalrelic.bodypart.RecentBodyPartHit;
 import org.eternalrelic.capability.attached.ChestGuardEffect;
+import org.eternalrelic.capability.attached.ShieldWarding;
 import org.eternalrelic.capability.carried.ReversalPendantEffect;
 import org.eternalrelic.capability.carried.ThornsOathEffect;
 import org.eternalrelic.debug.BodyPartHitReport;
@@ -89,7 +90,12 @@ public abstract class PlayerDamageMixin {
         // 按部位的减伤：胸甲上缝着的护具各减几点，**可以扣到 0**——挡下轻击本来就是护具的本事
         float blocked = ChestGuardEffect.reductionFor(player, part);
 
-        float guarded = Math.max(0.0F, amount - blocked);
+        // 盾牌侧翼防护：**没举盾**时，主手的盾护右边、副手的盾护左边，各减 3 点并磨一点盾牌耐久。
+        // 与护具是两套互不相干的账：护具护的是"胸甲上缝的那一块"，盾护的是"这一击从哪一侧来"，
+        // 因此两者**相加**扣除（各算各的，谁也没占谁的便宜）。
+        float warded = blocked + ShieldWarding.blockFor(player, part, source, amount);
+
+        float guarded = Math.max(0.0F, amount - warded);
 
         // 魔法减伤另算，而且**至少给对方留 1 点**。
         //

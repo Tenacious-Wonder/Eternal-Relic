@@ -33,6 +33,8 @@ public class EternalRelicClient implements ClientModInitializer {
         RelicScreenOpener.register();
         SoulLanternKey.register();
         WindCloakJump.register();
+        ShieldRushCharge.register();
+        EveEnergyHud.register();
         DaiksonOxygenOrbModel.register();
         SoulLanternGlow.register();
         SoulFlameClientNetwork.register();

@@ -9,6 +9,7 @@ import net.minecraft.world.World;
 import org.eternalrelic.capability.carried.CarriedStacks;
 import org.eternalrelic.capability.using.CuratorLensEffect;
 import org.eternalrelic.capability.worn.WornRelicEffect;
+import org.eternalrelic.energy.EveEnergy;
 import org.eternalrelic.registry.ModItems;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -56,6 +57,12 @@ public abstract class PlayerEntityMixin {
 
         if (stack.isOf(Items.GOLDEN_APPLE) || stack.isOf(Items.ENCHANTED_GOLDEN_APPLE)) {
             WornRelicEffect.releaseAll((PlayerEntity) (Object) this);
+
+            // 金苹果同时也补 EVE 能量（制作者 2026-10-06 定）：普通 +50、附魔 +100（正好补满）。
+            // 与"取下义眼"是两件互不相干的事，各做各的
+            if ((Object) this instanceof ServerPlayerEntity serverPlayer) {
+                EveEnergy.restoreFromGoldenApple(serverPlayer, stack.isOf(Items.ENCHANTED_GOLDEN_APPLE));
+            }
         }
     }
 

@@ -318,6 +318,119 @@ public final class ModRelics {
             MaterialRarity.ROUGH_STONE);
 
     /**
+     * 镀金骰子 —— 带在背包里时幸运 +2。
+     *
+     * <p>与「干枯的四叶草」（幸运 +1）同一条路数，只是这一枚成色更好、给得更多。
+     * 幸运由游戏在跑掉落表与钓鱼时读取，本模组不必再做任何事。</p>
+     *
+     * <p>固有稀有度为粗石：一枚坠手的骰子，谈不上稀罕，但确实好用。</p>
+     */
+    public static final RelicDefinition GILDED_DIE = define(
+            ModItems.GILDED_DIE,
+            MaterialRarity.ROUGH_STONE,
+            RelicEffect.flat(RelicAttribute.LUCK, 2.0D));
+
+    /**
+     * 远行绑腿 —— <b>一次性道具</b>：右键缠上，换来五天的脚力（移速 +12%）。
+     *
+     * <p><b>它没有任何属性加成</b>（制作者 2026-10-06 从「带在身上就加速」改成一次性道具）：
+     * 物品一用就消失，加速由「远行的祝福」这条状态效果承担 —— 见
+     * {@code registry/ModStatusEffects} 与 {@link org.eternalrelic.item.WandererGaitersItem}。
+     * 这里只登记身份与成色。</p>
+     *
+     * <p>固有稀有度为粗石：一双结实的绑腿，走长路的人都会缠一副。</p>
+     */
+    public static final RelicDefinition WANDERER_GAITERS = define(
+            ModItems.WANDERER_GAITERS,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 炽心纹章 —— 身上带着它时，近战打中谁，谁就烧起来。
+     *
+     * <p><b>放在背包里就生效</b>，缝在正穿着的防具上也生效（走 {@code define}，
+     * 由 {@link org.eternalrelic.capability.carried.EmberheartEmblemEffect} 判定）。
+     * 它<b>没有任何属性加成</b>，价值全在那一次点火上。</p>
+     *
+     * <p>★ <b>纹章的通用口径（制作者 2026-10-06 定，做新纹章时照这条走）</b>：
+     * <b>除了「给附着物补附魔」的那几枚（走 {@code EnchantingRelics}，必须缝上去才有对象可补），
+     * 其余纹章一律「放在背包里就生效」</b>，缝在装备上只是多一条生效途径、不是前提。
+     * 因此新纹章不要顺手写成 {@code defineAttachmentOnly} —— 那条路是留给装备配件（甲片 / 内衬 /
+     * 肩甲 / 胸甲片 / 斗篷）的。</p>
+     *
+     * <p><b>只认近战</b>：判据是「伤害的直接来源就是玩家本人」，因此箭与火球点不着对手
+     * ——这与近战受击部位判定用的是同一把尺子。</p>
+     *
+     * <p>固有稀有度为精萃：原版火焰附加 II 是 8 秒，它每次都给 10 秒，而且不占附魔位。</p>
+     */
+    public static final RelicDefinition EMBERHEART_EMBLEM = define(
+            ModItems.EMBERHEART_EMBLEM,
+            MaterialRarity.ESSENCE);
+
+    /**
+     * 沙漏药瓶 —— 右键把身上所有增益各延长 9 秒；一共三次，用尽变成空瓶。
+     *
+     * <p>它<b>没有携带效果</b>：要点一下才生效，因此真正那件事写在
+     * {@link org.eternalrelic.item.HourglassVialItem} 里，这里只登记身份与成色。</p>
+     *
+     * <p>固有稀有度为成材：一次能给两三条药水续命，关键时刻真能救人。</p>
+     */
+    public static final RelicDefinition HOURGLASS_VIAL = define(
+            ModItems.HOURGLASS_VIAL,
+            MaterialRarity.LUMBER);
+
+    /**
+     * 空的沙漏药瓶 —— 三次用完之后的形态，一点效果也没有。
+     *
+     * <p>登记进遗物表只为一件事：<b>效果说明只有遗物界面会显示，而界面要求物品在遗物表里</b>。
+     * 它的 {@code effect} 与 {@code ward} 都是空的，因此不会带来任何额外效果
+     * （与「碎裂的回响之环」「黯淡的余烬吊坠」同一套做法）。</p>
+     */
+    public static final RelicDefinition HOURGLASS_VIAL_EMPTY = define(
+            ModItems.HOURGLASS_VIAL_EMPTY,
+            MaterialRarity.LUMBER);
+
+    /**
+     * 剥皮小刀 —— 带在背包里时，击杀动物有机会多掉一件。
+     *
+     * <p>与猎人徽章共用掉落表那一处注入，两者可以一起带、各掷各的骰子。
+     * 判据（只认动物）与加料过程见
+     * {@link org.eternalrelic.capability.carried.SkinningKnifeEffect}。</p>
+     *
+     * <p>固有稀有度为<b>碎屑</b>：一把用得旧了的小刀，算不上什么稀罕物件
+     * （制作者 2026-10-06 从粗石降下来）。</p>
+     */
+    public static final RelicDefinition SKINNING_KNIFE = define(
+            ModItems.SKINNING_KNIFE,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 唤马哨 —— 右键把三百格内的马、驴、骡叫到身边来。
+     *
+     * <p>没有携带效果：要点一下才生效。做法是「先搬近、再让它们自己跑完最后一段」，
+     * 见 {@link org.eternalrelic.capability.carried.HorseWhistleEffect}。</p>
+     *
+     * <p>固有稀有度为<b>碎屑</b>：一个能吹响的哨子，出门在外的人腰间都挂一个
+     * （制作者 2026-10-06 从粗石降下来）。</p>
+     */
+    public static final RelicDefinition HORSE_WHISTLE = define(
+            ModItems.HORSE_WHISTLE,
+            MaterialRarity.DEBRIS);
+
+    /**
+     * 破阵之书 —— <b>一次性道具</b>：右键读一遍，学会「破阵」（举盾蓄力冲刺）。
+     *
+     * <p><b>它没有任何携带效果</b>：真正那件事是"教出一门手艺"，而手艺记在玩家自己身上
+     * （见 {@code skill/ShieldRushSkill}）。登记进遗物表还有一个实际用处 ——
+     * <b>只有登记了，玩家才能在遗物界面（按 Shift）里读到用法</b>，
+     * 与「黯淡的余烬吊坠」「空的沙漏药瓶」同一套做法。</p>
+     *
+     * <p>固有稀有度为成材：一门能反复用的手艺，比一件用完就没的东西贵重。</p>
+     */
+    public static final RelicDefinition FORMATION_BREAKER_TOME = define(
+            ModItems.FORMATION_BREAKER_TOME,
+            MaterialRarity.LUMBER);
+
+    /**
      * 荆棘之誓 —— 带在身上时，把挨打时<b>实际掉的那部分血</b>的五分之一扎回给打你的人（最多 20 点）。
      *
      * <p>它<b>没有任何属性加成</b>，也不替玩家挡伤害：价值全在「动手的人也要付代价」上，
@@ -975,6 +1088,90 @@ public final class ModRelics {
      */
     public static final RelicDefinition MOON_EMBLEM = define(
             ModItems.MOON_EMBLEM,
+            MaterialRarity.LUMBER);
+
+    /**
+     * 雷电纹章 —— <b>雷雨天</b>时移速 +15%、攻击 +2（普通下雨不算）。
+     *
+     * <p><b>效果一栏是空的</b>：它的加成看天气，一天要挂上摘下好几回，因此走
+     * {@link org.eternalrelic.capability.carried.ConditionalAttributeEffect} 加
+     * {@link ConditionalRelics} 那一路 —— 与巡夜斗篷（看天色）同一个道理，
+     * 只是那一件独用一个能力类，这一族共用一张表。</p>
+     *
+     * <p>固有稀有度为成材：与太阳、月亮同一档的蜡制纹章。</p>
+     */
+    public static final RelicDefinition THUNDER_EMBLEM = define(
+            ModItems.THUNDER_EMBLEM,
+            MaterialRarity.LUMBER);
+
+    /**
+     * 无缺吊坠 —— 血量<b>满</b>时移速 +10%、攻击 +1；<b>一受伤立刻失效</b>。
+     *
+     * <p>同样没有属性加成写在这张表里，走条件遗物那一路。稀有度定为粗石：
+     * 它不给"更多东西"，只把"保住满血"变成一件有回报的事 ——
+     * 在此之前，挨打对玩家只有坏处。</p>
+     */
+    public static final RelicDefinition FLAWLESS_PENDANT = define(
+            ModItems.FLAWLESS_PENDANT,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 噬血护符 —— <b>亲手击杀</b>生物后，按它最大生命的 10% 回血，单次最多 4 点。
+     *
+     * <p>它<b>没有属性加成</b>，价值全在击杀那一刻的续航上，由
+     * {@link org.eternalrelic.capability.carried.BloodFeastEffect} 结算
+     * （走的是现成的击杀事件，不需要额外注入）。</p>
+     *
+     * <p>稀有度定为粗石：与无缺吊坠同一档 —— 两件都是"改变一处小取舍"的护符，
+     * 而不是"给更多东西"。</p>
+     */
+    public static final RelicDefinition BLOOD_FEAST_CHARM = define(
+            ModItems.BLOOD_FEAST_CHARM,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 动能器柄 —— 附在<b>武器或工具</b>上，连着命中同一个目标 3 次，第 4 次造成 <b>1.5 倍</b>伤害。
+     *
+     * <p><b>只认附着</b>（制作者 2026-10-07 定）：放在背包里不算，必须让它真的长在某件武器或工具上。
+     * 因此这里用 {@code defineAttachmentOnly}；至于"能附到哪几类东西上"，由
+     * {@link AttachableRelics} 那一行限定（武器与工具两类）。</p>
+     *
+     * <p>它<b>没有属性加成</b>（改的是"某一击的伤害"，不是一条持续属性），
+     * 也不在挨打时做任何事：价值全在平砍的节奏上，由
+     * {@link org.eternalrelic.capability.carried.KineticHiltEffect}（记账）与
+     * {@link org.eternalrelic.mixin.KineticHiltMixin}（换掉伤害数字）一起完成。</p>
+     *
+     * <p>稀有度定为粗石：它不改数值面板，只把"一直用同一件东西打同一个人"这件小事串起来。</p>
+     */
+    public static final RelicDefinition KINETIC_HILT = defineAttachmentOnly(
+            ModItems.KINETIC_HILT,
+            MaterialRarity.ROUGH_STONE);
+
+    /**
+     * 绿宝石徽章（原名"绿宝石徽章"）—— 与村民交易时<b>少付 25%</b>。
+     *
+     * <p><b>没有属性加成</b>，价值全在交易价格上，由
+     * {@link org.eternalrelic.capability.carried.EmeraldBadgeEffect}（算折扣、记原价）与
+     * {@link org.eternalrelic.mixin.EmeraldBadgeMixin}（在正确的时刻叫它）一起完成。</p>
+     *
+     * <p>稀有度从<b>粗石提升为精萃</b>（制作者 2026-10-07 定）：它给的不是战力，
+     * 而是"在这世界的人情往来里少花四分之一"—— 按"改变了多宽的玩法面"来评，这一条够得上精萃。</p>
+     */
+    public static final RelicDefinition EMERALD_BADGE = define(
+            ModItems.EMERALD_BADGE,
+            MaterialRarity.ESSENCE);
+
+    /**
+     * 末影吊坠 —— <b>末影人不会因为你盯着它而发怒</b>（动手打它照样还手）。
+     *
+     * <p><b>没有属性加成</b>：它改的是另一种生物的一次判断，由
+     * {@link org.eternalrelic.mixin.EnderPendantMixin} 与
+     * {@link org.eternalrelic.capability.carried.EnderPendantEffect} 完成。</p>
+     *
+     * <p>稀有度定为成材：与可怕狼牙吊坠（镇住野狼）同一档 —— 都是"与某种生物讲和"。</p>
+     */
+    public static final RelicDefinition ENDER_PENDANT = define(
+            ModItems.ENDER_PENDANT,
             MaterialRarity.LUMBER);
 
     /**

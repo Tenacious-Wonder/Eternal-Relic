@@ -79,6 +79,15 @@ public final class AttachableRelics {
                 AttachTarget.WEAPON,
                 AttachTarget.TOOL);
 
+        // 动能器柄：金属制的，配铁粒；只能附在**武器与工具**上（制作者 2026-10-07 定）——
+        // 它记的是"同一件东西连着打同一个目标"的节奏，附在防具上毫无意义
+        RelicAttachment.register(
+                ModItems.KINETIC_HILT,
+                Items.IRON_NUGGET,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.WEAPON,
+                AttachTarget.TOOL);
+
         // 川流纹章：蜡制的，配蜜脾；只钉头盔与靴子——它给的两条附魔分别只对这两个部位有意义
         RelicAttachment.register(
                 ModItems.STREAM_EMBLEM,
@@ -289,6 +298,14 @@ public final class AttachableRelics {
                 RelicAttachment.Stacking.NONE,
                 AttachTarget.ARMOR);
 
+        // 雷电纹章：与太阳、月亮同一路（蜡制、配蜜脾），能缝在四个部位的防具与盾牌上。
+        // 它看的是天气，与那两枚看时段的不冲突，可以同时钉着
+        RelicAttachment.register(
+                ModItems.THUNDER_EMBLEM,
+                Items.HONEYCOMB,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.ARMOR);
+
         // 古旧弓油：黏糊糊的一层油，配黏液球；只涂在弓弩上。
         // ★ 登记为**普通遗物**而不是「装备配件」：配件那一套（分类别、只能在胸甲台上装）
         // 是给盔甲配件准备的；油与带子是缝在**武器**上的，走遗物这条路——
@@ -324,5 +341,15 @@ public final class AttachableRelics {
                 Items.IRON_INGOT,
                 RelicAttachment.Stacking.NONE,
                 AttachTarget.SHIELD);
+
+        // 炽心纹章：蜡制的，配蜜脾；**只缝四个部位的防具**（盾牌不算）——
+        // 它管的是「你挥拳打中谁」，钉在盾牌上说不通。
+        // ★ 它「只认附着份」：放在背包里完全没有用，登记在遗物表那一侧（defineAttachmentOnly）。
+        // 纹章不填类别，因此它可以与别的纹章、以及肩甲内衬那类配件同时待在一件防具上
+        RelicAttachment.register(
+                ModItems.EMBERHEART_EMBLEM,
+                Items.HONEYCOMB,
+                RelicAttachment.Stacking.NONE,
+                AttachTarget.ARMOR_PIECE);
     }
 }

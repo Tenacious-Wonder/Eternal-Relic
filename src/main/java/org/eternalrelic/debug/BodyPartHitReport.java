@@ -139,7 +139,8 @@ public final class BodyPartHitReport {
             case CHEST -> "正胸";
             case ABDOMEN -> "腹部";
             case BACK -> "后背";
-            case LEGS -> "腿部";
+            case LEFT_LEG -> "左腿";
+            case RIGHT_LEG -> "右腿";
         };
     }
 

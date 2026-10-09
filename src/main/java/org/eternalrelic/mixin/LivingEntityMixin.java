@@ -19,6 +19,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.eternalrelic.capability.carried.BeeswaxPendantEffect;
 import org.eternalrelic.capability.carried.HunterBadgeEffect;
 import org.eternalrelic.capability.carried.SilentBootsEffect;
+import org.eternalrelic.capability.carried.SkinningKnifeEffect;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * 传进来，因此这里既认得出「是谁下的」，也认得出「下的是什么效果」；其余任何来源
  * （药水、毒箭、洞穴蜘蛛、毒土豆）传进来的来源不是蜜蜂，一律放行。</p>
  *
- * <p><b>猎人徽章为什么挂在这里</b>：生物掉什么是游戏照它自己的掉落表算出来的，模组没有
+ * <p><b>猎人徽章与剥皮小刀为什么挂在这里</b>：生物掉什么是游戏照它自己的掉落表算出来的，模组没有
  * 可以监听的事件，因此守在「跑掉落表」那一次调用上。用的是
  * {@code @WrapOperation}（包一层）而不是把它顶掉——那一步别的模组也可能动，
  * 包一层可以多家并存，顶掉则会在启动时报错。</p>
@@ -62,10 +63,13 @@ public abstract class LivingEntityMixin {
     }
 
     /**
-     * 跑掉落表那一步：击杀者是带着猎人徽章的玩家且掷骰命中时，额外多掉一件战利品。
+     * 跑掉落表那一步：击杀者是带着猎人徽章 / 剥皮小刀的玩家且掷骰命中时，额外多掉一件战利品。
      *
-     * <p>命中的处理是「先照原样让游戏掉完，再从这一次掉出来的东西里挑一样多给一个」——
-     * 挑的过程交给 {@link HunterBadgeEffect}，本方法只负责把掉落清单接住。</p>
+     * <p><b>两件遗物共用这一处注入</b>：徽章不限对象、小刀只认动物，各掷各的骰子，
+     * 因此可能同时命中、一次多掉两件。判断分别交给 {@link HunterBadgeEffect} 与
+     * {@link SkinningKnifeEffect}，本方法只负责把掉落清单接住。</p>
+     *
+     * <p>命中的处理是「先照原样让游戏掉完，再从这一次掉出来的东西里挑一样多给一个」。</p>
      *
      * @param lootTable  这张生物自己的掉落表
      * @param parameters 游戏已经算好的掉落上下文（幸运、击杀条件都在里面）
@@ -78,20 +82,34 @@ public abstract class LivingEntityMixin {
             method = "dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContextParameterSet;JLjava/util/function/Consumer;)V"))
-    private void eternal_relic$hunterBadgeExtraItem(LootTable lootTable, LootContextParameterSet parameters, long seed,
-                                                    Consumer<ItemStack> consumer, Operation<Void> original,
-                                                    @Local(argsOnly = true) DamageSource source) {
-        ServerPlayerEntity hunter = HunterBadgeEffect.hunterOf(source);
+    private void eternal_relic$extraLootFromRelics(LootTable lootTable, LootContextParameterSet parameters, long seed,
+                                                   Consumer<ItemStack> consumer, Operation<Void> original,
+                                                   @Local(argsOnly = true) DamageSource source) {
+        // 这只生物自己：mixin 的目标就是它
+        LivingEntity victim = (LivingEntity) (Object) this;
 
-        // 没带徽章、不是玩家击杀、或者这次没命中：一步都不多走，原样放行。
-        if (hunter == null || !HunterBadgeEffect.rollsExtra(hunter)) {
+        ServerPlayerEntity hunter = HunterBadgeEffect.hunterOf(source);
+        boolean badgeHit = hunter != null && HunterBadgeEffect.rollsExtra(hunter);
+
+        ServerPlayerEntity skinner = SkinningKnifeEffect.skinnerOf(source, victim);
+        boolean knifeHit = skinner != null && SkinningKnifeEffect.rollsExtra(skinner);
+
+        // 两件都没命中（没带、不是玩家击杀、或者这次没掷中）：一步都不多走，原样放行。
+        if (!badgeHit && !knifeHit) {
             original.call(lootTable, parameters, seed, consumer);
             return;
         }
 
         HunterBadgeEffect.Collector collector = new HunterBadgeEffect.Collector(consumer);
         original.call(lootTable, parameters, seed, collector);
-        HunterBadgeEffect.dropExtraItem(hunter, collector.collected(), consumer);
+
+        if (badgeHit) {
+            HunterBadgeEffect.dropExtraItem(hunter, collector.collected(), consumer);
+        }
+
+        if (knifeHit) {
+            SkinningKnifeEffect.dropExtraItem(skinner, collector.collected(), consumer);
+        }
     }
 
     /**

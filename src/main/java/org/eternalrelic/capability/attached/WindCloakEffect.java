@@ -42,10 +42,13 @@ public final class WindCloakEffect {
     /**
      * 二段跳给的向上初速。
      *
-     * <p>取的正是原版跳跃的那一个数（{@code 0.42}），因此第二段跳蹬起来<b>与第一段同高</b>——
-     * 比它小会显得"没劲"，比它大会让披风变成一件登山工具。</p>
+     * <p>原版跳跃用的是 {@code 0.42}，约合 <b>1.25 格</b>高；制作者 2026-10-06 要求
+     * 「蹬起来要有两格」，因此这里取 <b>{@code 0.53}</b>。</p>
+     *
+     * <p>这个数不是随手写的：**跳起的高度与初速的平方成正比**，
+     * 于是 {@code 0.42 × √(2 ÷ 1.25) ≈ 0.53}。想再调时照这个式子算，别凭感觉加。</p>
      */
-    private static final double JUMP_VELOCITY = 0.42D;
+    private static final double JUMP_VELOCITY = 0.53D;
 
     /** 这次离地已经用过二段跳的玩家。落地即从这张表里移走。 */
     private static final Set<UUID> USED_SINCE_GROUND = new HashSet<>();

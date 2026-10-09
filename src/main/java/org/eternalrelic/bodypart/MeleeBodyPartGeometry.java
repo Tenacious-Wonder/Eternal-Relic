@@ -82,12 +82,15 @@ public final class MeleeBodyPartGeometry {
     /**
      * 每个部位「从哪一边才够得着」。
      *
-     * <p>没登记在这里的部位<b>从哪一边都够得着</b>：后脑勺也是头，从背后砍腿一样砍得着，
-     * 头与腿脚本来就没有背面可言。</p>
+     * <p>没登记在这里的部位<b>从哪一边都够得着</b>：后脑勺也是头，从背后砍过来一样够得着头部
+     * —— 头本来就没有背面可言。<b>两条腿与两侧肩膀是同一套规矩</b>：站在你右边的人够不着你的左腿
+     * （腿原先是一整块、哪边都够得着，制作者 2026-10-06 要求拆开之后才登记上这一条）。</p>
      */
     private static final Map<BodyPart, Facing> FACINGS = Map.of(
             BodyPart.LEFT_SHOULDER, new Facing(-1.0, 0.0, SIDE_REACH),
             BodyPart.RIGHT_SHOULDER, new Facing(1.0, 0.0, SIDE_REACH),
+            BodyPart.LEFT_LEG, new Facing(-1.0, 0.0, SIDE_REACH),
+            BodyPart.RIGHT_LEG, new Facing(1.0, 0.0, SIDE_REACH),
             BodyPart.ABDOMEN, new Facing(0.0, 1.0, DEPTH_REACH),
             BodyPart.CHEST, new Facing(0.0, 1.0, DEPTH_REACH),
             BodyPart.BACK, new Facing(0.0, -1.0, DEPTH_REACH));
